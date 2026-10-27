@@ -1,0 +1,300 @@
+﻿reference_id,kind,description,source_locator,operation_ids,screen,related_reference_ids,historical_status,current_policy
+R001,PDF_REQUIREMENT_CONTEXT,Đăng ký/xác minh email trường; các trang 70-72 ghi giảng viên cấp tài khoản.,"requirements.pdf p.23,49,70-72",,/login; /account-help,C01,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R002,PDF_REQUIREMENT_CONTEXT,Đăng nhập bằng email và mật khẩu; device_id bắt buộc.,"requirements.pdf p.23,73",login;getMyProfile,/login,"C09,C12",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R003,PDF_REQUIREMENT_CONTEXT,Đăng xuất và kết thúc phiên thiết bị.,requirements.pdf p.74,logout,/settings/security,C09,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R004,PDF_REQUIREMENT_CONTEXT,Đổi mật khẩu bằng mật khẩu cũ và mới.,requirements.pdf p.75,changePassword,/settings/security,C12,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R005,PDF_REQUIREMENT_CONTEXT,Khôi phục mật khẩu: chú thích giảng viên reset theo yêu cầu SV.,requirements.pdf p.76,,/account-help,C01,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R006,PDF_REQUIREMENT_CONTEXT,Refresh trả access token và refresh token mới khác token cũ.,requirements.pdf p.77,refreshToken,Auth boundary,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R007,PDF_REQUIREMENT_CONTEXT,Xem hồ sơ bản thân và các chỉ số học tập/xã hội.,requirements.pdf p.78-80,getMyProfile,/me,"C09,C23",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R008,PDF_REQUIREMENT_CONTEXT,Xem hồ sơ người khác và trạng thái quan hệ.,requirements.pdf p.81-83,getUserProfile;getRelationshipStats,/users/:userId,"C09,C24",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R009,PDF_REQUIREMENT_CONTEXT,Cập nhật ít nhất một trường full_name/avatar_url/cover_url/bio.,requirements.pdf p.84,updateMyProfile,/settings/profile,C23,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R010,PDF_REQUIREMENT_CONTEXT,"Phần yêu cầu cấm tự xóa tài khoản, phần API lại có DELETE /users/me.","requirements.pdf p.29,50,85",deleteMyProfile,/settings/security (chờ),C05,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R011,PDF_REQUIREMENT_CONTEXT,Đăng ký push device; DELETE devices/register chỉ được gọi phía server.,requirements.pdf p.86-87,syncFid;unregisterFid;getMyDevices,/settings/devices,C13,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R012,PDF_REQUIREMENT_CONTEXT,Màn hình đăng nhập không lưu/chứa nhiều tài khoản để lựa chọn.,requirements.pdf p.28,login,/login,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R013,PDF_REQUIREMENT_CONTEXT,Đăng bài; giới hạn 500 từ; schema payload phải được thống nhất.,"requirements.pdf p.23,132-133",createPost,/posts/new,"C06,C09,C14",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R014,PDF_REQUIREMENT_CONTEXT,Tối đa 4 ảnh khi chấm BTL; trang 23 nói số ảnh không giới hạn.,"requirements.pdf p.23,27,67",createPost;uploadMedia;getPresignedUrls,PostComposer,C10,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R015,PDF_REQUIREMENT_CONTEXT,Ảnh tối đa 4MB; không ảnh động.,"requirements.pdf p.27,157-158",uploadMedia;getPresignedUrls,MediaPicker,C10,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R016,PDF_REQUIREMENT_CONTEXT,Public duy nhất ở trang 23; trang 43 mô tả chia sẻ riêng với bạn bè.,"requirements.pdf p.23,43",createPost;getPost;getUserPosts;updatePost,PostVisibility,C06,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R017,PDF_REQUIREMENT_CONTEXT,Người không bị chặn xem/like/comment; chặn phải ngăn truy cập.,"requirements.pdf p.23-24,33",getPost;createComment;toggleReact;blockUser;getUserPosts,PostDetail,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R018,PDF_REQUIREMENT_CONTEXT,Tác giả sửa bài; cần ít nhất content hoặc media_urls.,"requirements.pdf p.27,136",updatePost,/posts/:postId/edit,"C09,C14",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R019,PDF_REQUIREMENT_CONTEXT,Tác giả xóa bài; trở về trang phù hợp sau thao tác.,"requirements.pdf p.27,138",deletePost,/posts/:postId,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R020,PDF_REQUIREMENT_CONTEXT,Sau tạo/sửa/xóa điều hướng về trang phù hợp theo kịch bản.,requirements.pdf p.27,createPost;updatePost;deletePost,Post mutation navigation,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R021,PDF_REQUIREMENT_CONTEXT,"Xem video học tập do giảng viên đăng, lọc môn học.","requirements.pdf p.27,56,139",getVideoPosts;createPost,/videos,"C15,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R022,PDF_REQUIREMENT_CONTEXT,Giảng viên thêm ghi chú chuyên môn vào bài.,requirements.pdf p.137,updateLecturerNote,PostDetail,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R023,PDF_REQUIREMENT_CONTEXT,Bình luận bài/phiên/câu hỏi và reply; tối đa 500 từ.,"requirements.pdf p.23,140-141",createComment;getComments,CommentThread,C14,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R024,PDF_REQUIREMENT_CONTEXT,Trang 25 cấm chủ bình luận sửa; trang 144 mô tả sửa.,"requirements.pdf p.25,57,144",updateComment,CommentActions (chờ),C02,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R025,PDF_REQUIREMENT_CONTEXT,Chủ bài không được xóa bình luận của người khác; chủ comment có API xóa.,"requirements.pdf p.25,145",deleteComment,CommentActions,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R026,PDF_REQUIREMENT_CONTEXT,Trang 26 chỉ cho text/link/emote; trang 140/144 cho một ảnh.,"requirements.pdf p.26,140,144",createComment;updateComment,CommentComposer,"C02,C10",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R027,PDF_REQUIREMENT_CONTEXT,"Bình luận bị chặn/xóa ẩn nội dung, media; tác giả null khi bị chặn; giữ replies.",requirements.pdf p.142-143,getComments;deleteComment;blockUser,CommentThread,C24,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R028,PDF_REQUIREMENT_CONTEXT,Chỉ LIKE; request NONE/LIKE nhưng bảng response còn LOVE/WOW.,"requirements.pdf p.25,146-147",toggleReact,ReactionButton,C03,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R029,PDF_REQUIREMENT_CONTEXT,Không hiển thị danh sách người like bài; không reaction bình luận.,requirements.pdf p.26,toggleReact;getPost,ReactionSummary,C03,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R030,PDF_REQUIREMENT_CONTEXT,"Feed ưu tiên bạn bè, theo thời gian, rồi người khác; loại tài khoản chặn.","requirements.pdf p.25,148-150",getActivityFeeds,/,C16,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R031,PDF_REQUIREMENT_CONTEXT,"Đếm bài/sự kiện mới theo since, có tổng và chi tiết theo loại.",requirements.pdf p.151,getNewFeedCount,FeedNewItems,C16,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R032,PDF_REQUIREMENT_CONTEXT,"Full-text search không phụ thuộc thứ tự từ; lọc loại, phân trang.","requirements.pdf p.29,152-154",search,/search,"C09,C24",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R033,PDF_REQUIREMENT_CONTEXT,Xem lịch sử tìm kiếm/thịnh hành và xóa lịch sử cá nhân.,requirements.pdf p.155-156,getSavedAndTrendingSearches;deleteSavedSearch,SearchHistory,C09,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R034,PDF_REQUIREMENT_CONTEXT,"Không tag người dùng trong bài, comment, chat.",requirements.pdf p.28,createPost;createComment,Composer components,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R035,PDF_REQUIREMENT_CONTEXT,"Bài dài có Xem thêm, mở rộng rồi không thu gọn.",requirements.pdf p.28,getPost;getActivityFeeds,ExpandableText,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R036,PDF_REQUIREMENT_CONTEXT,Ảnh upload hiển thị vùng trung tâm.,requirements.pdf p.28,uploadMedia,MediaPreview,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R037,PDF_REQUIREMENT_CONTEXT,Kết bạn hai chiều chỉ giữa người cùng vai trò SV-SV hoặc GV-GV.,"requirements.pdf p.43,159",sendFriendRequest,/friends,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R038,PDF_REQUIREMENT_CONTEXT,Chấp nhận/từ chối yêu cầu kết bạn.,requirements.pdf p.160-161,acceptFriendRequest;declineFriendRequest,/friends/requests,C17,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R039,PDF_REQUIREMENT_CONTEXT,Hủy kết bạn.,requirements.pdf p.162,unfriend,/friends,C17,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R040,PDF_REQUIREMENT_CONTEXT,"Danh sách bạn bè, yêu cầu nhận/gửi, cursor.",requirements.pdf p.163-168,getMyFriends;getReceivedFriendRequests;getSentFriendRequests,/friends; /friends/requests,C17,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R041,PDF_REQUIREMENT_CONTEXT,"Follow một chiều cho liên hệ học thuật; xem followers/following, unfollow.","requirements.pdf p.43,169-174",followUser;unfollowUser;getFollowing;getFollowers,ProfileRelationships,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R042,PDF_REQUIREMENT_CONTEXT,Thống kê bạn bè/follow và quan hệ với người đang xem.,requirements.pdf p.175,getRelationshipStats,ProfileHeader,C09,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R043,PDF_REQUIREMENT_CONTEXT,"Block/unblock ngay, không cooldown; xem danh sách block.","requirements.pdf p.24,176-178",blockUser;unblockUser;getBlockedUsers,/settings/blocked,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R044,PDF_REQUIREMENT_CONTEXT,"Block hủy bạn bè, giấu tương tác cũ nhưng không xóa chúng.","requirements.pdf p.24,33",blockUser;getComments;getMyFriends;getPost,Privacy boundary,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R045,PDF_REQUIREMENT_CONTEXT,Block ngăn chat hai chiều và xem profile nhau.,"requirements.pdf p.24,33",blockUser;getUserProfile;createDirectConversation,Chat/Profile boundary,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R046,PDF_REQUIREMENT_CONTEXT,Báo cáo bài/comment/user; bảng trang 179 còn có QUESTION.,"requirements.pdf p.24,179",createReport,ReportDialog,C18,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R047,PDF_REQUIREMENT_CONTEXT,Chat 1-1; cấm lập nhóm ở phần yêu cầu nhưng có GROUP trong bảng response.,"requirements.pdf p.25,27,180-184",createDirectConversation;getConversations;getMessages,/messages; /messages/:conversationId,"C04,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R048,PDF_REQUIREMENT_CONTEXT,Xóa tin nhắn scope ME hoặc EVERYONE.,requirements.pdf p.185,deleteMessage,MessageActions,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R049,PDF_REQUIREMENT_CONTEXT,STOMP chat.send và queue messages: gửi/nhận tin nhắn realtime.,"requirements.pdf p.39,64,186-190",createDirectConversation;getMessages,ChatThread,C19,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R050,PDF_REQUIREMENT_CONTEXT,chat.read phát MESSAGE_READ.,"requirements.pdf p.64,191",getMessages,ChatReadReceipt,C19,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R051,PDF_REQUIREMENT_CONTEXT,chat.typing và topic cuộc hội thoại phát trạng thái đang gõ.,"requirements.pdf p.39,64,188,192",,TypingIndicator,C19,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R052,PDF_REQUIREMENT_CONTEXT,"Thông báo sự kiện xã hội/học thuật, actor/target và unread_count.","requirements.pdf p.26,193-194",getNotifications,/notifications,C20,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R053,PDF_REQUIREMENT_CONTEXT,Đánh dấu một hoặc mọi thông báo đã đọc.,requirements.pdf p.195-196,markAsRead;markAllAsRead,NotificationList,C09,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R054,PDF_REQUIREMENT_CONTEXT,Bật/tắt push theo nhóm; cài âm thanh/rung; hiển thị thiết bị.,"requirements.pdf p.29,197-200",getPushSettings;updatePushSettings;getMyDevices,/settings/notifications,"C13,C20",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R055,PDF_REQUIREMENT_CONTEXT,"SV nộp câu hỏi theo môn, khai nguồn AI/tự làm và độ tự tin 0..4.","requirements.pdf p.30,88-89",proposeSession,/submissions/new,"C09,C21",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R056,PDF_REQUIREMENT_CONTEXT,Nguồn gốc AI/tự làm phải ẩn với giảng viên.,"requirements.pdf p.30,33",getSessionDetailForReview;getSessionQuestions;getMySubmissionDetail;search,Review/practice boundaries,C08,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R057,PDF_REQUIREMENT_CONTEXT,SV xem danh sách/chi tiết phiên mình nộp cùng kết quả duyệt.,requirements.pdf p.90-93,getMySubmissions;getMySubmissionDetail,/submissions; /submissions/:sessionId,C09,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R058,PDF_REQUIREMENT_CONTEXT,Sửa/xóa phiên; không sửa/xóa khi đã duyệt.,"requirements.pdf p.94-96,68",updateMySubmissionSession;deleteMySubmissionSession,SubmissionActions,"C07,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R059,PDF_REQUIREMENT_CONTEXT,Xem câu hỏi theo tác giả và môn; ẩn đáp án trước khi làm.,requirements.pdf p.97-98,getUserProposedSessions;getSessionQuestions,/users/:userId; /practice/:sessionId,"C15,C08",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R060,PDF_REQUIREMENT_CONTEXT,"Trả lời câu hỏi rồi nhận đúng/sai, đáp án và lời giải.",requirements.pdf p.99,answerQuestion;getSessionQuestions,/practice/:sessionId,"C09,C22",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R061,PDF_REQUIREMENT_CONTEXT,"Thống kê số lần làm, đúng, phân phối đáp án, điểm 0..4; PDF ghi server gọi.",requirements.pdf p.100-101,getQuestionStatistics,QuestionStatistics (chờ),C25,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R062,PDF_REQUIREMENT_CONTEXT,"Đánh giá câu hỏi 0..4, comment và xem danh sách rating.",requirements.pdf p.102-104,rateQuestion;getQuestionRatings,QuestionRating,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R063,PDF_REQUIREMENT_CONTEXT,GV xem phiên chờ duyệt và chi tiết; hỗ trợ cảnh báo trùng.,requirements.pdf p.105-108,getPendingSessions;getSessionDetailForReview,/lecturer/reviews; /lecturer/reviews/:sessionId,"C07,C08,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R064,PDF_REQUIREMENT_CONTEXT,"Duyệt có trạng thái Cần edit, bảo lưu điểm trước quyết định giữ/loại.",requirements.pdf p.31,editQuestion;approveQuestions;rejectQuestions,ReviewWorkbench,C07,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R065,PDF_REQUIREMENT_CONTEXT,GV duyệt/từ chối danh sách câu hỏi và cộng điểm tác giả.,requirements.pdf p.109-110,approveQuestions;rejectQuestions,ReviewWorkbench,"C07,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R066,PDF_REQUIREMENT_CONTEXT,GV chỉnh nội dung/đáp án/lời giải và auto_approve.,requirements.pdf p.111,editQuestion,QuestionEditor,"C07,C09",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R067,PDF_REQUIREMENT_CONTEXT,"GV dùng AI để refine, xem audit rồi apply/discard.","requirements.pdf p.31,112-115",refineQuestion;applyAiRefinement,ReviewAiPanel,"C07,C26",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R068,PDF_REQUIREMENT_CONTEXT,GV được chat trực tiếp với AI ngay trong hệ thống.,requirements.pdf p.31,,AI chat (chờ),C26,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R069,PDF_REQUIREMENT_CONTEXT,Kiểm tra trùng text/file/ảnh/paraphrase và trả cảnh báo nhiều tầng.,"requirements.pdf p.38,44,89",getSessionDetailForReview;proposeSession,DuplicateWarnings,C21,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R070,PDF_REQUIREMENT_CONTEXT,BTPROP kiểm định hallucination; từ chối sửa ảnh; xử lý AI lỗi/giới hạn.,"requirements.pdf p.38,45,68",refineQuestion;applyAiRefinement,HallucinationAudit,C26,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R071,PDF_REQUIREMENT_CONTEXT,GV xuất ngân hàng câu hỏi kèm/không đáp án.,"requirements.pdf p.31,124",exportQuestions,/lecturer/exports,C15,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R072,PDF_REQUIREMENT_CONTEXT,"Sinh đề từ ngân hàng, ưu tiên single-choice, độ khó/chủ đề và đảo đáp án.","requirements.pdf p.31,125-127",generateExam,/lecturer/exams/new,"C22,C27",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R073,PDF_REQUIREMENT_CONTEXT,GV xem chi tiết và danh sách đề đã tạo.,requirements.pdf p.128-130,getExamDetail;getMyExams,/lecturer/exams; /lecturer/exams/:examId,"C09,C27",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R074,PDF_REQUIREMENT_CONTEXT,"Xuất đề PDF/Excel, answer key và paper size, URL có hạn.",requirements.pdf p.131,exportExam,ExamExportDialog,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R075,PDF_REQUIREMENT_CONTEXT,"Game 1 dự đoán người nộp ngày sau, sai số ±5%.","requirements.pdf p.30,116",predictGame1;getMyCourseClassesForGame1Prediction,/games,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R076,PDF_REQUIREMENT_CONTEXT,Game 2 dự đoán chính xác số câu AI/tự làm được duyệt của phiên mình.,"requirements.pdf p.30,117-118",predictGame2;getMyPredictions,/games,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R077,PDF_REQUIREMENT_CONTEXT,"Game 3 phiên đúng 10 câu, dự đoán ≥50% đúng nhận +0.25.",requirements.pdf p.30,proposeSession,/submissions/new (candidate),C29,GAP,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R078,PDF_REQUIREMENT_CONTEXT,"Game 4 mỗi người một lần, top 3 chính xác và sớm nhất.","requirements.pdf p.30,119",predictGame4;getMyPredictions,/games,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R079,PDF_REQUIREMENT_CONTEXT,"Game 5 báo lỗi rate 0; duyệt lỗi thưởng người báo, trừ tác giả; báo gần cuối kỳ.",requirements.pdf p.30,rateQuestion;reviewErrorGame5;getNotifications,QuestionReportError,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R080,PDF_REQUIREMENT_CONTEXT,"Game 6 tối thiểu 7 câu, một lần mỗi phiên, đúng hết và sớm nhất có thưởng.",requirements.pdf p.30,getActiveGame6Session;submitGame6,/games,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R081,PDF_REQUIREMENT_CONTEXT,"Xem lịch sử dự đoán, trạng thái PENDING/RESOLVED.",requirements.pdf p.120-121,getMyPredictions,/games/history,"C09,C28",BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R082,PDF_REQUIREMENT_CONTEXT,"Leaderboard theo thời gian/môn, có vị trí bản thân.","requirements.pdf p.122-123,46",getLeaderboard,/leaderboard,C28,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R083,PDF_REQUIREMENT_CONTEXT,"Cosmetics optional: inventory, type/rarity, trang bị hiện tại.","requirements.pdf p.66,201-202",getMyInventory,/inventory,C30,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R084,PDF_REQUIREMENT_CONTEXT,"Shop optional: điều kiện mở khóa, giá, vật phẩm có hạn.","requirements.pdf p.66,203-204",getShop;buyCosmetic,/shop,C30,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R085,PDF_REQUIREMENT_CONTEXT,Equip tự tháo cùng loại; unequip trả mặc định.,"requirements.pdf p.66,205-206",equipCosmetic;unequipCosmetic,/inventory,C30,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+R086,PDF_REQUIREMENT_CONTEXT,Admin panel thêm/sửa/xóa dữ liệu.,requirements.pdf p.29,,Ngoài phạm vi theo chỉ thị người dùng,,EXCLUDED_ADMIN,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N001,PDF_REQUIREMENT_CONTEXT,Validate client trước gửi; email/password bằng regex.,"requirements.pdf p.35,39",login;changePassword,All forms,C12,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N002,PDF_REQUIREMENT_CONTEXT,Offline vẫn validate input trước kiểm tra mạng; báo mất mạng sớm.,requirements.pdf p.35-36,,OfflineBanner/FormErrors,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N003,PDF_REQUIREMENT_CONTEXT,Cache chỉ áp dụng trang chủ; tạo cảm giác tải nhanh sau lần đầu.,requirements.pdf p.35,getActivityFeeds,FeedCache,C31,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N004,PDF_REQUIREMENT_CONTEXT,Pull down refresh và pull up load more.,requirements.pdf p.35,getActivityFeeds,FeedControls,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N005,PDF_REQUIREMENT_CONTEXT,"Có loading khi request, thông báo lỗi khi không có/sai định dạng response; phân biệt NO_MORE_DATA cần chốt.","requirements.pdf p.35,67",,AsyncBoundary,C33,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N006,PDF_REQUIREMENT_CONTEXT,"Ứng dụng mượt, tránh crash đột ngột.",requirements.pdf p.35,,AppErrorBoundary,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N007,PDF_REQUIREMENT_CONTEXT,Dữ liệu privacy cần mã hóa.,requirements.pdf p.35,,Auth/data lifecycle,C32,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N008,PDF_REQUIREMENT_CONTEXT,Thông báo validate và lỗi nhất quán giữa màn hình.,requirements.pdf p.36,,FormField/ErrorSummary,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N009,PDF_REQUIREMENT_CONTEXT,Báo sớm đăng nhập trên thiết bị khác.,requirements.pdf p.36,getMyDevices;getNotifications,SecurityNotifications,C20,BLOCKED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N010,PDF_REQUIREMENT_CONTEXT,Mã màu cụ thể tập trung trong một file.,requirements.pdf p.37,,Design tokens,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N011,PDF_REQUIREMENT_CONTEXT,Giữ dung lượng cài đặt nhỏ; web cần thống nhất budget tải.,requirements.pdf p.37,,Build/performance,,PROPOSED_WEB_ADAPTATION,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N012,PDF_REQUIREMENT_CONTEXT,Animation theo tương tác Facebook.,requirements.pdf p.35,,Motion tokens,,PROPOSED_WEB_ADAPTATION,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+N013,PDF_REQUIREMENT_CONTEXT,Backend chấm realtime và xử lý lượng lớn media.,requirements.pdf p.38,,Performance evidence,C32,GAP,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+D001,PDF_REQUIREMENT_CONTEXT,"Báo cáo phân công, link mã nguồn, demo; tối thiểu 70% chức năng để hướng điểm tối đa.",requirements.pdf p.18-19,,Defense evidence,,DOCUMENTED_UNVERIFIED,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+D002,PDF_REQUIREMENT_CONTEXT,Điện thoại thật/USB/camera trong app/nút đóng áp dụng IT4788.,"requirements.pdf p.18,26-28",,Cần xác nhận học phần,C32,CONDITIONAL_MOBILE,SECONDARY_REFERENCE_ONLY: Swagger ưu tiên; không dùng trạng thái/expected từ PDF để chặn hoặc ghi đè Swagger.
+C01,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Cấp tài khoản, xác minh và quên mật khẩu
+1. **PDF:** p.23,49,70-72 có đăng ký/xác minh; chú thích đỏ p.70-72 nói thầy tạo account đầu kỳ; p.76 nói thầy reset theo đơn SV.
+2. **Swagger:** chỉ có `POST /auth/admin/register`, `/verify`, `/resend-verify`, `/reset-password`, `/bulk-import`; không có các endpoint tương ứng ngoài Admin. Đây đều là API cấm gọi.
+3. **Ảnh hưởng:** không thể xây self-service registration/OTP/reset với hợp đồng hiện tại; tài khoản test cũng cần bên backend cấp.
+4. **Khuyến nghị:** màn login và hướng dẫn xin tài khoản/reset qua quy trình bên ngoài; không form gọi API Admin.
+5. **Câu hỏi lịch sử (không cần trả lời):** xác nhận chỉ dùng tài khoản được cấp và reset ngoài ứng dụng, hay yêu cầu backend cung cấp hợp đồng non-Admin mới? Ai cung cấp tài khoản test?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C02,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Sửa bình luận và nội dung ảnh
+1. **PDF:** p.25 cấm chủ comment sửa, cấm chủ bài xóa comment của người khác; p.26 chỉ text/link/emote. Ngược lại p.57,140,144 có PUT sửa và một ảnh.
+2. **Swagger:** `PUT /comments/{commentId}` cho tác giả sửa; `CreateCommentRequest`/`UpdateCommentRequest` có `media_url`; `DELETE` chỉ tác giả hoặc Admin.
+3. **Ảnh hưởng:** không thể chốt menu thao tác, composer và expected result cho edit/ảnh; quyền xóa của chủ bài không mâu thuẫn với Swagger và vẫn kiểm thử.
+4. **Khuyến nghị:** tách quyết định sửa và ảnh; giữ quy tắc chỉ tác giả được thao tác, không cấp quyền chủ bài.
+5. **Câu hỏi lịch sử (không cần trả lời):** cho phép edit hay cấm edit? Comment text-only hay được một ảnh?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C03,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Reaction loại nào và toggle thế nào
+1. **PDF:** p.25-26 chỉ LIKE, không react comment; p.146 request `NONE, LIKE`, p.146-147 response lại có LOVE/WOW.
+2. **Swagger:** `POST /react`, `ReactRequest.reaction_type` là LIKE/LOVE/WOW; gọi lại cùng loại sẽ gỡ. `target_type` enum chỉ POST/SESSION/QUESTION nhưng description còn ghi COMMENT.
+3. **Ảnh hưởng:** nút like, picker, gỡ reaction và counter có hợp đồng khác nhau.
+4. **Khuyến nghị:** chốt một hợp đồng; nếu chỉ LIKE vẫn cần xác nhận thao tác gỡ dùng toggle, không tự gửi NONE hoặc COMMENT.
+5. **Câu hỏi lịch sử (không cần trả lời):** LIKE-only hay ba loại; gỡ bằng toggle hay cần backend bổ sung NONE? Có loại mục tiêu nào khác không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C04,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Group chat và giới hạn thành viên
+1. **PDF:** p.25,27 cấm group chat/tạo nhóm; p.180 lại có DIRECT/GROUP; p.184 nói trước đây định dùng group chat.
+2. **Swagger:** 7 operations quản lý group (tạo, sửa, xem/thêm/xóa thành viên, đổi role, leave); CHIEF/VILLAGE_ELDER/VILLAGER. Description group là 3..200 người, nhưng `CreateGroupConversationDto.member_ids.maxItems=99`, tức tối đa 100 nếu cộng người tạo.
+3. **Ảnh hưởng:** route nhóm, phân quyền, boundary 100/200 chưa có expected result thống nhất. Không dựng 200 tài khoản trên shared server.
+4. **Khuyến nghị:** chat 1-1 là core; hoãn UI nhóm tới khi xác nhận và sửa giới hạn contract. Vẫn giữ 7 operations trong denominator 124 và kế hoạch test.
+5. **Câu hỏi lịch sử (không cần trả lời):** group chat thuộc phạm vi không? Nếu có, tối đa 100 hay 200, tính người tạo/ID trùng ra sao?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C05,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Tự xóa tài khoản
+1. **PDF:** p.29 cấm; p.50,85 lại liệt kê DELETE.
+2. **Swagger:** `DELETE /users/me` vô hiệu hóa/xóa dữ liệu hồ sơ.
+3. **Ảnh hưởng:** có thể mất tài khoản và dữ liệu liên quan; chưa rõ soft delete, giữ đóng góp, thu hồi token và khả năng cấp lại.
+4. **Khuyến nghị:** chưa hiển thị nút; chỉ thiết kế test bằng tài khoản disposable sau quyết định và quyền chạy riêng.
+5. **Câu hỏi lịch sử (không cần trả lời):** cấm tự xóa hay cho phép; chính sách dữ liệu/token sau xóa là gì? Ai cấp lại tài khoản disposable?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C06,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Privacy bài viết
+1. **PDF:** p.23 chỉ PUBLIC; p.43 giải thích chia sẻ riêng cho bạn bè.
+2. **Swagger:** `CreatePostRequest.visibility` và `UpdatePostRequest.visibility` bắt buộc, enum PUBLIC/ONLY_ME/FRIENDS; read kiểm tra privacy/block.
+3. **Ảnh hưởng:** default composer, feed/search, profile và ma trận quyền xem chưa thể chốt. Không thể tự chọn PUBLIC cho mọi request như quyết định nghiệp vụ đã được duyệt.
+4. **Khuyến nghị:** xác nhận cả ba mức và kiểm thử server-side ở mọi đường truy xuất nếu muốn dùng khả năng đã đặc tả.
+5. **Câu hỏi lịch sử (không cần trả lời):** PUBLIC-only hay cả ba mức, default nào, lecturer có ngoại lệ FRIENDS không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C07,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Duyệt câu hỏi, bảo lưu điểm và tính bất biến
+1. **PDF:** p.31 (nội dung dạng ảnh) có bước Cần edit, bảo lưu điểm rồi giữ/loại; p.68 chỉ chặn sửa/xóa khi APPROVED; p.109-111 có duyệt/sửa.
+2. **Swagger:** session PENDING/REVIEWING/RESOLVED; question PENDING/APPROVED/REJECTED, không có NEEDS_EDIT. GET `/sessions/{sessionId}` chuyển REVIEWING; tác giả chỉ sửa/xóa PENDING. Approve cộng điểm ngay; `completeSessionReview` tự reject câu PENDING còn lại; `auto_approve` có thể duyệt ngay. Không đặc tả bảo lưu/thu hồi điểm, lock giữa hai lecturer.
+3. **Ảnh hưởng:** sai state machine có thể reject ngoài ý muốn, cộng điểm hai lần hoặc cấm sửa sớm hơn yêu cầu.
+4. **Khuyến nghị:** backend xác nhận state machine, thời điểm điểm được bảo lưu và idempotency; màn review có xác nhận riêng trước complete-review. Không mô phỏng NEEDS_EDIT bằng trạng thái frontend.
+5. **Câu hỏi lịch sử (không cần trả lời):** giữ bước Cần edit hay quy trình ba trạng thái; có bảo lưu điểm khi bị loại sau edit không; quyền reviewer theo lớp/môn; semantics complete-review và xung đột hai reviewer?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C08,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Nguồn câu hỏi và bảo mật giảng viên
+1. **PDF:** p.30,33 yêu cầu nguồn LLM/tự làm ẩn với GV; p.98 lại trả source trong danh sách câu hỏi chung.
+2. **Swagger:** `SessionQuestionReviewDto` không khai báo source trực tiếp (điểm phù hợp, không chứng minh đã an toàn). `PracticeQuestionDto.source`, endpoint own-detail có source; `QuestionEditLogDto.before_state/after_state` là object mở. Chưa rõ lecturer có truy cập practice/own submissions và nguồn lọt qua search/export/log không.
+3. **Ảnh hưởng:** giấu một field trên UI không bảo vệ dữ liệu trong response; không thể kết luận đã rò rỉ hay đã tuân thủ khi chưa chạy kiểm thử.
+4. **Khuyến nghị:** backend làm DTO/filter theo vai trò cho mọi read path; test lecturer qua practice, logs, search, exports và các object lồng nhau.
+5. **Câu hỏi lịch sử (không cần trả lời):** nguồn ẩn với GV trên toàn hệ thống hay chỉ trong review? GV tự đề xuất thì có xem nguồn của chính mình không? AI metadata/log nào được phép hiển thị?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C09,HISTORICAL_DIFFERENCE,"RESOLVED_BY_SWAGGER — Hợp đồng wire, envelope và kiểu dữ liệu
+1. **PDF:** p.67 thành công `1000`; nhiều bảng p.73-206 dùng ID/boolean/count kiểu string, `data` array/map không nhất quán; login có `id`, không `platform`; logout p.74 yêu cầu body refresh_token/device_id.
+2. **Swagger:** info.description ví dụ thành công `0000`; envelope schema chỉ `code:string`, không enum; login bắt buộc platform, trả user_id:int64, role enum và boolean; logout không requestBody. Post media là `MediaItem[]`, không URL string[]; answer nhận selected_options[] thay selected_option; danh sách submission/predictions dùng contents. Bảng delta theo operation nằm trong requirements-matrix và inventory có nguyên schema.
+3. **Ảnh hưởng:** parser, auth bootstrap, form và contract assertions không thể chốt bằng cách tự ép string sang boolean hoặc chấp nhận mọi code thành công.
+4. **Khuyến nghị:** xin hợp đồng hiệu chỉnh hoặc văn bản chấp thuận từng delta; giữ OpenAPI nguyên bản, không silently patch; snapshot response chỉ sau khi được phép chạy.
+5. **Câu hỏi lịch sử (không cần trả lời):** có chấp thuận contract OpenAPI cho payload từng operation và code thành công `0000` không, hay backend phải theo PDF? Logout có body không? Chốt các delta trong bảng trước triển khai adapter liên quan.",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C10,HISTORICAL_DIFFERENCE,"Lịch sử: C10 HIGH
+PDF: p.23,27: số ảnh mâu thuẫn; 4MB, không ảnh động, 4 ảnh khi demo
+Swagger: PresignFileItem maximum 15,728,640 bytes, files maxItems 10; direct upload chỉ ghi 413 không định số; không có min file_size; Post media không maxItems
+Ảnh hưởng: Frontend/backend có thể chấp nhận dữ liệu không đạt rubric
+Khuyến nghị cũ: Chốt limit theo purpose, image vs video/document; test đúng byte ngưỡng và +1, không tải file lớn tới shared server
+Câu hỏi cũ: 4MB là 4,000,000 hay 4,194,304 bytes? 4 ảnh là demo hay hard limit? GIF/video/document có được phép?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C11,HISTORICAL_DIFFERENCE,"Lịch sử: C11 HIGH
+PDF: p.78 yêu cầu Bearer JWT
+Swagger: 38 operations tham chiếu bearerAuth chưa khai báo; components chỉ có BearerAuth; OAuth scopes/role không được mã hóa
+Ảnh hưởng: Generator và security validator lỗi; không thể coi đây là public
+Khuyến nghị cũ: Yêu cầu backend sửa scheme; bảo tồn source và ghi unresolved scheme, không gọi thử
+Câu hỏi cũ: Xác nhận scheme BearerAuth áp dụng cho 38 operation và cung cấp spec sửa?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C12,HISTORICAL_DIFFERENCE,"Lịch sử: C12 HIGH
+PDF: p.23 password không ký tự đặc biệt, email trường; p.39 regex
+Swagger: Login/ChangePassword chỉ minLength 1; RegisterRequest minLength 8 nằm Admin; không regex domain/password, TTL token hay storage/cookie
+Ảnh hưởng: Sai client validation có thể chặn tài khoản hợp lệ; reload/refresh đa tab chưa rõ
+Khuyến nghị cũ: Login validate required/email theo contract đã chốt; chưa hardcode regex mật khẩu/domain từ phỏng đoán; ưu tiên token in-memory
+Câu hỏi cũ: Domain hợp lệ, password policy cho đổi mật khẩu, TTL/rotation/reuse và yêu cầu giữ đăng nhập qua reload?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C13,HISTORICAL_DIFFERENCE,"Lịch sử: C13 HIGH
+PDF: p.86 fcm_token, POST /devices/register; DELETE server-only; p.198 devices trong settings
+Swagger: /devices/fid và /devices/fid/unregister nhận fid; login đăng ký device; GET /devices riêng
+Ảnh hưởng: FID không đồng nghĩa FCM registration token; browser push thiếu cấu hình
+Khuyến nghị cũ: Backend cung cấp quy trình Firebase Web/permissions và cleanup; không gọi đường cũ
+Câu hỏi cũ: Web push dùng FID thế nào, FCM token gửi đâu, cấu hình public Firebase nào, hỗ trợ browser nào?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C14,HISTORICAL_DIFFERENCE,"Lịch sử: C14 HIGH
+PDF: p.23 tối đa 500 từ post/comment; p.136 ít nhất một field
+Swagger: content không word-count/maxLength trong Create/UpdatePost và Comment; CreatePost chỉ required visibility; comment required target fields
+Ảnh hưởng: Schema pass nhưng business fail; text rỗng/media-only khác nhau
+Khuyến nghị cũ: Thêm validation sau chốt word counting; test rỗng, Unicode, 499/500/501 từ
+Câu hỏi cũ: Đếm từ tiếng Việt thế nào; media-only có hợp lệ; update chỉ visibility có được không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C15,HISTORICAL_DIFFERENCE,"Lịch sử: C15 HIGH
+PDF: p.51,97 /users/{userId}/questions; p.55,124 /questions/export; p.59 /media/*; p.139 /video_posts
+Swagger: /users/{userId}/sessions rồi /sessions/{sessionId}/questions; /lecturer/questions/export; /medias/*; /video-posts; không API browse question bank độc lập
+Ảnh hưởng: Không được tự gọi alias PDF; flow thay thế chưa tương đương
+Khuyến nghị cũ: Ghi mapping candidate, xin xác nhận; dùng search không tự coi là bank catalog đủ lọc
+Câu hỏi cũ: Chấp thuận đường mới và flow sessions→practice không; có cần API duyệt toàn bộ bank?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C16,HISTORICAL_DIFFERENCE,"Lịch sử: C16 HIGH
+PDF: p.25 ưu tiên friend rồi random khác; p.151 total_new/detail/include_types
+Swagger: activity feed trọng số, không cam kết thứ tự/fallback; new-count chỉ new_count, since optional không unit trong schema
+Ảnh hưởng: Sai feed và polling kể cả khi trả 200
+Khuyến nghị cũ: Xin thuật toán acceptance và đơn vị since; không tự sort/chắp feed phía client
+Câu hỏi cũ: Quy tắc xếp feed, fallback và since là Unix milliseconds? Có cần count theo loại?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C17,HISTORICAL_DIFFERENCE,"Lịch sử: C17 HIGH
+PDF: p.159 user_id; p.160-162 friendship_id; p.165-168 có friendship_id
+Swagger: Request addressee_id; accept/decline requester_id; unfriend friendId mô tả ID bạn; list không friendship_id
+Ảnh hưởng: Gửi nhầm loại ID, sai target cross-user
+Khuyến nghị cũ: Chốt semantic từng ID; không suy ID friendship từ user
+Câu hỏi cũ: Chấp thuận requester/addressee/user ID theo Swagger và friendId là user_id?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C18,HISTORICAL_DIFFERENCE,"Lịch sử: C18 MEDIUM
+PDF: p.179 report target có QUESTION
+Swagger: target enum POST/COMMENT/USER; violation description HATE_SPEECH/COPYRIGHT/... nhưng enum HATE_STATEMENT/HARASSMENT/SPAM/OTHER
+Ảnh hưởng: Không report question qua /report; nhầm Game 5
+Khuyến nghị cũ: Dùng Game 5 chỉ cho lỗi học thuật sau chốt; không tự mở rộng enum
+Câu hỏi cũ: QUESTION báo vi phạm ở đâu, enum violation nào là chuẩn?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C19,HISTORICAL_DIFFERENCE,"Lịch sử: C19 HIGH
+PDF: p.64,186-192 mô tả event payload chi tiết
+Swagger: info.description có 3 SEND, 2 SUB; DTO tên Ws* không trong components; message_type prose TEXT/IMAGE/FILE nhưng REST MessageDto TEXT/IMAGE/VIDEO/GIF; URL ws://placeholder
+Ảnh hưởng: Không generate contract WS; lỗi mixed content trên HTTPS; chưa rõ ACK/reconnect/order/dedup/error/heartbeat
+Khuyến nghị cũ: Xin WS contract, xác nhận wss trên host thật và SockJS support; không nối thử
+Câu hỏi cũ: Xác nhận transport/URL, enum và event schemas, authorization subscribe/send, expiry/refresh/error policy?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C20,HISTORICAL_DIFFERENCE,"Lịch sử: C20 MEDIUM
+PDF: p.26,36 notification like, message, friend post, device login; âm mặc định/giọng nói p.29
+Swagger: NotificationDto enum không đủ sự kiện; settings chỉ boolean sound/vibration, category uppercase, quiet_hours; không trường chọn âm
+Ảnh hưởng: Backend có thể có sự kiện chưa được mô tả; web sound phụ thuộc quyền browser
+Khuyến nghị cũ: Chốt phạm vi web; test API setting khác với bằng chứng push delivery
+Câu hỏi cũ: Sự kiện và âm thanh nào bắt buộc trên web, ai cung cấp push fixtures?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C21,HISTORICAL_DIFFERENCE,"Lịch sử: C21 HIGH
+PDF: p.48 upload .zip; p.68 parse .txt/malware; p.89 duplicate_warnings ngay propose
+Swagger: propose JSON bắt buộc questions; không request zip/txt; ProposeSessionResponse không duplicate_warnings; cảnh báo tại review detail
+Ảnh hưởng: Không thực hiện import zip/parse hay xác nhận antivirus qua API
+Khuyến nghị cũ: Form JSON question editor; không tự tạo backend parser; mẫu file benign để test dedup ở staging
+Câu hỏi cũ: JSON thay upload zip được chấp nhận? Khi nào hiển thị cảnh báo duplicate, backend có cung cấp thêm API không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C22,HISTORICAL_DIFFERENCE,"Lịch sử: C22 HIGH
+PDF: p.31 ưu tiên single-choice; p.99 selected_option
+Swagger: answer selected_options array; correct_answer string; QuestionOption.is_correct; nhiều option đúng chưa có quy tắc
+Ảnh hưởng: UI checkbox/radio và chấm nhiều đáp án chưa rõ
+Khuyến nghị cũ: Chốt single-choice trước; không coi plural là bằng chứng multi-select đã hoạt động
+Câu hỏi cũ: Cho phép nhiều đáp án đúng không, exact-match/partial scoring và format correct_answer là gì?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C23,HISTORICAL_DIFFERENCE,"Lịch sử: C23 MEDIUM
+PDF: p.79 total_approved_questions, faculty; p.84 ít nhất một field
+Swagger: ProfileResponse school_faculty, không total_approved_questions; UpdateProfileRequest không required/minProperties; thêm gender/date/timezone
+Ảnh hưởng: Chỉ số thiếu không thể suy từ proposed; empty update chưa rõ
+Khuyến nghị cũ: Ẩn metric không có, không tổng hợp từ trang chưa đầy đủ
+Câu hỏi cũ: Có cần approved count; chấp thuận tên field và bổ sung edit fields; {} xử lý thế nào?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C24,HISTORICAL_DIFFERENCE,"Lịch sử: C24 HIGH
+PDF: p.81-83 profile public không email; p.142-143 hidden/null khi block; p.98 ẩn đáp án
+Swagger: Public profile dùng cùng ProfileResponse có email/date_of_birth; UserSearchResultDto có email; QuestionSearchResultDto có explanation, avg_rating description 1..5 khác 0..4; CommentResponseDto không hidden, nhiều field không nullable
+Ảnh hưởng: Có nguy cơ lộ PII/đáp án qua đường khác; schema pass không chứng minh privacy
+Khuyến nghị cũ: Backend xác nhận redaction toàn bộ read surface, nested log/media URL; ghi quan sát thực tế sau này
+Câu hỏi cũ: Email có được public qua search không; fields ẩn phải omitted hay null; search có tiết lộ lời giải trước khi làm?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C25,HISTORICAL_DIFFERENCE,"Lịch sử: C25 HIGH
+PDF: p.100 ghi statistics dành server gọi
+Swagger: GET /questions/{questionId}/statistics non-Admin, không restriction trong prose
+Ảnh hưởng: Không thể mặc định frontend được gọi
+Khuyến nghị cũ: Giữ operation trong kế hoạch nhưng chặn tích hợp và execution đến khi chốt
+Câu hỏi cũ: Student/Lecturer có được xem stats trực tiếp, thời điểm nào?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C26,HISTORICAL_DIFFERENCE,"Lịch sử: C26 HIGH
+PDF: p.31 GV chat AI; p.68 AI service/rate/image errors
+Swagger: Chat/history/sessions chỉ dưới /admin/ai/chat**, cấm toàn bộ; refine/apply non-Admin nhưng thiếu quyền role rõ cho refine, thiếu 2101..2105 mapping HTTP
+Ảnh hưởng: Không thể triển khai AI chat bằng endpoint này; AI refine chưa đủ permission/error oracle
+Khuyến nghị cũ: Chỉ nghiên cứu panel refine/apply sau hợp đồng; backend cung cấp đường non-Admin nếu cần chat
+Câu hỏi cũ: Hoãn AI chat hay yêu cầu endpoint mới; ai được refine/apply; audit phải chặn apply thế nào?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C27,HISTORICAL_DIFFERENCE,"Lịch sử: C27 HIGH
+PDF: p.125 tạo đề không class_ids; question_count default 40; topic sum 1
+Swagger: class_ids minItems 1 required; question_count optional không default/min/max; difficulty sum mô tả nhưng thiếu range; quyền read/export đề chưa rõ
+Ảnh hưởng: Cần lớp/môn/học kỳ fixture; không thể khẳng định default hoặc chia sẻ đề SV
+Khuyến nghị cũ: Xin rule lớp chủ quản và immutable snapshot; không tự cấp quyền lecturer khác
+Câu hỏi cũ: class_ids bắt buộc được chấp nhận? Defaults/rounding khi thiếu bank, quyền student và lecturer khác xem/export?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C28,HISTORICAL_DIFFERENCE,"Lịch sử: C28 HIGH
+PDF: p.30,116-123 quy tắc điểm, thời điểm báo Game 5, leaderboard alltime/monthly/weekly
+Swagger: Game1 cutoff 22:00; Game6 thứ 7/7 câu; leaderboard SUBJECT/SEMESTER; Game2 predicted counts không required/bounds; Game5 mô tả thưởng khi confirm, không nói delay thông báo
+Ảnh hưởng: Test điểm/thời gian thiếu oracle; scheduler cuối kỳ đòi Admin cấm gọi
+Khuyến nghị cũ: Seed state/time-controlled staging do backend hỗ trợ; không đổi đồng hồ server hay finalize
+Câu hỏi cũ: Xác nhận timezone/cutoff/ties/rounding/reward schedule, bounds Game2, period leaderboard và thông báo Game5?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C29,HISTORICAL_DIFFERENCE,"Lịch sử: C29 HIGH
+PDF: p.30 Game3 đúng 10 câu, ≥50% +0.25
+Swagger: Không operation Game3 riêng; confidence trong propose có thể liên quan nhưng chưa đủ rule
+Ảnh hưởng: Không thể kết luận đã hỗ trợ vì enum GAME_3_AUTHOR_CONFIDENCE tồn tại
+Khuyến nghị cũ: Ghi GAP, không tạo endpoint hoặc tự cộng điểm FE
+Câu hỏi cũ: Game3 tự chạy qua confidence hay cần API mới; có bỏ khỏi phạm vi đã duyệt không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C30,HISTORICAL_DIFFERENCE,"Lịch sử: C30 MEDIUM
+PDF: p.66,201-204 cosmetics có PROFILE_BADGE/PIN, featured/limited, điều kiện unlock, equip type
+Swagger: enum chỉ AVATAR_FRAME/CHAT_BUBBLE; shop type thay category, uppercase sort, owned thay prerequisites; equip chỉ cosmetic_id; buy không header idempotency
+Ảnh hưởng: Shop UI và unlock rule khác; thiếu mua nhầm trừ tiền/chống lặp
+Khuyến nghị cũ: Chốt phần hỗ trợ; không bịa Idempotency-Key header; 60s chỉ theo prose buy
+Câu hỏi cũ: Chấp thuận hai type và mua bằng Coins; điều kiện mở khóa/expiry; key và scope chống trùng 60s là gì?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C31,HISTORICAL_DIFFERENCE,"Lịch sử: C31 MEDIUM
+PDF: p.35 chỉ cache trang chủ
+Swagger: Swagger không chỉ dẫn caching; TanStack Query user yêu cầu có thể giữ data ở mọi màn
+Ảnh hưởng: Đề xuất cache đa feature sẽ trái PDF nếu tự coi đã được phép
+Khuyến nghị cũ: Mặc định chỉ giữ cache feed; màn khác không giữ qua unmount, tắt retry/refetch GET có side effect; chốt chính sách trước code
+Câu hỏi cũ: Có cho phép cache ngắn hạn non-feed không; có được persist feed qua reload không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C32,HISTORICAL_DIFFERENCE,"Lịch sử: C32 MEDIUM
+PDF: p.18,26-28 IT4788 mobile; p.35 privacy mã hóa; p.38 realtime/large media; p.37 dung lượng nhỏ
+Swagger: OpenAPI không chứng minh encryption at rest, SLO hoặc yêu cầu thiết bị thật
+Ảnh hưởng: Không lấy REST pass làm bằng chứng NFR; scope web vs mobile chưa rõ
+Khuyến nghị cũ: Web E2E offline/responsive; xin bằng chứng backend và SLO; không load test shared server
+Câu hỏi cũ: Học phần/rubric web nào áp dụng; mục tiêu latency/bundle và phạm vi mã hóa; backend cung cấp bằng chứng gì?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
+C33,HISTORICAL_DIFFERENCE,"MEDIUM — Empty response khác lỗi kết nối
+1. **PDF:** p.35 yêu cầu báo lỗi kết nối khi không có dữ liệu hoặc dữ liệu sai định dạng; p.67 đồng thời có `9994 NO_MORE_DATA`.
+2. **Swagger:** nhiều response danh sách có arrays và pagination, không quy định mã business cho list rỗng; không có required đủ chặt ở nhiều schema.
+3. **Ảnh hưởng:** UI empty state theo thiết kế thông thường có thể trái cách đọc literal p.35; coi hết trang là mất mạng cũng gây sai trải nghiệm.
+4. **Khuyến nghị:** phân biệt list rỗng hợp lệ/hết trang, malformed response và network failure, với oracle rõ ràng cho từng loại.
+5. **Câu hỏi lịch sử (không cần trả lời):** chấp thuận empty state cho list rỗng/hết trang; chỉ hiện lỗi kết nối/contract cho request fail hoặc payload sai? Mã `9994` còn được backend dùng không?",Đối chiếu Phase 0; chi tiết trích trong description,,,,SUPERSEDED,"FOLLOW_SWAGGER: câu hỏi/approval/PDF constraints cũ không còn là gate; dùng giả định an toàn trong docs/PLAN.md, chưa kiểm chứng backend."
