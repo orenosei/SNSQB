@@ -1,89 +1,99 @@
 # SNSQB
 
-Web Frontend cho Social Network for Student-Generated Question Bank, kết nối backend có sẵn và kiểm thử bằng Playwright/Vitest.
+Social Network for Student-Generated Question Bank — frontend tiếng Việt cho cộng đồng học tập sinh viên.
 
-## Quy tắc dự án
+## Trạng thái Phase 1–2
 
-- **Nguồn chính:** [docs/source/openapi.json](docs/source/openapi.json). Swagger do giảng viên cung cấp, không sửa file này hoặc backend.
-- **Nguồn phụ:** `docs/source/requirements.pdf`, chỉ dùng cho bối cảnh, UX và yêu cầu bổ sung không trái Swagger. Khi khác nhau, làm theo Swagger, không cần hỏi lại.
-- Không invent endpoint, request/response field hoặc quyền. Chi tiết chưa rõ: chọn giả định an toàn, ghi ngắn trong [PLAN](docs/PLAN.md); chỉ hỏi khi thực sự không thể tiếp tục.
-- Không gọi `/admin/**`, `/auth/admin/**` hoặc operation khác được chỉ định Admin-only, kể cả để tạo fixture. AI chat dưới `/admin/ai/chat**` cũng bị loại.
-- Có thể test server thật bằng tài khoản test chuyên dụng và dữ liệu riêng. Không thay đổi dữ liệu người dùng thật, hardcode credentials hoặc chạy destructive/load tests trên server dùng chung.
-- Ưu tiên code chạy được, UI tốt và test có ý nghĩa. Mock chỉ dùng trong test frontend cô lập; kết quả mock không chứng minh backend hoạt động.
+Đã có ứng dụng trong `frontend/`: React + TypeScript + Vite, Tailwind CSS, React Router, Axios, TanStack Query và Lucide React. Giao diện gồm đăng nhập, header/sidebar responsive, hồ sơ và chỉnh sửa hồ sơ. Phase 2 bổ sung bảng tin phân trang, CRUD bài viết kèm media, bình luận/phản hồi, LIKE/LOVE/WOW, hồ sơ công khai, kết bạn/theo dõi/chặn và tìm kiếm USER/POST. Ngân hàng câu hỏi, Tin nhắn và Đề thi vẫn là “Sắp có”.
 
-## Trạng thái hiện tại
+Swagger tại [docs/source/openapi.json](docs/source/openapi.json) là nguồn chính; PDF chỉ là tham khảo phụ. Không sửa backend/Swagger, không gọi API Admin, không có đăng ký hoặc reset mật khẩu tự phục vụ.
 
-Phase 0 đã được rút gọn. Có 124 API được phép trong tổng 146 operations; chưa có frontend, `package.json`, test runner hoặc credentials. **Chưa bắt đầu Phase 1, chưa chạy test server.**
+## Chạy ứng dụng
 
-Chỉ duy trì bốn tài liệu:
-
-| Tài liệu | Nội dung |
-|---|---|
-| [API_CHECKLIST](docs/API_CHECKLIST.md) | 124 API theo module, trạng thái tích hợp và API test |
-| [PLAN](docs/PLAN.md) | Các phase, checklist tiến độ và giả định đang dùng |
-| [TEST_REPORT](docs/TEST_REPORT.md) | Kết quả thực tế, coverage và vấn đề backend đáng chú ý |
-| [README](README.md) | Quy tắc, setup, công nghệ và cách sử dụng |
-
-Dữ liệu hỗ trợ được giữ gọn, không phải bộ tài liệu phê duyệt:
-
-- [api-inventory.csv](docs/analysis/api-inventory.csv): đủ 146 operations, đánh dấu 124 non-Admin/22 excluded; giữ parameters, request/response, schema closure và metadata coverage.
-- [test-case-matrix.csv](docs/testing/test-case-matrix.csv): giữ nguyên 2.119 dòng thiết kế testcase, chưa implement/chạy. Không bắt buộc chuyển mọi dòng thành test tự động.
-- [test-reference-data.csv](docs/testing/test-reference-data.csv): 101 ngữ cảnh yêu cầu + 33 khác biệt lịch sử để các ID trong testcase/inventory không mất nghĩa. `current_policy` nhắc Swagger ưu tiên, không yêu cầu trả lời conflict cũ.
-
-Các tài liệu phân tích/architecture/roadmap/test strategy cũ đã được gộp phần hữu ích vào PLAN và TEST_REPORT rồi bỏ bản trùng. Không có test data thực hoặc credentials trong repository.
-
-## Công nghệ đã chọn
-
-React + TypeScript + Vite + Tailwind CSS; React Router; TanStack Query; Axios; React Hook Form + Zod. Playwright cho API/E2E, Vitest cho unit/component test khi hữu ích. STOMP client cho realtime ở phase tương ứng. Giữ cấu trúc đơn giản, component tái sử dụng, responsive và accessible; giao diện riêng lấy cảm hứng từ Facebook + Quizlet.
-
-## Cấu trúc
-
-```text
-README.md
-docs/
-  API_CHECKLIST.md
-  PLAN.md
-  TEST_REPORT.md
-  source/
-    openapi.json
-    requirements.pdf
-  analysis/
-    api-inventory.csv
-    generate-api-audit.py
-  testing/
-    test-case-matrix.csv
-    test-reference-data.csv
-```
-
-Dự kiến Phase 1 bổ sung `src/` và `tests/{api,e2e}/`; hiện chưa tạo.
-
-## Regenerate inventory (chạy được ngay, offline)
+Yêu cầu **Node.js 22.12+** (đã kiểm chứng với Node 24.0.2), npm.
 
 ```sh
-python3 docs/analysis/generate-api-audit.py
-python3 docs/analysis/generate-api-audit.py --check
+cd frontend
+npm ci
+cp .env.example .env
+npm run dev
 ```
 
-Script chỉ dùng Python standard library, chỉ ghi `api-inventory.csv`; không gọi backend, không sinh lại tài liệu cũ hoặc testcase, không sửa Swagger/checklist/kết quả test. Cần giữ hai CSV trong `docs/testing/` để lấy traceability/categories. Metadata feature/priority/phase và trạng thái xác minh được giữ từ inventory hiện có theo method/path; chúng là ghi chú kế hoạch, không phải contract Swagger. `historical_reference_ids` trong inventory tra ở reference CSV, không phải blocker.
+Mở URL Vite in trong terminal (mặc định `http://localhost:5173`). Biến `VITE_API_BASE_URL` trong `.env` mặc định là `https://snsqb.duckdns.org/api/v1`; khởi động lại Vite sau khi đổi cấu hình. Đây là URL công khai, không đặt credentials trong biến `VITE_*`.
 
-Snapshot nguồn SHA-256 sau cleanup:
+Dùng tài khoản được cấp để đăng nhập. Token chỉ nằm trong bộ nhớ, **tải lại trang hoặc đóng tab cần đăng nhập lại**. Chỉ định danh thiết bị ngẫu nhiên được lưu trong localStorage. Refresh chạy một lần khi nhận 401 nếu server cấp refresh token, dùng chung cho request đồng thời; 403 không kích hoạt refresh. Nếu refresh token là null hoặc không được cấp, access token vẫn dùng được; khi nhận 401, ứng dụng yêu cầu đăng nhập lại và không gọi refresh. Đăng xuất xóa token/cache kể cả khi mạng lỗi và thông báo rõ nếu chưa xác nhận được việc thu hồi phiên trên server.
 
-- `openapi.json`: `2a37c0824fcccdade48250463ba67874976732a380335e663942fed1bb2f7f00`.
-- `requirements.pdf`: `4352d4feef48259256c9f00dfeb1bddd34d7b2f6fdde204ac3e6f8a26cf2e151`.
+Routes hiện có: `/login`, `/me`, `/settings/profile`, `/` (bảng tin), `/posts/new`, `/posts/:postId`, `/posts/:postId/edit`, `/my-posts`, `/users/:userId`, `/friends`, `/search`. Hồ sơ và chỉnh sửa được bảo vệ. Khi triển khai static hosting, cấu hình fallback về `index.html` cho React Router; backend cần cho phép CORS của frontend.
 
-## Setup và commands
+## API đã nối trong code (35 operations)
 
-Hiện chưa có ứng dụng để cài/chạy; không có lệnh npm nào sẵn dùng. Khi triển khai Phase 1, tạo lockfile và ghi phiên bản Node được chọn; bổ sung các scripts dự kiến sau, rồi cập nhật mục này bằng lệnh đã kiểm chứng:
+| Method | Path | Chức năng |
+|---|---|---|
+| POST | `/auth/login` | Gửi email, password, device_id, platform WEB |
+| POST | `/auth/refresh` | Đổi cặp token bằng refresh_token |
+| POST | `/auth/logout` | Đăng xuất, không gửi body |
+| GET | `/users/me` | Đọc hồ sơ hiện tại |
+| PUT | `/users/me` | Sửa các trường hồ sơ được Swagger hỗ trợ |
 
-| Lệnh dự kiến, **chưa tồn tại** | Mục đích |
-|---|---|
-| `npm install` | Cài dependencies khi đã có package.json |
-| `npm run dev` | Vite dev server |
-| `npm run build` | Typecheck và production build |
-| `npm run test:unit` | Vitest |
-| `npm run test:api` | Playwright API tests |
-| `npm run test:e2e` | Playwright browser E2E |
+Phase 2 dùng GET `/activity-feeds`; POST `/posts`, GET/PUT/DELETE `/posts/{id}`, GET `/posts/me` và `/users/{userId}/posts`; GET/POST `/comments`, PUT/DELETE `/comments/{commentId}`; POST `/react`; GET public profile/relationship-stats; 7 friendship operations; follow/unfollow/following/followers; block/unblock/list; GET `/search`; POST `/medias/upload` multipart (purpose POST/COMMENT). Từng operation và trạng thái ở [API_CHECKLIST](docs/API_CHECKLIST.md).
 
-REST base URL: `https://snsqb.duckdns.org/api/v1`. Swagger UI: `https://snsqb.duckdns.org/api/v1/docs`. Các URL này chưa được kiểm tra kết nối trong đợt cập nhật tài liệu.
+Các form social tuân schema, không tự áp giới hạn 500 từ hoặc giới hạn upload chưa có trong Swagger. Cache được làm mới sau mutation; block/unblock reset nội dung có thể mất quyền xem. Không suy đoán loại cảm xúc cũ hoặc chiều lời mời từ field không đủ thông tin.
 
-Khi có code: cấu hình base URL công khai cho frontend; credentials test chỉ ở environment riêng không commit, không đặt trong biến `VITE_*`. Đăng nhập bằng tài khoản được cấp; không có self-service register/reset vì các API đó thuộc Admin. API/E2E thật chỉ chạy khi có credentials và fixture phù hợp; báo cáo giữ NOT_RUN/BLOCKED cho phần chưa chạy.
+Axios kiểm danh sách method/path trước transport, không gửi JWT tới URL ngoài. DTO/envelope theo Swagger; chấp nhận `code: "0000"` theo đặc tả và `"1000"` theo phản hồi login thực do người dùng cung cấp. Phản hồi thực cũng có `refresh_token: null`, nên frontend chỉ bắt buộc access token hợp lệ. Swagger/backend được giữ nguyên. Form sửa họ tên, tiểu sử, giới tính, ngày sinh, múi giờ, URL avatar/ảnh bìa; chỉ gửi trường thay đổi. Thông tin học tập chỉ đọc. Upload trực tiếp hiện dùng cho bài viết/bình luận; form hồ sơ vẫn dùng URL ảnh có sẵn.
+
+**Chưa tự chạy kiểm thử backend thật** vì chưa có tài khoản test chuyên dụng; đã đối chiếu phản hồi login thành công do người dùng cung cấp (không lưu credentials/token vào repo). Mock UI chỉ kiểm frontend, không chứng minh backend hoạt động.
+
+## Kiểm thử
+
+```sh
+cd frontend
+npx playwright install chromium
+npm run typecheck
+npm run build
+npm test          # UI desktop + mobile và API thật (mặc định skip)
+npm run test:e2e  # Chỉ UI mock
+npm run test:api  # Chỉ API thật, không cần browser/dev server
+```
+
+Kết quả ngày 2026-10-27: typecheck/build PASS; **88 lượt UI PASS, 16 bài API thật SKIPPED**. UI mock kiểm validation, payload/header, login thành công/thất bại (bao gồm code 1000, refresh token null/không được cấp), loading/lỗi mạng, route guard, refresh đồng thời/không lặp, logout, sửa hồ sơ/giữ bản nháp khi lỗi và responsive 320/375/768/1280/1536 px. Phase 2 có 15 case UI (30 lượt trên desktop/mobile) bao phủ post/comment/reaction lifecycle, hai phiên kết bạn, follow/block/search và responsive 320/768/1280 px. Đã xem ảnh chụp login/profile/feed trên desktop và mobile. Chi tiết ở [TEST_REPORT](docs/TEST_REPORT.md). Báo cáo HTML và ảnh/trace nằm trong `frontend/playwright-report/`, `frontend/test-results/` (không commit).
+
+`tests/e2e/` chặn request API bằng mock và dùng base URL localhost riêng. `tests/api/` chỉ chạy thật khi export đủ ba biến sau bằng tài khoản test chuyên dụng:
+
+```sh
+export SNSQB_RUN_REAL_API=1
+export SNSQB_TEST_EMAIL='email-tai-khoan-test'
+# Đặt SNSQB_TEST_PASSWORD qua environment riêng, không commit hoặc ghi vào VITE_*.
+npm run test:api
+```
+
+Playwright không tự đọc `.env`; credentials lấy từ environment của tiến trình. Có thể đổi server test bằng `SNSQB_TEST_API_BASE_URL`. Auth test thật kiểm login/profile/logout, refresh khi được cấp token và sai mật khẩu; không gọi Admin, không sửa hồ sơ hoặc dữ liệu dùng chung. PUT hồ sơ hiện chỉ có kiểm thử UI mock. Không đưa tài khoản người dùng thật vào bộ test; reporter/trace API được hạn chế để tránh ghi token.
+
+API social được bật **riêng** với cặp tài khoản test cùng vai trò, không có quan hệ từ trước:
+
+```sh
+export SNSQB_RUN_REAL_SOCIAL=1
+export SNSQB_TEST_EMAIL='tai-khoan-test-A'
+export SNSQB_TEST_PEER_EMAIL='tai-khoan-test-B'
+# Đặt SNSQB_TEST_PASSWORD và SNSQB_TEST_PEER_PASSWORD qua environment riêng.
+npm run test:api
+```
+
+Suite kiểm baseline rồi chỉ tạo/xóa post/comment của run và quan hệ giữa A/B, cleanup ở finally/teardown. Không bật bằng tài khoản cá nhân. Không bật SNSQB_RUN_REAL_API nếu chỉ muốn chạy social. Chưa có cặp test chuyên dụng nên 14 social API scenarios đang skip. Upload media rời không có API xóa; hủy soạn sau upload có thể để lại tệp. GET post không cung cấp loại reaction cũ; PENDING không cho biết chiều lời mời ở profile. Đây là giới hạn contract, không tạo API thay thế.
+
+## Cấu trúc và bước tiếp theo
+
+```text
+frontend/
+  src/
+    app/          # Router và application shell
+    components/   # Brand, avatar, feedback
+    features/     # auth, profile
+    lib/          # Axios client và xử lý lỗi
+  tests/
+    e2e/          # UI mock
+    api/          # Backend thật, cần tài khoản test
+```
+
+Phase 2 core social đã triển khai. Phase 3 còn danh mục môn/lớp học, đề xuất và duyệt câu hỏi, luyện tập, tạo/xuất đề theo [docs/PLAN.md](docs/PLAN.md); chưa bắt đầu tự động. Notifications, danh mục video bài giảng và search history chưa thuộc đợt Phase 2 này. CSV/Swagger/PDF Phase 0 được giữ nguyên.
+
+Kiểm tra inventory offline khi cần: `python3 docs/analysis/generate-api-audit.py --check`.

@@ -1,6 +1,6 @@
 # API checklist
 
-Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](source/openapi.json). Đây là checklist tiến độ đang dùng; chi tiết contract ở [api-inventory.csv](analysis/api-inventory.csv), case thiết kế ở [test-case-matrix.csv](testing/test-case-matrix.csv).
+Cập nhật 2026-10-27. Nguồn chính, bất biến: [source/openapi.json](source/openapi.json). Đây là checklist tiến độ đang dùng; chi tiết contract ở [api-inventory.csv](analysis/api-inventory.csv), case thiết kế ở [test-case-matrix.csv](testing/test-case-matrix.csv).
 
 **146 REST operations = 124 non-Admin được phép + 22 Admin bị cấm.** Phân loại dựa path và rà lại nhãn/prose Admin-only; không loại operation chỉ vì mô tả cho cả Lecturer/Admin. Tất cả endpoint bên dưới có prefix `/api/v1` trên REST base URL `https://snsqb.duckdns.org/api/v1`.
 
@@ -14,9 +14,9 @@ Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](sou
 
 ## Trạng thái
 
-- **Frontend:** TODO / DONE / N/A (kèm lý do nếu chỉ phục vụ test hoặc không cần UI riêng). DONE khi luồng đã kết nối API; mock không tính tích hợp.
-- **API test:** NOT_WRITTEN / NOT_RUN / PASS / FAIL / BLOCKED. PASS/FAIL dựa lần chạy thật gần nhất; ghi số scenario/bằng chứng ở [TEST_REPORT](TEST_REPORT.md). Một PASS không ngụ ý đã kiểm hết mọi trường hợp.
-- Hiện **Frontend 0/124**, chưa có test code hoặc credentials. Tất cả hàng là TODO / NOT_WRITTEN; việc chưa có credentials chỉ chặn chạy thật, không chặn viết code/test.
+- **Frontend:** TODO / DONE / N/A (kèm lý do nếu chỉ phục vụ test hoặc không cần UI riêng). DONE khi code đã nối luồng tới endpoint theo Swagger; việc xác minh backend thật được ghi riêng ở cột API test, mock không chứng minh backend hoạt động.
+- **API test:** NOT_WRITTEN / NOT_RUN / PASS / FAIL / BLOCKED. PASS/FAIL dựa lần chạy thật gần nhất; kết quả Phase 1–2 ở [TEST_REPORT](TEST_REPORT.md). Một PASS không ngụ ý đã kiểm hết mọi trường hợp.
+- Hiện **Frontend 35/124** đã nối trong code, chưa xác minh server thật. Typecheck/build PASS; **88 lượt UI mock PASS**, **16 bài API thật SKIPPED** do chưa có tài khoản test chuyên dụng. Phản hồi login thực do người dùng cung cấp có code 1000 và refresh_token null; đã bổ sung tương thích và test hồi quy, không lưu thông tin xác thực vào repo. Phase 2 bổ sung 30 operations và 14 API scenarios; các module ngoài phạm vi giữ TODO / NOT_WRITTEN.
 - Không gọi `/admin/**`, `/auth/admin/**` hoặc API khác được chỉ định Admin-only. Cả AI chat/history/sessions dưới `/admin/ai/chat**` đều bị loại. Không dùng Admin để tạo tài khoản/fixtures.
 - Các khác biệt PDF đã được giải quyết bằng Swagger; không giữ decision gate C01-C33. Giả định kỹ thuật ngắn ở [PLAN](PLAN.md).
 
@@ -24,77 +24,77 @@ Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](sou
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `POST /auth/refresh` | `refreshToken` | TODO | NOT_WRITTEN |
-| `POST /auth/logout` | `logout` | TODO | NOT_WRITTEN |
-| `POST /auth/login` | `login` | TODO | NOT_WRITTEN |
+| `POST /auth/refresh` | `refreshToken` | DONE | BLOCKED — đã viết, chờ tài khoản test chuyên dụng |
+| `POST /auth/logout` | `logout` | DONE | BLOCKED — đã viết, chờ tài khoản test chuyên dụng |
+| `POST /auth/login` | `login` | DONE | BLOCKED — đã viết, chờ tài khoản test chuyên dụng |
 | `POST /auth/change-password` | `changePassword` | TODO | NOT_WRITTEN |
 
 ## 03. Hồ sơ người dùng (User Profile) — 4 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `GET /users/me` | `getMyProfile` | TODO | NOT_WRITTEN |
-| `PUT /users/me` | `updateMyProfile` | TODO | NOT_WRITTEN |
+| `GET /users/me` | `getMyProfile` | DONE | BLOCKED — đã viết, chờ tài khoản test chuyên dụng |
+| `PUT /users/me` | `updateMyProfile` | DONE | NOT_WRITTEN — chỉ test UI mock, không sửa dữ liệu chung |
 | `DELETE /users/me` | `deleteMyProfile` | TODO | NOT_WRITTEN |
-| `GET /users/{userId}` | `getUserProfile` | TODO | NOT_WRITTEN |
+| `GET /users/{userId}` | `getUserProfile` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 04. Mạng xã hội - Bài viết (Posts) — 8 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `GET /posts/{id}` | `getPost` | TODO | NOT_WRITTEN |
-| `PUT /posts/{id}` | `updatePost` | TODO | NOT_WRITTEN |
-| `DELETE /posts/{id}` | `deletePost` | TODO | NOT_WRITTEN |
+| `GET /posts/{id}` | `getPost` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `PUT /posts/{id}` | `updatePost` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `DELETE /posts/{id}` | `deletePost` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 | `PUT /posts/{id}/lecturer-notes` | `updateLecturerNote` | TODO | NOT_WRITTEN |
-| `POST /posts` | `createPost` | TODO | NOT_WRITTEN |
+| `POST /posts` | `createPost` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 | `GET /video-posts` | `getVideoPosts` | TODO | NOT_WRITTEN |
-| `GET /users/{userId}/posts` | `getUserPosts` | TODO | NOT_WRITTEN |
-| `GET /posts/me` | `getMyPosts` | TODO | NOT_WRITTEN |
+| `GET /users/{userId}/posts` | `getUserPosts` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /posts/me` | `getMyPosts` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 05. Tương tác - Bình luận (Comments) — 4 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `PUT /comments/{commentId}` | `updateComment` | TODO | NOT_WRITTEN |
-| `DELETE /comments/{commentId}` | `deleteComment` | TODO | NOT_WRITTEN |
-| `GET /comments` | `getComments` | TODO | NOT_WRITTEN |
-| `POST /comments` | `createComment` | TODO | NOT_WRITTEN |
+| `PUT /comments/{commentId}` | `updateComment` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `DELETE /comments/{commentId}` | `deleteComment` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /comments` | `getComments` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `POST /comments` | `createComment` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 06. Tương tác - Cảm xúc (Reactions) — 1 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `POST /react` | `toggleReact` | TODO | NOT_WRITTEN |
+| `POST /react` | `toggleReact` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 07. Quan hệ - Kết bạn (Friendships) — 7 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `POST /friendships/request` | `sendFriendRequest` | TODO | NOT_WRITTEN |
-| `POST /friendships/decline` | `declineFriendRequest` | TODO | NOT_WRITTEN |
-| `POST /friendships/accept` | `acceptFriendRequest` | TODO | NOT_WRITTEN |
-| `GET /friendships` | `getMyFriends` | TODO | NOT_WRITTEN |
-| `GET /friendships/requests/sent` | `getSentFriendRequests` | TODO | NOT_WRITTEN |
-| `GET /friendships/requests/received` | `getReceivedFriendRequests` | TODO | NOT_WRITTEN |
-| `DELETE /friendships/{friendId}` | `unfriend` | TODO | NOT_WRITTEN |
+| `POST /friendships/request` | `sendFriendRequest` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `POST /friendships/decline` | `declineFriendRequest` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `POST /friendships/accept` | `acceptFriendRequest` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /friendships` | `getMyFriends` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /friendships/requests/sent` | `getSentFriendRequests` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /friendships/requests/received` | `getReceivedFriendRequests` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `DELETE /friendships/{friendId}` | `unfriend` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 08. Quan hệ - Theo dõi (Follows) — 5 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `POST /follows/{targetUserId}` | `followUser` | TODO | NOT_WRITTEN |
-| `DELETE /follows/{targetUserId}` | `unfollowUser` | TODO | NOT_WRITTEN |
-| `GET /users/{userId}/relationship-stats` | `getRelationshipStats` | TODO | NOT_WRITTEN |
-| `GET /follows/following` | `getFollowing` | TODO | NOT_WRITTEN |
-| `GET /follows/followers` | `getFollowers` | TODO | NOT_WRITTEN |
+| `POST /follows/{targetUserId}` | `followUser` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `DELETE /follows/{targetUserId}` | `unfollowUser` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /users/{userId}/relationship-stats` | `getRelationshipStats` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /follows/following` | `getFollowing` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /follows/followers` | `getFollowers` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 09. Quan hệ - Chặn (Blocks) — 3 APIs
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `POST /blocks/{targetUserId}` | `blockUser` | TODO | NOT_WRITTEN |
-| `DELETE /blocks/{targetUserId}` | `unblockUser` | TODO | NOT_WRITTEN |
-| `GET /blocks` | `getBlockedUsers` | TODO | NOT_WRITTEN |
+| `POST /blocks/{targetUserId}` | `blockUser` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `DELETE /blocks/{targetUserId}` | `unblockUser` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
+| `GET /blocks` | `getBlockedUsers` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 
 ## 10. Trò chuyện - Cuộc hội thoại (Conversations) — 14 APIs
 
@@ -136,7 +136,7 @@ Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](sou
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `GET /activity-feeds` | `getActivityFeeds` | TODO | NOT_WRITTEN |
+| `GET /activity-feeds` | `getActivityFeeds` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 | `GET /activity-feeds/new-count` | `getNewFeedCount` | TODO | NOT_WRITTEN |
 
 ## 15b. Danh mục Môn học (Subjects Catalog) — 1 APIs
@@ -246,7 +246,7 @@ Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](sou
 
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
-| `GET /search` | `search` | TODO | NOT_WRITTEN |
+| `GET /search` | `search` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 | `GET /search/saved` | `getSavedAndTrendingSearches` | TODO | NOT_WRITTEN |
 | `DELETE /search/saved/{id}` | `deleteSavedSearch` | TODO | NOT_WRITTEN |
 
@@ -261,7 +261,7 @@ Cập nhật 2026-10-26. Nguồn chính, bất biến: [source/openapi.json](sou
 | Method + path | operationId | Frontend | API test |
 |---|---|---|---|
 | `POST /medias/verify` | `verifyMedias` | TODO | NOT_WRITTEN |
-| `POST /medias/upload` | `uploadMedia` | TODO | NOT_WRITTEN |
+| `POST /medias/upload` | `uploadMedia` | DONE | BLOCKED — test đã viết, chờ cặp tài khoản test riêng |
 | `POST /medias/presign` | `getPresignedUrls` | TODO | NOT_WRITTEN |
 
 ## 28. Quản lý Thiết bị (Devices) — 5 APIs
