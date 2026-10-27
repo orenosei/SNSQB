@@ -1,27 +1,41 @@
 # Kế hoạch SNSQB
 
-Cập nhật 2026-10-26. Swagger là nguồn chính; PDF chỉ bổ sung khi không mâu thuẫn. Không sửa Swagger/backend và không yêu cầu duyệt lại các khác biệt PDF đã được Swagger định nghĩa. Phần hữu ích từ tài liệu Phase 0 cũ đã được gom vào đây, TEST_REPORT và các CSV hỗ trợ; không duy trì bộ Markdown phân tích riêng.
+Cập nhật 2026-10-27. Swagger là nguồn chính; PDF chỉ bổ sung khi không mâu thuẫn. Không sửa Swagger/backend và không yêu cầu duyệt lại các khác biệt PDF đã được Swagger định nghĩa. Phần hữu ích từ tài liệu Phase 0 cũ đã được gom vào đây, TEST_REPORT và các CSV hỗ trợ; không duy trì bộ Markdown phân tích riêng.
 
 ## Tiến độ và các phase
 
 - [x] Phase 0: rà tài liệu cũ, lấy Swagger làm chuẩn, lập API checklist và báo cáo trung thực.
-- [ ] **Phase 1 — Foundation + Authentication:** React/TypeScript/Vite/Tailwind; router/AppShell và UI cơ bản; Axios; login → profile → refresh → logout; cấu hình Vitest/Playwright và chặn request Admin.
-- [ ] **Phase 2 — Social Network:** feed, bài viết/media/video, comment/reply/edit, ba reaction, hồ sơ, friends/follows/blocks, search, notifications/settings.
+- [x] **Phase 1 — Foundation + Authentication:** đã triển khai frontend trong `frontend/`, login/profile/edit/refresh/logout, responsive AppShell, Axios chặn ngoài phạm vi và Playwright. Xác minh backend thật còn chờ tài khoản test.
+- [x] **Phase 2 — Core Social Network (phạm vi yêu cầu):** feed, CRUD bài viết thảo luận/media, comment/reply/edit/delete, LIKE/LOVE/WOW, hồ sơ công khai, friends/follows/blocks, search người dùng/bài viết. Notifications/settings và danh mục video bài giảng chưa thuộc đợt này.
 - [ ] **Phase 3 — Question Bank + Academic:** môn học/lớp/enrollment, đề xuất và duyệt câu hỏi, luyện tập/answer/rating/statistics, tạo/xem/xuất đề.
 - [ ] **Phase 4 — Realtime + Extended:** chat 1-1 trước, rồi group/hidden chat; games, leaderboard, badges, cosmetics, AI refine/apply; web push khi có cấu hình.
 - [ ] **Phase 5 — Testing + Defense:** regression, bổ sung coverage còn thiếu, sửa lỗi UI/integration, báo cáo kết quả và demo. Viết/chạy test phù hợp ngay trong từng phase, không dồn tới cuối.
 
 Core frontend: auth, social feed/post/comment/reaction, quan hệ/block, submission/review/practice/exam và chat 1-1. Các chức năng mở rộng làm sau core; mọi API non-Admin vẫn được theo dõi trong [API_CHECKLIST](API_CHECKLIST.md).
 
-## Việc đầu tiên khi bắt đầu Phase 1
+## Phase 1 đã triển khai
 
-1. Tạo Vite React TypeScript, Tailwind, router, component nền và scripts build/test. Dùng cấu trúc vừa đủ: `src/{app,components,features,lib}` và `tests/{api,e2e}`.
-2. Tạo Axios client đúng base URL, kiểm method/path được phép và chặn Admin trước transport; unit test chặn bằng mock, không gọi Admin thật.
-3. Login gửi `email`, `password`, `device_id`, `platform: WEB`; dùng đúng DTO `AuthResponse`, `GET /users/me`, `POST /auth/refresh` và `POST /auth/logout` không body.
-4. Làm login/profile/AppShell có loading/error/offline, validation và keyboard focus; viết test refresh/logout/validation có ý nghĩa.
-5. Chuẩn bị API/E2E tests và đọc credentials từ environment; chạy thật khi tài khoản test đã được cung cấp, cập nhật checklist/report bằng kết quả thực.
+- [x] React/TypeScript/Vite, Tailwind Vite plugin, Router, TanStack Query, Axios, Lucide; lockfile và `.env.example`, Node 22.12+.
+- [x] Login tiếng Việt, hồ sơ, chỉnh sửa hồ sơ, header/sidebar desktop và menu mobile. Các module social được mở tiếp trong Phase 2 bên dưới; mục chưa triển khai vẫn gắn “Sắp có”.
+- [x] Nối 5 operations: POST login/refresh/logout và GET/PUT users/me. Request/envelope/DTO theo Swagger; không Admin/đăng ký/reset.
+- [x] Token trong memory, route guard, refresh single-flight tối đa một lần/request, chặn phản hồi cũ khôi phục phiên, xóa cache khi logout; loading/error/validation và giữ draft khi lưu lỗi.
+- [x] TypeScript và production build PASS. Playwright: **58 lượt UI PASS (29 case × desktop/mobile), 2 bài backend SKIPPED** ngày 2026-10-27. Responsive kiểm 320/375/768/1280/1536 px và xem ảnh login/profile desktop/mobile.
+- [ ] Chạy API thật bằng tài khoản test chuyên dụng: bộ test đã viết cho login success/failure, GET profile, refresh, logout. Chưa có tài khoản test chuyên dụng nên chưa chạy bộ test backend; không suy PASS từ mock. Đã đối chiếu phản hồi login thực do người dùng gửi: code 1000, refresh_token null; frontend đã hỗ trợ, không lưu credentials/token. PUT profile chưa có test thật để tránh sửa dữ liệu dùng chung.
 
-**Chưa thực hiện các bước trên trong lần cập nhật này.** Không cần thêm vòng phân tích hoặc phê duyệt trước khi bắt đầu Phase 1 theo yêu cầu tiếp theo.
+Không thêm React Hook Form/Zod/Vitest vì form Phase 1 đơn giản và Playwright đã bao phủ hành vi cần kiểm. Cách chạy và giới hạn phiên ở [README](../README.md). Báo cáo hiện tại ở TEST_REPORT; CSV thiết kế Phase 0 được giữ nguyên.
+
+## Phase 2 đã triển khai
+
+- [x] Bảng tin `/` đọc `/activity-feeds`, phân trang theo cursor và resolve mục POST qua `/posts/{id}`; không suy diễn payload `content` của sự kiện. Sự kiện ngoài bài viết có nhãn chi tiết chưa khả dụng.
+- [x] Tạo/xem/sửa/xóa bài viết, bài của tôi, bài của người khác; PUBLIC/FRIENDS/ONLY_ME; chỉ hiện sửa/xóa cho tác giả, xác nhận trước khi xóa. Upload multipart qua `/medias/upload?purpose=POST|COMMENT`, map MediaItem đúng schema.
+- [x] Bình luận/phản hồi phân trang và sort newest/oldest; sửa/xóa bình luận của mình; ba cảm xúc toggle theo kết quả server, không cộng số đếm giả.
+- [x] Hồ sơ công khai, gửi/nhận/chấp nhận/từ chối lời mời, danh sách bạn bè/đã gửi/theo dõi/người theo dõi/đã chặn; unfriend/follow/unfollow/block/unblock. Invalidate cache sau mutation, reset nội dung nhạy cảm khi block/unblock.
+- [x] Tìm kiếm USER/POST bằng query/type/after/limit; cursor search dùng offset server trả, không tự thêm filter.
+- [x] 30 API operations mới; tổng 35/124 nối trong frontend. Không sửa backend/Swagger hoặc cơ chế auth; chỉ mở rộng allowlist endpoint và thông báo lỗi theo ngữ cảnh social.
+- [x] Typecheck/build PASS. `npm test`: **88 UI PASS (44 case × desktop/mobile), 16 API SKIPPED**. Có 15 UI case Phase 2 và 14 API case Phase 2; test API tách biệt, chỉ bật với cặp tài khoản test chuyên dụng. Đã xem ảnh feed desktop/mobile, kiểm responsive 320/768/1280 px trên sáu trang social và hồi quy màn Phase 1.
+- [ ] Chạy API suite thật khi có hai tài khoản cùng vai trò, không có quan hệ giữa hai tài khoản trước test. Không dùng credentials cá nhân từ hội thoại. Suite chỉ tạo/xóa post/comment của run, kiểm baseline và khôi phục quan hệ test.
+
+Giới hạn contract: GET post chỉ có reacted_by_me, không biết loại cảm xúc cũ; UI không tự gán LIKE. PENDING trong profile/stats không cho biết chiều lời mời; xử lý ở danh sách received/sent. Không có hủy lời mời đã gửi hoặc xóa media rời, không tự tạo endpoint. Chưa bắt đầu Phase 3. Chi tiết kiểm chứng ở [TEST_REPORT](TEST_REPORT.md).
 
 ## Quyết định và giả định đang dùng
 
@@ -32,11 +46,11 @@ Core frontend: auth, social feed/post/comment/reaction, quan hệ/block, submiss
 | Comment/reaction/privacy | Cho tác giả sửa comment; dùng LIKE/LOVE/WOW và toggle cùng loại để gỡ; hỗ trợ PUBLIC/FRIENDS/ONLY_ME. UI mặc định PUBLIC là lựa chọn sản phẩm, không phải default server. |
 | Group và xóa tài khoản | Có trong phạm vi vì Swagger hỗ trợ. Request tạo group tuân `member_ids` 2..99; không dùng mô tả 200 để vượt schema. Tự xóa tài khoản có xác nhận UI; test xóa chỉ dùng account disposable. |
 | Review và provenance | Session PENDING/REVIEWING/RESOLVED, question PENDING/APPROVED/REJECTED; không tự thêm bước NEEDS_EDIT/bảo lưu điểm từ PDF. Hiển thị field đúng DTO từng màn, không kết luận backend lỗi chỉ vì khác PDF. Review DTO không có source thì không tự thêm. |
-| Request/response | Dùng snake_case, kiểu và tên field của Swagger; thành công dự kiến `code: "0000"` theo info.description, kết hợp HTTP và dữ liệu. Đây là giả định cần đối chiếu response thật, không thay bằng `1000` từ PDF. |
+| Request/response | Dùng snake_case, kiểu và tên field của Swagger; kết hợp HTTP và envelope. Chấp nhận `code: "0000"` theo Swagger và `"1000"` theo phản hồi login thực do người dùng cung cấp. Hỗ trợ refresh_token null như phản hồi thực; không sửa Swagger/backend. |
 | Swagger tự chưa nhất quán | Ưu tiên constraint schema cho payload so với prose/ví dụ. Dùng description bổ sung semantics như owner, side effect và đơn vị tham số; không sửa source. Field optional không tự biến thành required nếu không có rule rõ. |
 | Security scheme | 38 operations dùng `bearerAuth` chưa được khai báo; giả định cùng JWT Bearer với `BearerAuth`, giữ xác thực. Không sửa spec hoặc coi chúng là public. |
 | Validation/media | Theo schema từng request: presign tối đa 10 file/request, mỗi file ≤15,728,640 bytes. Không lấy giới hạn ảnh 4MB/4 ảnh trong PDF để ghi đè Swagger; direct upload xử lý 413 khi server báo, không tự suy cùng giới hạn. |
-| Auth session/cache | Access/refresh token trong memory trước; reload đăng nhập lại. Refresh single-flight khi 401, không loop hoặc tự retry mutation có kết quả chưa rõ. TanStack Query cache ngắn theo feature, clear khi logout/đổi user; không cần duyệt cache theo PDF. |
+| Auth session/cache | Access/refresh token trong memory trước; reload đăng nhập lại. Refresh single-flight khi 401 và có refresh token; thiếu/null thì yêu cầu đăng nhập lại, không gửi request refresh. Không loop hoặc tự retry mutation có kết quả chưa rõ. TanStack Query cache ngắn theo feature, clear khi logout/đổi user; không cần duyệt cache theo PDF. |
 | GET có side effect | Mở review GET chuyển REVIEWING; GET messages cập nhật read receipt. Không prefetch/refetch tự động hai operation này. |
 | Chi tiết đã có trong Swagger | `friendId` là ID người bạn; `since` ở new-count là epoch milliseconds theo parameter description; statistics là API non-Admin được phép tích hợp. Không giữ các câu hỏi PDF cũ cho chúng. |
 | Tính năng không có API được phép | Không AI chat/history dưới `/admin/ai/chat**`, không endpoint Game3 riêng hoặc import ZIP do tự invent; chỉ dùng khả năng đã mô tả. |
@@ -66,7 +80,7 @@ Làm một luồng dùng được → thêm test có giá trị → kiểm UI re
 
 Đây là route UI, không phải endpoint mới. `QuestionCard` đọc từ session/practice; không invent `GET /questions/{id}`. Không có Admin UI hoặc AI chat route. Guard phân biệt role global, ownership, enrollment và membership; quyền thực tế vẫn do backend kiểm tra. Global roles là STUDENT/LECTURER/ADMIN; CHIEF/VILLAGE_ELDER/VILLAGER chỉ là vai trò trong group.
 
-UI gợi HUST với primary `#B91C35`, accent/focus `#1D4ED8`, nền `#F7F8FA`, surface `#FFFFFF`, chữ `#172033`/`#475569`; tokens tập trung, font hệ thống hỗ trợ tiếng Việt, body 16px/line-height 1.5. Card/form/dialog tái sử dụng; sidebar desktop, một cột mobile và chat list→thread. Kiểm 320/375/768/1280/1536px, zoom 200%, labels/keyboard/focus, contrast và reduced motion; trạng thái không chỉ biểu diễn bằng màu. Đây là lựa chọn frontend, chưa có screen hoặc CSS được triển khai.
+UI gợi HUST với primary `#B91C35`, accent/focus `#1D4ED8`, nền `#F7F8FA`, surface `#FFFFFF`, chữ `#172033`/`#475569`; tokens tập trung, font hệ thống hỗ trợ tiếng Việt, body 16px/line-height 1.5. Card/form/dialog tái sử dụng; sidebar desktop, một cột mobile và chat list→thread. Kiểm 320/375/768/1280/1536px, zoom 200%, labels/keyboard/focus, contrast và reduced motion; trạng thái không chỉ biểu diễn bằng màu. Login/profile/AppShell đã triển khai theo hướng này; các screen tương lai chưa được xây.
 
 API DTO giữ snake_case; mapper theo feature, không tự ép string/boolean hoặc bù field thiếu. Tách local form state khỏi server state; cursor theo response, đổi filter reset cursor. JWT không gửi sang presigned storage URLs; dùng client tách biệt cho upload/download. Markdown/LaTeX cần render an toàn, không raw HTML tùy ý. Không tự dựng online presence/event/ACK hoặc Idempotency-Key khi Swagger chưa mô tả. Rich message types và multi-select chưa rõ thì bắt đầu TEXT/single-choice, không coi đó là giới hạn backend đã xác minh.
 

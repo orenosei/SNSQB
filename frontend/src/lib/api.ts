@@ -1,0 +1,211 @@
+import axios, { AxiosError } from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
+import { getSession, rotateTokens, setSession } from "../features/auth/session";
+import type { RefreshTokenResponse, Tokens } from "../features/auth/types";
+
+export interface ApiEnvelope<T> {
+  code?: string;
+  message?: string;
+  data?: T;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
+    super(message);
+  }
+}
+
+export function unwrap<T>(response: { data: ApiEnvelope<T> }): T {
+  // Swagger documents 0000; the deployed login response supplied by the user uses 1000.
+  if (!["0000", "1000"].includes(response.data.code ?? "")) {
+    throw new ApiError(
+      response.data.message || "Yêu cầu chưa được thực hiện. Vui lòng thử lại.",
+      response.data.code,
+    );
+  }
+  return response.data.data as T;
+}
+
+export function requireTokens(data: RefreshTokenResponse | undefined): Tokens {
+  if (typeof data?.access_token !== "string" || !data.access_token.trim()) {
+    throw new ApiError(
+      "Phản hồi xác thực thiếu token. Vui lòng đăng nhập lại.",
+    );
+  }
+  return {
+    access_token: data.access_token,
+    refresh_token:
+      typeof data.refresh_token === "string" && data.refresh_token.trim()
+        ? data.refresh_token
+        : null,
+  };
+}
+
+const baseURL = (
+  import.meta.env.VITE_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
+).replace(/\/+$/, "");
+const options = {
+  baseURL,
+  timeout: 15_000,
+  headers: { "Content-Type": "application/json" },
+};
+export const api = axios.create(options);
+const refreshClient = axios.create(options);
+
+// Only implemented non-Admin operations are allowed. Deny everything else before transport,
+// including absolute URLs and any Admin operation; don't send JWTs to other hosts.
+const allowed = new Set([
+  "post /auth/login",
+  "post /auth/logout",
+  "get /users/me",
+  "put /users/me",
+  "get /activity-feeds",
+  "post /posts",
+  "get /posts/me",
+  "get /comments",
+  "post /comments",
+  "post /react",
+  "get /friendships",
+  "post /friendships/request",
+  "post /friendships/accept",
+  "post /friendships/decline",
+  "get /friendships/requests/received",
+  "get /friendships/requests/sent",
+  "get /follows/following",
+  "get /follows/followers",
+  "get /blocks",
+  "get /search",
+  "post /medias/upload",
+]);
+const resourceOperations = [
+  /^(get|put|delete) \/posts\/[1-9]\d*$/,
+  /^(put|delete) \/comments\/[1-9]\d*$/,
+  /^get \/users\/[1-9]\d*(\/posts|\/relationship-stats)?$/,
+  /^delete \/friendships\/[1-9]\d*$/,
+  /^(post|delete) \/(follows|blocks)\/[1-9]\d*$/,
+];
+type RetryConfig = InternalAxiosRequestConfig & {
+  _retried?: boolean;
+  _sessionRevision?: number;
+};
+api.interceptors.request.use((config) => {
+  const operation = `${config.method?.toLowerCase()} ${config.url}`;
+  if (
+    !(
+      allowed.has(operation) ||
+      resourceOperations.some((pattern) => pattern.test(operation))
+    ) ||
+    config.baseURL !== baseURL
+  ) {
+    throw new ApiError("API này chưa được hỗ trợ trong phiên bản hiện tại.");
+  }
+  const request = config as RetryConfig;
+  if (
+    request._sessionRevision !== undefined &&
+    request._sessionRevision !== getSession().revision
+  ) {
+    throw new ApiError("Phiên đăng nhập đã thay đổi. Vui lòng thử lại.");
+  }
+  request._sessionRevision = getSession().revision;
+  config.headers.delete("Authorization");
+  const tokens = getSession().tokens;
+  if (tokens && config.url !== "/auth/login")
+    config.headers.set("Authorization", `Bearer ${tokens.access_token}`);
+  return config;
+});
+
+let refreshFlight: { session: Tokens; promise: Promise<Tokens> } | null = null;
+async function refreshSession(session: Tokens): Promise<Tokens> {
+  if (refreshFlight?.session === session) return refreshFlight.promise;
+  const promise = (async () => {
+    try {
+      const response = await refreshClient.post<
+        ApiEnvelope<RefreshTokenResponse>
+      >("/auth/refresh", {
+        refresh_token: session.refresh_token,
+      });
+      const tokens = requireTokens(unwrap(response));
+      // Logout or a new login may have happened while refresh was in flight.
+      if (getSession().tokens !== session)
+        throw new ApiError("Phiên đăng nhập đã thay đổi.");
+      rotateTokens(tokens);
+      return tokens;
+    } catch (error) {
+      if (getSession().tokens === session)
+        setSession(null, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+      throw error;
+    }
+  })();
+  refreshFlight = { session, promise };
+  try {
+    return await promise;
+  } finally {
+    if (refreshFlight?.promise === promise) refreshFlight = null;
+  }
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const config = error.config as RetryConfig | undefined;
+    const session = getSession().tokens;
+    if (
+      error.response?.status !== 401 ||
+      !config ||
+      config.url === "/auth/login" ||
+      !session ||
+      config._sessionRevision !== getSession().revision
+    )
+      throw error;
+    if (config._retried) {
+      if (
+        config.headers.get("Authorization") === `Bearer ${session.access_token}`
+      ) {
+        setSession(
+          null,
+          "Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.",
+        );
+      }
+      throw error;
+    }
+    config._retried = true;
+    // A concurrent request may already have refreshed this access token.
+    if (
+      config.headers.get("Authorization") === `Bearer ${session.access_token}`
+    ) {
+      if (!session.refresh_token) {
+        setSession(null, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        throw error;
+      }
+      await refreshSession(session);
+    }
+    if (!getSession().tokens) throw error;
+    return api(config);
+  },
+);
+
+export function errorMessage(error: unknown): string {
+  if (error instanceof ApiError) return error.message;
+  if (axios.isAxiosError(error)) {
+    if (!error.response)
+      return "Không thể kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại.";
+    if (error.response.status === 400)
+      return "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
+    if (error.response.status === 401)
+      return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+    if (error.response.status === 403)
+      return "Tài khoản chưa được kích hoạt, bị khóa hoặc không có quyền truy cập. Nội dung cũng có thể bị giới hạn quyền riêng tư hoặc chặn.";
+    if (error.response.status === 404)
+      return "Nội dung không còn tồn tại hoặc không thể truy cập.";
+    if (error.response.status === 409)
+      return "Trạng thái đã thay đổi hoặc yêu cầu đang chờ xử lý. Hãy tải lại dữ liệu trước khi thử lại.";
+    if (error.response.status === 413)
+      return "Máy chủ từ chối tệp vì kích thước quá lớn. Hãy chọn tệp nhỏ hơn.";
+    if (error.response.status === 429)
+      return "Bạn thao tác quá nhanh. Vui lòng thử lại sau.";
+  }
+  return "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
+}
