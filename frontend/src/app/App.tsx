@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, Link } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "./AppShell";
@@ -15,6 +15,64 @@ import {
 import { PeoplePage } from "../features/people/PeoplePage";
 import { UserPage } from "../features/people/UserPage";
 import { SearchPage } from "../features/search/SearchPage";
+import { ChatPage } from "../features/chat/ChatPage";
+import { NotificationsPage } from "../features/notifications/NotificationsPage";
+import { NotificationSettingsPage } from "../features/notifications/SettingsPage";
+import { ChangePasswordPage } from "../features/auth/ChangePasswordPage";
+import { VideoPage } from "../features/feed/VideoPage";
+import { LecturerOnly } from "../features/academic/components";
+
+// Keep academic screens out of the initial social/auth bundle.
+const BankPage = lazy(() =>
+  import("../features/academic/BankPage").then((module) => ({
+    default: module.BankPage,
+  })),
+);
+const SubmissionsPage = lazy(() =>
+  import("../features/academic/SubmissionPages").then((module) => ({
+    default: module.SubmissionsPage,
+  })),
+);
+const SubmissionDetailPage = lazy(() =>
+  import("../features/academic/SubmissionPages").then((module) => ({
+    default: module.SubmissionDetailPage,
+  })),
+);
+const SubmissionEditorPage = lazy(() =>
+  import("../features/academic/SubmissionPages").then((module) => ({
+    default: module.SubmissionEditorPage,
+  })),
+);
+const PracticePage = lazy(() =>
+  import("../features/academic/PracticePage").then((module) => ({
+    default: module.PracticePage,
+  })),
+);
+const ReviewListPage = lazy(() =>
+  import("../features/academic/ReviewPages").then((module) => ({
+    default: module.ReviewListPage,
+  })),
+);
+const ReviewDetailPage = lazy(() =>
+  import("../features/academic/ReviewPages").then((module) => ({
+    default: module.ReviewDetailPage,
+  })),
+);
+const ExamsPage = lazy(() =>
+  import("../features/academic/ExamPages").then((module) => ({
+    default: module.ExamsPage,
+  })),
+);
+const ExamCreatePage = lazy(() =>
+  import("../features/academic/ExamPages").then((module) => ({
+    default: module.ExamCreatePage,
+  })),
+);
+const ExamDetailPage = lazy(() =>
+  import("../features/academic/ExamPages").then((module) => ({
+    default: module.ExamDetailPage,
+  })),
+);
 
 function ProtectedRoute() {
   const { tokens } = useSession();
@@ -40,6 +98,63 @@ export function App() {
           <Route path="/friends" element={<PeoplePage />} />
           <Route path="/users/:userId" element={<UserPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
+          <Route path="/settings/password" element={<ChangePasswordPage />} />
+          <Route path="/videos" element={<VideoPage />} />
+          <Route path="/question-bank" element={<BankPage />} />
+          <Route path="/submissions" element={<SubmissionsPage />} />
+          <Route path="/submissions/new" element={<SubmissionEditorPage />} />
+          <Route
+            path="/submissions/:sessionId"
+            element={<SubmissionDetailPage />}
+          />
+          <Route
+            path="/submissions/:sessionId/edit"
+            element={<SubmissionEditorPage />}
+          />
+          <Route path="/practice/:sessionId" element={<PracticePage />} />
+          <Route
+            path="/lecturer/reviews"
+            element={
+              <LecturerOnly>
+                <ReviewListPage />
+              </LecturerOnly>
+            }
+          />
+          <Route
+            path="/lecturer/reviews/:sessionId"
+            element={
+              <LecturerOnly>
+                <ReviewDetailPage />
+              </LecturerOnly>
+            }
+          />
+          <Route
+            path="/lecturer/exams"
+            element={
+              <LecturerOnly>
+                <ExamsPage />
+              </LecturerOnly>
+            }
+          />
+          <Route
+            path="/lecturer/exams/new"
+            element={
+              <LecturerOnly>
+                <ExamCreatePage />
+              </LecturerOnly>
+            }
+          />
+          <Route
+            path="/lecturer/exams/:examId"
+            element={
+              <LecturerOnly>
+                <ExamDetailPage />
+              </LecturerOnly>
+            }
+          />
           <Route path="/me" element={<ProfilePage />} />
           <Route path="/settings/profile" element={<EditProfilePage />} />
           <Route

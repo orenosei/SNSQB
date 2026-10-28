@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Search } from "lucide-react";
 import { Avatar } from "../../components/Avatar";
 import { Loading } from "../../components/Feedback";
@@ -10,7 +11,9 @@ import {
 } from "../../components/SocialFeedback";
 import { formatTime, validId } from "../../lib/cursor";
 import { UserCard } from "../people/UserCard";
-import { useSearch } from "./api";
+import { deleteSavedSearch, getSavedSearches, useSearch } from "./api";
+import { errorMessage } from "../../lib/api";
+import { ErrorNotice } from "../../components/Feedback";
 
 export function SearchPage() {
   const [params, setParams] = useSearchParams();
@@ -21,6 +24,9 @@ export function SearchPage() {
     setDraft(term);
   }, [term]);
   const query = useSearch(term, type);
+  const saved = useQuery({ queryKey: ["saved-searches"], queryFn: getSavedSearches });
+  const client = useQueryClient();
+  const removeSaved = useMutation({ mutationFn: deleteSavedSearch, onSuccess: () => void client.invalidateQueries({ queryKey: ["saved-searches"] }) });
   const items = query.data?.pages.flatMap((page) => page.items || []) || [];
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -53,6 +59,9 @@ export function SearchPage() {
           Tìm kiếm
         </button>
       </form>
+      {!!saved.data?.saved_searches?.length && <section className="surface search-saved"><h2>Tìm kiếm gần đây</h2><div className="search-chip-list">{saved.data.saved_searches.map(item => <span key={item.saved_search_id} className="search-chip"><button onClick={() => item.query_text && setParams({query:item.query_text,type})}>{item.query_text}</button><button aria-label={`Xóa ${item.query_text} khỏi lịch sử`} disabled={removeSaved.isPending} onClick={() => item.saved_search_id && removeSaved.mutate(item.saved_search_id)}>×</button></span>)}</div></section>}
+      {!!saved.data?.trending_searches?.length && <section className="surface search-saved"><h2>Đang được tìm kiếm</h2><div className="search-chip-list">{saved.data.trending_searches.map(item => <button key={item} className="search-chip" onClick={() => setParams({query:item,type})}>{item}</button>)}</div></section>}
+      {removeSaved.isError && <ErrorNotice message={errorMessage(removeSaved.error)}/>}
       <nav className="social-tabs" aria-label="Loại kết quả tìm kiếm">
         {(["USER", "POST"] as const).map((value) => (
           <button
