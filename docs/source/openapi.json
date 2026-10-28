@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Hệ Thống Mạng Xã Hội Học Tập & Ngân Hàng Đề Thi - SQB HUST",
-    "description": "Tài liệu đặc tả và kiểm thử tương tác toàn bộ 143+ REST API & Giao thức WebSocket STOMP của nền tảng SQB (Social Network Student-Generated Question Bank).\n\n\u003E ⚠️ **LƯU Ý:** Các API dành cho admin không cần gọi và không được gọi.\n\n---\n\n### 🔑 Hướng dẫn xác thực:\n1. Gọi API `/auth/login` để lấy JWT `access_token`.\n2. Nhấn nút **Authorize** ở góc phải trên cùng màn hình, dán token vào ô `Value` (không cần gõ thêm chữ `Bearer `).\n3. Nhấn **Authorize** để tự động gắn Header Authorization cho mọi API cần kiểm thử.\n\n---\n\n### 📦 Cấu trúc phản hồi chuẩn (GlobalResponse Envelope):\nTất cả các REST API trong hệ thống đều trả về theo định dạng vỏ bọc thống nhất (snake_case):\n```json\n{\n  \"code\": \"0000\",\n  \"message\": \"Thành công\",\n  \"data\": { ... Payload nghiệp vụ ... }\n}\n```\n\n---\n\n### 📡 Đặc tả giao thức Realtime WebSocket STOMP (Chat & Trực tuyến):\n\n- **Endpoint kết nối Handshake:** `ws://\u003Cdomain\u003E/api/v1/ws` (Client có thể dùng `@stomp/stompjs` hoặc `sockjs-client`).\n- **Header xác thực khi CONNECT:** `Authorization: Bearer \u003Cjwt_access_token\u003E`.\n- **Tiền tố Application (Client -\u003E Server):** `/app`\n- **Tiền tố Broker (Server -\u003E Client):** `/user` (kênh riêng tư) và `/topic` (kênh nhóm/cộng đồng)\n\n#### 1. Kênh Client gửi lên Server (Publish Destinations):\n\n| STOMP Destination | Mô tả nghiệp vụ | Payload DTO & Các trường chính (snake_case) |\n| :--- | :--- | :--- |\n| `/app/chat.send` | Gửi tin nhắn mới trong hội thoại | `SendWsMessageRequestDto`\u003Cbr\u003E• `conversation_id` (Long)\u003Cbr\u003E• `content` (String)\u003Cbr\u003E• `message_type` (TEXT / IMAGE / FILE)\u003Cbr\u003E• `media_urls` (List&lt;String&gt;)\u003Cbr\u003E• `reply_to_message_id` (Long) |\n| `/app/chat.read` | Báo đã đọc tin nhắn trong cuộc hội thoại | `ReadWsMessageRequestDto`\u003Cbr\u003E• `conversation_id` (Long)\u003Cbr\u003E• `message_id` (Long) |\n| `/app/chat.typing` | Phát sự kiện đang soạn / dừng soạn tin nhắn | `TypingWsRequestDto`\u003Cbr\u003E• `conversation_id` (Long)\u003Cbr\u003E• `is_typing` (Boolean) |\n\n#### 2. Kênh Client đăng ký lắng nghe (Subscribe Topics / Queues):\n\n| STOMP Topic / Queue | Mô tả sự kiện | Payload DTO nhận được (snake_case) |\n| :--- | :--- | :--- |\n| `/user/queue/messages` | Lắng nghe tin nhắn cá nhân 1-1, thông báo hệ thống và biên nhận đã đọc | `WsMessageBroadcastDto` / `WsReadReceiptBroadcastDto` |\n| `/topic/conv.{conversation_id}.typing` | Lắng nghe sự kiện thành viên trong cuộc hội thoại đang soạn tin | `WsTypingBroadcastDto` |\n",
+    "description": "Tài liệu đặc tả và kiểm thử tương tác toàn bộ 143+ REST API & Giao thức WebSocket STOMP của nền tảng SQB (Social Network Student-Generated Question Bank).\n\n> ⚠️ **LƯU Ý:** Các API dành cho admin không cần gọi và không được gọi.\n\n---\n\n### 🔑 Hướng dẫn xác thực:\n1. Gọi API `/auth/login` để lấy JWT `access_token`.\n2. Nhấn nút **Authorize** ở góc phải trên cùng màn hình, dán token vào ô `Value` (không cần gõ thêm chữ `Bearer `).\n3. Nhấn **Authorize** để tự động gắn Header Authorization cho mọi API cần kiểm thử.\n\n---\n\n### 📦 Cấu trúc phản hồi chuẩn (GlobalResponse Envelope):\nTất cả các REST API trong hệ thống đều trả về theo định dạng vỏ bọc thống nhất (snake_case):\n```json\n{\n  \"code\": \"0000\",\n  \"message\": \"Thành công\",\n  \"data\": { ... Payload nghiệp vụ ... }\n}\n```\n\n---\n\n### 📡 Đặc tả giao thức Realtime WebSocket STOMP (Chat & Trực tuyến):\n\n- **Endpoint kết nối Handshake:** `ws://<domain>/api/v1/ws` (Client có thể dùng `@stomp/stompjs` hoặc `sockjs-client`).\n- **Header xác thực khi CONNECT:** `Authorization: Bearer <jwt_access_token>`.\n- **Tiền tố Application (Client -> Server):** `/app`\n- **Tiền tố Broker (Server -> Client):** `/user` (kênh riêng tư) và `/topic` (kênh nhóm/cộng đồng)\n\n#### 1. Kênh Client gửi lên Server (Publish Destinations):\n\n| STOMP Destination | Mô tả nghiệp vụ | Payload DTO & Các trường chính (snake_case) |\n| :--- | :--- | :--- |\n| `/app/chat.send` | Gửi tin nhắn mới trong hội thoại | `SendWsMessageRequestDto`<br>• `conversation_id` (Long)<br>• `content` (String)<br>• `message_type` (TEXT / IMAGE / FILE)<br>• `media_urls` (List&lt;String&gt;)<br>• `reply_to_message_id` (Long) |\n| `/app/chat.read` | Báo đã đọc tin nhắn trong cuộc hội thoại | `ReadWsMessageRequestDto`<br>• `conversation_id` (Long)<br>• `message_id` (Long) |\n| `/app/chat.typing` | Phát sự kiện đang soạn / dừng soạn tin nhắn | `TypingWsRequestDto`<br>• `conversation_id` (Long)<br>• `is_typing` (Boolean) |\n\n#### 2. Kênh Client đăng ký lắng nghe (Subscribe Topics / Queues):\n\n| STOMP Topic / Queue | Mô tả sự kiện | Payload DTO nhận được (snake_case) |\n| :--- | :--- | :--- |\n| `/user/queue/messages` | Lắng nghe tin nhắn cá nhân 1-1, thông báo hệ thống và biên nhận đã đọc | `WsMessageBroadcastDto` / `WsReadReceiptBroadcastDto` |\n| `/topic/conv.{conversation_id}.typing` | Lắng nghe sự kiện thành viên trong cuộc hội thoại đang soạn tin | `WsTypingBroadcastDto` |\n",
     "contact": {
       "name": "Đội ngũ phát triển SQB HUST",
       "email": "bangiaohuongmuadong@gmail.com"
@@ -1770,7 +1770,7 @@
           "17. Phiên Đề xuất Câu hỏi (Sessions)"
         ],
         "summary": "Đề xuất phiên câu hỏi mới",
-        "description": "Sinh viên/người dùng đề xuất danh sách câu hỏi trắc nghiệm kèm đáp án và hình ảnh cho một môn học đang theo học.",
+        "description": "Sinh viên/người dùng đề xuất danh sách câu hỏi trắc nghiệm kèm đáp án và hình ảnh cho một lớp học phần trong học kỳ hiện tại.",
         "operationId": "proposeSession",
         "requestBody": {
           "content": {
@@ -1794,7 +1794,7 @@
             }
           },
           "400": {
-            "description": "Dữ liệu không hợp lệ hoặc môn học không tồn tại",
+            "description": "Dữ liệu không hợp lệ hoặc lớp học phần không thuộc học kỳ hiện tại",
             "content": {
               "*/*": {
                 "schema": {
@@ -1804,7 +1804,7 @@
             }
           },
           "403": {
-            "description": "Từ chối truy cập: Sinh viên chưa đăng ký lớp học phần thuộc môn này",
+            "description": "Từ chối truy cập: Người dùng không có quyền đề xuất cho lớp học phần này",
             "content": {
               "*/*": {
                 "schema": {
@@ -4045,7 +4045,7 @@
           "10. Trò chuyện - Cuộc hội thoại (Conversations)"
         ],
         "summary": "Rời khỏi nhóm chat",
-        "description": "Tự rời khỏi nhóm. Nếu Tù trưởng rời nhóm, có thể chỉ định người kế nhiệm hoặc hệ thống sẽ tự động chuyển quyền theo thứ tự ưu tiên: Già làng lâu năm nhất -\u003E Dân làng tham gia sớm nhất.",
+        "description": "Tự rời khỏi nhóm. Nếu Tù trưởng rời nhóm, có thể chỉ định người kế nhiệm hoặc hệ thống sẽ tự động chuyển quyền theo thứ tự ưu tiên: Già làng lâu năm nhất -> Dân làng tham gia sớm nhất.",
         "operationId": "leaveGroup",
         "parameters": [
           {
@@ -6347,21 +6347,21 @@
         ]
       }
     },
-    "/sessions/my-enrolled-subjects": {
+    "/sessions/my-enrolled-course-classes": {
       "get": {
         "tags": [
           "17. Phiên Đề xuất Câu hỏi (Sessions)"
         ],
-        "summary": "Lấy danh sách môn học người dùng đang tham gia",
-        "description": "Trả về danh sách các môn học mà sinh viên đang theo học dựa trên các lớp học phần đã tham gia.",
-        "operationId": "getMyEnrolledSubjects",
+        "summary": "Lấy danh sách lớp học phần người dùng đang tham gia",
+        "description": "Trả về cả lớp của học kỳ hiện tại và lịch sử; chỉ lớp thuộc học kỳ hiện tại có can_propose=true.",
+        "operationId": "getMyEnrolledCourseClasses",
         "responses": {
           "200": {
             "description": "Lấy danh sách môn học thành công",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/GlobalResponseListSubjectResponse"
+                  "$ref": "#/components/schemas/GlobalResponseListCourseClassOptionResponse"
                 }
               }
             }
@@ -9222,11 +9222,11 @@
             "description": "Đường dẫn tài liệu nguồn tham khảo",
             "example": "https://tailieu.hust.edu.vn/it3080/chapter3.pdf"
           },
-          "subject_id": {
+          "course_class_id": {
             "type": "integer",
             "format": "int64",
-            "description": "ID môn học",
-            "example": 10
+            "description": "ID lớp học phần",
+            "example": 100
           },
           "questions": {
             "type": "array",
@@ -10176,7 +10176,10 @@
           "question_ids": {
             "type": "array",
             "description": "Danh sách ID câu hỏi bị từ chối",
-            "example": [104, 105],
+            "example": [
+              104,
+              105
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -10213,11 +10216,11 @@
             "description": "Nguồn tài liệu tham khảo (URL giáo trình, tài liệu tham khảo online)",
             "example": "https://microservices.io/patterns"
           },
-          "subject_id": {
+          "course_class_id": {
             "type": "integer",
             "format": "int64",
-            "description": "ID môn học trong hệ thống mà sinh viên đang theo học",
-            "example": 10
+            "description": "ID lớp học phần mà sinh viên đang theo học trong học kỳ hiện tại",
+            "example": 100
           },
           "questions": {
             "type": "array",
@@ -10229,8 +10232,8 @@
           }
         },
         "required": [
+          "course_class_id",
           "questions",
-          "subject_id",
           "title"
         ]
       },
@@ -10321,6 +10324,17 @@
             "description": "ID môn học",
             "example": 10
           },
+          "course_class_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID lớp học phần",
+            "example": 100
+          },
+          "semester_name": {
+            "type": "string",
+            "description": "Tên học kỳ",
+            "example": "20261"
+          },
           "question_count": {
             "type": "integer",
             "format": "int32",
@@ -10350,7 +10364,11 @@
           "question_ids": {
             "type": "array",
             "description": "Danh sách ID câu hỏi cần phê duyệt",
-            "example": [101, 102, 103],
+            "example": [
+              101,
+              102,
+              103
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -10370,7 +10388,7 @@
             "type": "number",
             "format": "double",
             "description": "Tổng điểm thưởng đã cộng cho tác giả",
-            "example": 30
+            "example": 30.0
           }
         }
       },
@@ -11416,7 +11434,11 @@
           "student_user_ids": {
             "type": "array",
             "description": "Danh sách ID tài khoản người dùng trực tiếp",
-            "example": [5, 6, 7],
+            "example": [
+              5,
+              6,
+              7
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -11486,7 +11508,10 @@
           "selected_llm_question_ids": {
             "type": "array",
             "description": "Danh sách ID các câu hỏi mà bạn phán đoán do AI tạo",
-            "example": [105, 107],
+            "example": [
+              105,
+              107
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -11664,13 +11689,13 @@
             "type": "number",
             "format": "double",
             "description": "Số xu nhận được từ lượt điểm danh này",
-            "example": 1
+            "example": 1.0
           },
           "current_coin_balance": {
             "type": "number",
             "format": "double",
             "description": "Tổng số dư xu mới sau điểm danh",
-            "example": 25
+            "example": 25.0
           },
           "current_streak": {
             "type": "integer",
@@ -11845,7 +11870,7 @@
             "type": "number",
             "format": "double",
             "description": "Tỉ lệ câu chưa phân loại",
-            "example": 0
+            "example": 0.0
           }
         }
       },
@@ -11899,7 +11924,10 @@
           "class_ids": {
             "type": "array",
             "description": "Danh sách ID các lớp học phần được áp dụng đề thi này",
-            "example": [101, 102],
+            "example": [
+              101,
+              102
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -12161,13 +12189,13 @@
             "type": "number",
             "format": "double",
             "description": "Giá bán hiện tại (SQB Coins)",
-            "example": 250
+            "example": 250.0
           },
           "original_price": {
             "type": "number",
             "format": "double",
             "description": "Giá gốc trước khi giảm giá (nếu có)",
-            "example": 300
+            "example": 300.0
           },
           "available_until": {
             "type": "string",
@@ -12186,7 +12214,11 @@
           "user_ids": {
             "type": "array",
             "description": "Danh sách ID các người dùng cần thêm vào nhóm",
-            "example": [5, 6, 7],
+            "example": [
+              5,
+              6,
+              7
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -12318,7 +12350,11 @@
           "member_ids": {
             "type": "array",
             "description": "Danh sách ID các thành viên mời vào nhóm (tối thiểu 2 thành viên khác người tạo)",
-            "example": [2, 3, 4],
+            "example": [
+              2,
+              3,
+              4
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -13077,7 +13113,11 @@
           "user_ids": {
             "type": "array",
             "description": "Danh sách ID người dùng được cấp huy hiệu",
-            "example": [10, 15, 23],
+            "example": [
+              10,
+              15,
+              23
+            ],
             "items": {
               "type": "integer",
               "format": "int64",
@@ -13347,6 +13387,38 @@
             "description": "Mã môn học",
             "example": "IT3180"
           },
+          "course_class_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID lớp học phần",
+            "example": 100
+          },
+          "class_code": {
+            "type": "string",
+            "description": "Mã lớp học phần",
+            "example": "171146"
+          },
+          "semester_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID học kỳ",
+            "example": 2
+          },
+          "semester_name": {
+            "type": "string",
+            "description": "Tên học kỳ",
+            "example": "20261"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thực tế của phiên đề xuất",
+            "enum": [
+              "PENDING",
+              "REVIEWING",
+              "RESOLVED"
+            ],
+            "example": "PENDING"
+          },
           "question_counts": {
             "type": "integer",
             "format": "int32",
@@ -13441,6 +13513,9 @@
               "DECLINED"
             ]
           },
+          "followed_by": {
+            "type": "boolean"
+          },
           "friend": {
             "type": "boolean"
           },
@@ -13448,9 +13523,6 @@
             "type": "boolean"
           },
           "following": {
-            "type": "boolean"
-          },
-          "followed_by": {
             "type": "boolean"
           }
         }
@@ -13977,6 +14049,38 @@
             "description": "Mã môn học",
             "example": "IT3180"
           },
+          "course_class_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID lớp học phần",
+            "example": 100
+          },
+          "class_code": {
+            "type": "string",
+            "description": "Mã lớp học phần",
+            "example": "171146"
+          },
+          "semester_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID học kỳ",
+            "example": 2
+          },
+          "semester_name": {
+            "type": "string",
+            "description": "Tên học kỳ",
+            "example": "20261"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thực tế của phiên đề xuất",
+            "enum": [
+              "PENDING",
+              "REVIEWING",
+              "RESOLVED"
+            ],
+            "example": "PENDING"
+          },
           "comment_count": {
             "type": "integer",
             "format": "int32",
@@ -14082,6 +14186,57 @@
             "format": "int32",
             "description": "Số lượt đánh giá chất lượng sao",
             "example": 15
+          }
+        }
+      },
+      "CourseClassOptionResponse": {
+        "description": "Lớp học phần có thể hiển thị trong danh sách đề xuất câu hỏi",
+        "properties": {
+          "course_class_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "class_code": {
+            "type": "string"
+          },
+          "subject_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "subject_code": {
+            "type": "string"
+          },
+          "subject_name": {
+            "type": "string"
+          },
+          "semester_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "semester_name": {
+            "type": "string"
+          },
+          "active_semester": {
+            "type": "boolean"
+          },
+          "can_propose": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GlobalResponseListCourseClassOptionResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseClassOptionResponse"
+            }
           }
         }
       },
@@ -14715,7 +14870,7 @@
             "type": "number",
             "format": "double",
             "description": "Điểm số đánh giá [0; 4]",
-            "example": 4
+            "example": 4.0
           },
           "is_error": {
             "type": "boolean",
@@ -15324,7 +15479,7 @@
             "type": "number",
             "format": "double",
             "description": "Tổng điểm tích lũy",
-            "example": 1250
+            "example": 1250.0
           },
           "top_percent": {
             "type": "number",
@@ -15680,10 +15835,10 @@
             "type": "string",
             "format": "date-time"
           },
-          "following_back": {
+          "friend": {
             "type": "boolean"
           },
-          "friend": {
+          "following_back": {
             "type": "boolean"
           }
         }
@@ -15858,7 +16013,7 @@
             "type": "number",
             "format": "double",
             "description": "Số dư SQB Coins hiện tại của người dùng",
-            "example": 1500
+            "example": 1500.0
           },
           "items": {
             "type": "array",
@@ -16212,10 +16367,10 @@
             "type": "string",
             "format": "date-time"
           },
-          "revoked": {
+          "edited": {
             "type": "boolean"
           },
-          "edited": {
+          "revoked": {
             "type": "boolean"
           }
         }

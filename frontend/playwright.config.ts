@@ -1,6 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+import { existsSync } from "node:fs";
+import { loadEnvFile } from "node:process";
+import { fileURLToPath } from "node:url";
 
 const apiOnly = process.argv.includes("--project=api-real");
+const realtime = process.argv.includes("--project=realtime");
+const envFile = fileURLToPath(new URL(".env", import.meta.url));
+if ((apiOnly || realtime) && existsSync(envFile)) loadEnvFile(envFile);
 
 export default defineConfig({
   testDir: "./tests",
@@ -30,6 +36,11 @@ export default defineConfig({
       testDir: "./tests/api",
       use: { trace: "off", screenshot: "off", video: "off" },
     },
+    {
+      name: "realtime",
+      testDir: "./tests/realtime",
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
   webServer: apiOnly
     ? undefined
@@ -37,6 +48,10 @@ export default defineConfig({
         command: "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",
         url: "http://127.0.0.1:4173",
         reuseExistingServer: false,
-        env: { VITE_API_BASE_URL: "http://127.0.0.1:4173/api/v1" },
+        env: {
+          VITE_API_BASE_URL: realtime
+            ? process.env.SNSQB_TEST_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
+            : "http://127.0.0.1:4173/api/v1",
+        },
       },
 });

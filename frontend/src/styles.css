@@ -669,8 +669,13 @@ svg {
   flex-direction: column;
   justify-content: space-between;
   padding: 30px 18px 18px;
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 20;
+}
+.sidebar-top {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 .sidebar-label {
   color: #8a93a0;
@@ -730,7 +735,8 @@ svg {
   padding: 9px 14px;
 }
 .sidebar-bottom {
-  margin-top: 35px;
+  margin-top: 18px;
+  flex-shrink: 0;
 }
 .sidebar-promo {
   padding: 19px 16px;

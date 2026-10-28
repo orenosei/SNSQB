@@ -3,17 +3,17 @@ import { randomUUID } from "node:crypto";
 
 const email = process.env.SNSQB_TEST_EMAIL;
 const password = process.env.SNSQB_TEST_PASSWORD;
-const enabled = process.env.SNSQB_RUN_REAL_API === "1" && !!email && !!password;
+const enabled = !!email && !!password;
 const successCodes = ["0000", "1000"];
 const base = (
   process.env.SNSQB_TEST_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
 ).replace(/\/+$/, "");
 
-test.describe("Dedicated-account backend API tests (no shared-data edits)", () => {
+test.describe("Real authentication API tests", () => {
   test.describe.configure({ mode: "serial" });
   test.skip(
     !enabled,
-    "Cần SNSQB_RUN_REAL_API=1 và credentials của tài khoản test chuyên dụng.",
+    "Cần SNSQB_TEST_EMAIL và SNSQB_TEST_PASSWORD trong môi trường chạy test.",
   );
 
   test("login → current profile → refresh when available → logout", async ({
@@ -71,9 +71,7 @@ test.describe("Dedicated-account backend API tests (no shared-data edits)", () =
     }
   });
 
-  test("login rejects an incorrect password for the dedicated account", async ({
-    request,
-  }) => {
+  test("login rejects an incorrect password", async ({ request }) => {
     const response = await request.post(`${base}/auth/login`, {
       data: {
         email,
@@ -85,4 +83,6 @@ test.describe("Dedicated-account backend API tests (no shared-data edits)", () =
     expect(response.status()).toBe(400);
     expect(successCodes).not.toContain((await response.json()).code);
   });
+
+
 });

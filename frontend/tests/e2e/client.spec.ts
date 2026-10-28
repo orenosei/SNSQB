@@ -25,6 +25,7 @@ test("blocks unsupported and external URLs before transport", async ({
             baseURL: "https://outside.example.test/api/v1",
           }),
         () => api.delete("/users/me"),
+        () => api.get("/sessions/my-enrolled-subjects"),
       ].map(async (invoke) => {
         try {
           await invoke();
@@ -35,7 +36,7 @@ test("blocks unsupported and external URLs before transport", async ({
       }),
     );
   });
-  expect(results).toEqual(Array(5).fill("blocked"));
+  expect(results).toEqual(Array(6).fill("blocked"));
   expect(outgoing).toEqual([]);
 });
 
@@ -128,4 +129,46 @@ test("a late refresh cannot restore a logged-out session", async ({ page }) => {
   release();
   expect(await result).toBe("rejected");
   await expect(page).toHaveURL("/login");
+});
+
+test("late successful responses cannot enter the next user session", async ({
+  page,
+}) => {
+  await signIn(page);
+  await expect(
+    page.getByRole("heading", { name: profile.full_name }),
+  ).toBeVisible();
+  let started!: () => void;
+  let release!: () => void;
+  const requested = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/v1/subjects", async (route) => {
+    started();
+    await pending;
+    await route.fulfill({
+      json: ok([{ subject_id: 10, code: "TEST", name: "Old session data" }]),
+    });
+  });
+  const result = page.evaluate(async () => {
+    const modulePath = "/src/lib/api.ts";
+    const { api } = await import(/* @vite-ignore */ modulePath);
+    try {
+      await api.get("/subjects");
+      return "accepted";
+    } catch {
+      return "rejected";
+    }
+  });
+  await requested;
+  await page.evaluate(async () => {
+    const modulePath = "/src/features/auth/session.ts";
+    const { setSession } = await import(/* @vite-ignore */ modulePath);
+    setSession({ access_token: "mock-another-session", refresh_token: null });
+  });
+  release();
+  expect(await result).toBe("rejected");
 });

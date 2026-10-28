@@ -824,6 +824,10 @@
   padding: 10px 0;
   font-size: 13px;
 }
+.search-form > .button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .search-summary {
   font-size: 12px;
   margin: 0 0 22px;

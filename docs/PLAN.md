@@ -1,13 +1,14 @@
 # Kế hoạch SNSQB
 
-Cập nhật 2026-10-27. Swagger là nguồn chính; PDF chỉ bổ sung khi không mâu thuẫn. Không sửa Swagger/backend và không yêu cầu duyệt lại các khác biệt PDF đã được Swagger định nghĩa. Phần hữu ích từ tài liệu Phase 0 cũ đã được gom vào đây, TEST_REPORT và các CSV hỗ trợ; không duy trì bộ Markdown phân tích riêng.
+Cập nhật 2026-10-28. Swagger là nguồn chính; PDF chỉ bổ sung khi không mâu thuẫn. Chỉ đồng bộ Swagger từ backend khi được yêu cầu, không sửa backend và không yêu cầu duyệt lại các khác biệt PDF đã được Swagger định nghĩa. Phần hữu ích từ tài liệu Phase 0 cũ đã được gom vào đây, TEST_REPORT và các CSV hỗ trợ; không duy trì bộ Markdown phân tích riêng.
 
 ## Tiến độ và các phase
 
 - [x] Phase 0: rà tài liệu cũ, lấy Swagger làm chuẩn, lập API checklist và báo cáo trung thực.
 - [x] **Phase 1 — Foundation + Authentication:** đã triển khai frontend trong `frontend/`, login/profile/edit/refresh/logout, responsive AppShell, Axios chặn ngoài phạm vi và Playwright. Xác minh backend thật còn chờ tài khoản test.
 - [x] **Phase 2 — Core Social Network (phạm vi yêu cầu):** feed, CRUD bài viết thảo luận/media, comment/reply/edit/delete, LIKE/LOVE/WOW, hồ sơ công khai, friends/follows/blocks, search người dùng/bài viết. Notifications/settings và danh mục video bài giảng chưa thuộc đợt này.
-- [ ] **Phase 3 — Question Bank + Academic:** môn học/lớp/enrollment, đề xuất và duyệt câu hỏi, luyện tập/answer/rating/statistics, tạo/xem/xuất đề.
+- [x] **Phase 3 — Question Bank & Practice:** danh mục môn/lớp học phần hiện tại và lịch sử; bộ câu hỏi theo phiên đề xuất, duyệt, luyện tập/answer/rating/statistics; đọc lớp phụ trách để tạo/xem/xuất đề cho giảng viên. Quản lý lớp/ghi danh riêng chưa thuộc UI core đợt này.
+- [x] Đồng bộ Swagger online ngày 2026-10-28: API lớp học phần thay môn đang học; đề xuất dùng course_class_id, chỉ chọn lớp can_propose=true; lỗi tải lớp giữ bản soạn và cho thử lại, bỏ fallback danh mục môn. Status từ owner detail quyết định sửa/xóa.
 - [ ] **Phase 4 — Realtime + Extended:** chat 1-1 trước, rồi group/hidden chat; games, leaderboard, badges, cosmetics, AI refine/apply; web push khi có cấu hình.
 - [ ] **Phase 5 — Testing + Defense:** regression, bổ sung coverage còn thiếu, sửa lỗi UI/integration, báo cáo kết quả và demo. Viết/chạy test phù hợp ngay trong từng phase, không dồn tới cuối.
 
@@ -35,7 +36,21 @@ Không thêm React Hook Form/Zod/Vitest vì form Phase 1 đơn giản và Playwr
 - [x] Typecheck/build PASS. `npm test`: **88 UI PASS (44 case × desktop/mobile), 16 API SKIPPED**. Có 15 UI case Phase 2 và 14 API case Phase 2; test API tách biệt, chỉ bật với cặp tài khoản test chuyên dụng. Đã xem ảnh feed desktop/mobile, kiểm responsive 320/768/1280 px trên sáu trang social và hồi quy màn Phase 1.
 - [ ] Chạy API suite thật khi có hai tài khoản cùng vai trò, không có quan hệ giữa hai tài khoản trước test. Không dùng credentials cá nhân từ hội thoại. Suite chỉ tạo/xóa post/comment của run, kiểm baseline và khôi phục quan hệ test.
 
-Giới hạn contract: GET post chỉ có reacted_by_me, không biết loại cảm xúc cũ; UI không tự gán LIKE. PENDING trong profile/stats không cho biết chiều lời mời; xử lý ở danh sách received/sent. Không có hủy lời mời đã gửi hoặc xóa media rời, không tự tạo endpoint. Chưa bắt đầu Phase 3. Chi tiết kiểm chứng ở [TEST_REPORT](TEST_REPORT.md).
+Giới hạn contract: GET post chỉ có reacted_by_me, không biết loại cảm xúc cũ; UI không tự gán LIKE. PENDING trong profile/stats không cho biết chiều lời mời; xử lý ở danh sách received/sent. Không có hủy lời mời đã gửi hoặc xóa media rời, không tự tạo endpoint. Phase 3 được ghi ở phần tiếp theo. Chi tiết kiểm chứng ở [TEST_REPORT](TEST_REPORT.md).
+
+## Phase 3 đã triển khai
+
+- [x] Ngân hàng theo SESSION/QUESTION qua search query/type/after/limit; xem nội dung/phương án từ DTO thật; danh mục môn và bộ của tôi lọc subject_id/status, phân trang contents/pagination đúng contract.
+- [x] Đề xuất bộ trắc nghiệm một/nhiều đáp án, nguồn LLM/tự soạn, confidence 0–4, ảnh QUESTION; sửa/xóa bộ của mình khi owner detail trả status PENDING. Create dùng llm_generated, update dùng source; không gửi field tự tạo.
+- [x] Luyện tập GET session/questions, chọn nhiều phương án, gửi timestamp updated_at chống stale; kết quả/đáp án/lời giải lấy từ server. 409/412/mất mạng không tự gửi lại; yêu cầu tải lại rồi chọn lại. Không tính điểm tổng hoặc suy đúng/sai của lượt cũ từ đáp án đúng.
+- [x] Rate 0–4, báo lỗi, thống kê và danh sách đánh giá. GET chỉ có answered/rated: trạng thái cũ được hiển thị nhưng không bịa lựa chọn/kết quả đã làm; phản hồi hiện tại chỉ cache trong phiên đăng nhập.
+- [x] Guard LECTURER trước API duyệt/đề thi; mở review bằng thao tác rõ ràng vì GET đổi REVIEWING; không prefetch/refetch tự động. Biên tập, approve/reject, chốt duyệt có cảnh báo từ chối PENDING còn lại; không suy RESOLVED là mọi câu APPROVED.
+- [x] Tạo đề với subject_id/class_ids, số câu tùy chọn, difficulty_distribution/topic_weights và cờ đáp án/đảo phương án; đọc lớp đang phụ trách, xem đề và xuất PDF/XLSX từ URL server. Không thêm luồng thi/nộp/chấm cả đề vì Swagger không có.
+- [x] 24 operations mới (tổng 59/124), mở rộng search types và upload purpose của operation đã có. Module học thuật tải theo route để giữ bundle ban đầu gọn; sidebar cuộn riêng, logout luôn truy cập được; bỏ response của phiên cũ trước khi cache.
+- [x] Typecheck/build PASS. Full Playwright: **152 UI PASS, 0 FAIL, 34 API SKIPPED** (76 UI case × desktop/mobile; 18 API case học thuật mới). Responsive bank/editor/practice/review/exams 320/375/768/1280 px, hồi quy Phase 1–2, đã xem ảnh ngân hàng/kết quả luyện tập desktop/mobile.
+- [ ] Chạy đường thành công có JWT trên backend thật: sinh viên dùng account hiện có, peer chỉ cho ownership/quan hệ, giảng viên cho review/exam, approved session/unanswered question cho answer. Test tự tìm lớp can_propose=true khi có; thao tác không có cleanup/reset được ghi retained IDs trong annotation.
+
+Không có GET/DELETE question độc lập cho sinh viên, CRUD topic, practice session/history tổng hợp hoặc thi/chấm nguyên đề; không tự dựng endpoint/workflow thay thế. Câu đã gửi chưa có quy tắc xóa lẻ trong update session nên UI chỉ gỡ câu chưa gửi. Nội dung hiển thị văn bản an toàn và ảnh; render nâng cao Markdown/LaTeX chưa có. Chưa bắt đầu Phase 4.
 
 ## Quyết định và giả định đang dùng
 
