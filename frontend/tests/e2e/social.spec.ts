@@ -489,7 +489,7 @@ test("social pages stay responsive and protected navigation exposes only impleme
     page.getByRole("link", { name: "Bảng tin", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Ngân hàng câu hỏi Sắp có", exact: true }),
+    page.getByRole("button", { name: "Tin nhắn Sắp có", exact: true }),
   ).toBeDisabled();
 });
 

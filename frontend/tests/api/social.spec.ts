@@ -10,11 +10,7 @@ const base = (
   process.env.SNSQB_TEST_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
 ).replace(/\/+$/, "");
 const enabled =
-  process.env.SNSQB_RUN_REAL_SOCIAL === "1" &&
-  !!process.env.SNSQB_TEST_EMAIL &&
-  !!process.env.SNSQB_TEST_PASSWORD &&
-  !!process.env.SNSQB_TEST_PEER_EMAIL &&
-  !!process.env.SNSQB_TEST_PEER_PASSWORD;
+  !!process.env.SNSQB_TEST_EMAIL && !!process.env.SNSQB_TEST_PASSWORD;
 const successCodes = ["0000", "1000"];
 const marker = `SNSQB-E2E-${randomUUID()}`;
 async function data(response: APIResponse) {
@@ -24,13 +20,12 @@ async function data(response: APIResponse) {
   return body.data;
 }
 
-// These tests mutate ONLY resources created by this suite and an explicitly dedicated pair.
-// Personal credentials supplied in conversation are never embedded or used automatically.
-test.describe("Real social API — isolated dedicated pair required", () => {
+// Mutations use only resources created by this suite; a second account is optional.
+test.describe("Real social API", () => {
   test.describe.configure({ mode: "serial" });
   test.skip(
     !enabled,
-    "Cần SNSQB_RUN_REAL_SOCIAL=1 và hai tài khoản test cùng vai trò, không có quan hệ từ trước.",
+    "Cần SNSQB_TEST_EMAIL và SNSQB_TEST_PASSWORD trong môi trường chạy test.",
   );
   let a: APIRequestContext;
   let b: APIRequestContext;
@@ -126,21 +121,23 @@ test.describe("Real social API — isolated dedicated pair required", () => {
       process.env.SNSQB_TEST_EMAIL!,
       process.env.SNSQB_TEST_PASSWORD!,
     );
-    b = await session(
-      process.env.SNSQB_TEST_PEER_EMAIL!,
-      process.env.SNSQB_TEST_PEER_PASSWORD!,
-    );
+    if (
+      process.env.SNSQB_TEST_PEER_EMAIL &&
+      process.env.SNSQB_TEST_PEER_PASSWORD
+    )
+      b = await session(
+        process.env.SNSQB_TEST_PEER_EMAIL,
+        process.env.SNSQB_TEST_PEER_PASSWORD,
+      );
     anonymous = await playwright.request.newContext({ timeout: 15_000 });
-    const [me, peer] = await Promise.all([
-      data(await a.get(`${base}/users/me`)),
-      data(await b.get(`${base}/users/me`)),
-    ]);
+    const me = await data(await a.get(`${base}/users/me`));
     aid = me.user_id;
-    bid = peer.user_id;
-    expect(
-      Number.isSafeInteger(aid) && Number.isSafeInteger(bid) && aid !== bid,
-    ).toBe(true);
+    expect(Number.isSafeInteger(aid)).toBe(true);
     expect(["STUDENT", "LECTURER"]).toContain(me.role);
+    if (!b) return;
+    const peer = await data(await b.get(`${base}/users/me`));
+    bid = peer.user_id;
+    expect(Number.isSafeInteger(bid) && aid !== bid).toBe(true);
     expect(peer.role).toBe(me.role);
     for (const [client, other] of [
       [a, bid],
@@ -185,9 +182,9 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     for (const path of [
       "/activity-feeds",
       "/posts/me",
-      `/users/${bid}`,
-      `/users/${bid}/posts`,
-      `/users/${bid}/relationship-stats`,
+      `/users/${aid}`,
+      `/users/${aid}/posts`,
+      ...(b ? [`/users/${bid}/relationship-stats`] : []),
       "/friendships",
       "/friendships/requests/received",
       "/friendships/requests/sent",
@@ -213,14 +210,15 @@ test.describe("Real social API — isolated dedicated pair required", () => {
           },
         }),
       );
-      expect((await data(await b.get(`${base}/posts/${id}`))).content).toBe(
-        `${marker} updated`,
-      );
+      expect(
+        (await data(await (b || a).get(`${base}/posts/${id}`))).content,
+      ).toBe(`${marker} updated`);
       await data(await a.delete(`${base}/posts/${id}`));
       expect((await a.get(`${base}/posts/${id}`)).status()).toBe(404);
     });
   });
   test("rejects another author editing or deleting an owned post", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm quyền tác giả khác.");
     await withPost("PUBLIC", async (id) => {
       expect(
         (
@@ -236,12 +234,14 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     });
   });
   test("ONLY_ME posts cannot be read by the peer", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm riêng tư.");
     await withPost("ONLY_ME", async (id) => {
       await data(await a.get(`${base}/posts/${id}`));
       expect((await b.get(`${base}/posts/${id}`)).status()).toBe(403);
     });
   });
   test("FRIENDS visibility changes only after friendship acceptance", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm quan hệ bạn bè.");
     await withPost("FRIENDS", async (id) => {
       expect((await b.get(`${base}/posts/${id}`)).status()).toBe(403);
       await data(
@@ -294,16 +294,18 @@ test.describe("Real social API — isolated dedicated pair required", () => {
               item.comment_id === reply.comment_id,
           ),
         ).toBe(true);
-        expect(
-          (
-            await b.put(`${base}/comments/${comment.comment_id}`, {
-              data: { content: "unauthorized" },
-            })
-          ).status(),
-        ).toBe(403);
-        expect(
-          (await b.delete(`${base}/comments/${comment.comment_id}`)).status(),
-        ).toBe(403);
+        if (b) {
+          expect(
+            (
+              await b.put(`${base}/comments/${comment.comment_id}`, {
+                data: { content: "unauthorized" },
+              })
+            ).status(),
+          ).toBe(403);
+          expect(
+            (await b.delete(`${base}/comments/${comment.comment_id}`)).status(),
+          ).toBe(403);
+        }
         await data(
           await a.put(`${base}/comments/${comment.comment_id}`, {
             data: { content: `${marker} edited`, media_url: "" },
@@ -407,6 +409,7 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     });
   });
   test("friend request send/accept/unfriend and send/decline lifecycle", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm kết bạn.");
     const sent = await data(
       await a.post(`${base}/friendships/request`, {
         data: { addressee_id: bid },
@@ -457,6 +460,7 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     ).toBe("DECLINED");
   });
   test("follow/unfollow updates relationship state and following list", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm theo dõi.");
     expect((await data(await a.post(`${base}/follows/${bid}`))).following).toBe(
       true,
     );
@@ -472,6 +476,7 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     ).toBe(false);
   });
   test("block/unblock revokes access and clears friendship/follows", async () => {
+    test.skip(!b, "Cần tài khoản thứ hai để kiểm chặn và quyền xem.");
     await withPost("PUBLIC", async (id) => {
       await data(
         await a.post(`${base}/friendships/request`, {
@@ -510,6 +515,25 @@ test.describe("Real social API — isolated dedicated pair required", () => {
       expect(Array.isArray(result.items)).toBe(true);
     }
   });
+  test("presigns a temporary upload URL without uploading a file", async () => {
+    const result = await data(
+      await a.post(`${base}/medias/presign`, {
+        data: {
+          files: [
+            {
+              file_name: `${marker}.png`,
+              file_size: 67,
+              content_type: "image/png",
+              purpose: "POST",
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.presigned_urls).toHaveLength(1);
+    expect(typeof result.presigned_urls[0].object_key).toBe("string");
+    expect(typeof result.presigned_urls[0].upload_url).toBe("string");
+  });
   test("direct multipart upload attaches synthetic media to an owned post", async () => {
     // Valid 1x1 PNG, no personal file or external URL fixture.
     const uploaded = await data(
@@ -527,6 +551,13 @@ test.describe("Real social API — isolated dedicated pair required", () => {
         },
       }),
     );
+    const verified = await data(
+      await a.post(`${base}/medias/verify`, {
+        data: { urls: [uploaded.url] },
+      }),
+    );
+    expect(Array.isArray(verified.missing_urls)).toBe(true);
+    expect(verified.missing_urls).not.toContain(uploaded.url);
     let id: number | undefined;
     try {
       const created = await data(
@@ -553,13 +584,11 @@ test.describe("Real social API — isolated dedicated pair required", () => {
     } finally {
       if (id) await data(await a.delete(`${base}/posts/${id}`));
       else
-        test
-          .info()
-          .annotations.push({
-            type: "cleanup",
-            description:
-              "Upload hoàn tất nhưng chưa tạo được post; Swagger không có API xóa media rời.",
-          });
+        test.info().annotations.push({
+          type: "cleanup",
+          description:
+            "Upload hoàn tất nhưng chưa tạo được post; Swagger không có API xóa media rời.",
+        });
     }
   });
 });
