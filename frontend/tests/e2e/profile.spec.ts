@@ -1,6 +1,6 @@
 import { test, expect, signIn, openNavigation, profile, ok } from "./fixtures";
 
-test("renders profile fields and explicitly unavailable modules", async ({
+test("renders profile fields and enabled messaging navigation", async ({
   page,
 }, testInfo) => {
   await signIn(page);
@@ -14,13 +14,7 @@ test("renders profile fields and explicitly unavailable modules", async ({
     fullPage: true,
   });
   await openNavigation(page);
-  for (const label of ["Ngân hàng câu hỏi", "Tin nhắn", "Đề thi"]) {
-    const button = page.getByRole("button", {
-      name: `${label} Sắp có`,
-      exact: true,
-    });
-    await expect(button).toBeDisabled();
-  }
+  await expect(page.getByRole("link", { name: "Tin nhắn" })).toBeVisible();
 });
 
 test("edits only changed Swagger fields and updates cached profile", async ({

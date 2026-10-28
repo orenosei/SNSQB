@@ -57,6 +57,8 @@ export const test = base.extend<{ apiMock: void }>({
           return route.fulfill({ json: ok(null) });
         if (path === "/users/me" && method === "GET")
           return route.fulfill({ json: ok(profile) });
+        if (path === "/notifications" && method === "GET")
+          return route.fulfill({ json: ok({ items: [], unread_count: 0, pagination: { has_next: false } }) });
         throw new Error(`Unexpected API request: ${method} ${path}`);
       });
       await use();

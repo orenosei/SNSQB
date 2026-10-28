@@ -18,6 +18,7 @@ import type { PostResponseDto } from "../social/types";
 import { deletePost, refreshPosts } from "./api";
 import { ReactionPicker } from "./ReactionPicker";
 import { visibilityLabels } from "./PostForm";
+import { ReportButton } from "../reports/ReportButton";
 
 export function PostCard({
   post,
@@ -171,6 +172,7 @@ export function PostCard({
             {post.comment_count ?? "—"} bình luận{" "}
             <span>{detail ? "Thảo luận bên dưới" : "Xem bài viết"}</span>
           </Link>
+          {!owner && <ReportButton targetType="POST" targetId={id} />}
         </>
       )}
       {confirm && (

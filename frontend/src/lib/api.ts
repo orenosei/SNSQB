@@ -78,7 +78,28 @@ const allowed = new Set([
   "get /follows/followers",
   "get /blocks",
   "get /search",
+  "get /search/saved",
+  "get /conversations",
+  "post /conversations/direct",
+  "get /notifications",
+  "post /notifications/read-all",
+  "post /report",
+  "get /video-posts",
+  "get /settings/push",
+  "put /settings/push",
+  "post /auth/change-password",
   "post /medias/upload",
+  "get /subjects",
+  "get /sessions/my-enrolled-course-classes",
+  "get /sessions/my-submissions",
+  "post /sessions/propose",
+  "get /sessions/pending",
+  "post /sessions/approve",
+  "post /sessions/reject",
+  "get /lecturer/course-classes/my-classes",
+  "get /lecturer/questions/export",
+  "get /exams/my-exams",
+  "post /exams/generate",
 ]);
 const resourceOperations = [
   /^(get|put|delete) \/posts\/[1-9]\d*$/,
@@ -86,6 +107,17 @@ const resourceOperations = [
   /^get \/users\/[1-9]\d*(\/posts|\/relationship-stats)?$/,
   /^delete \/friendships\/[1-9]\d*$/,
   /^(post|delete) \/(follows|blocks)\/[1-9]\d*$/,
+  /^(get|put|delete) \/sessions\/my-submissions\/[1-9]\d*$/,
+  /^get \/sessions\/[1-9]\d*(\/questions)?$/,
+  /^post \/sessions\/[1-9]\d*\/complete-review$/,
+  /^put \/questions\/[1-9]\d*$/,
+  /^get \/questions\/[1-9]\d*\/(statistics|ratings)$/,
+  /^post \/questions\/[1-9]\d*\/(answer|rate)$/,
+  /^get \/exams\/[1-9]\d*(\/export)?$/,
+  /^get \/conversations\/[1-9]\d*\/messages$/,
+  /^delete \/messages\/[1-9]\d*$/,
+  /^post \/notifications\/[1-9]\d*\/read$/,
+  /^delete \/search\/saved\/[1-9]\d*$/,
 ];
 type RetryConfig = InternalAxiosRequestConfig & {
   _retried?: boolean;
@@ -148,7 +180,18 @@ async function refreshSession(session: Tokens): Promise<Tokens> {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const config = response.config as RetryConfig;
+    if (
+      config.url !== "/auth/login" &&
+      config._sessionRevision !== getSession().revision
+    ) {
+      throw new ApiError(
+        "Phiên đăng nhập đã thay đổi. Phản hồi của phiên cũ đã được bỏ qua.",
+      );
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const config = error.config as RetryConfig | undefined;
     const session = getSession().tokens;
@@ -204,6 +247,8 @@ export function errorMessage(error: unknown): string {
       return "Trạng thái đã thay đổi hoặc yêu cầu đang chờ xử lý. Hãy tải lại dữ liệu trước khi thử lại.";
     if (error.response.status === 413)
       return "Máy chủ từ chối tệp vì kích thước quá lớn. Hãy chọn tệp nhỏ hơn.";
+    if (error.response.status === 412)
+      return "Câu hỏi đã thay đổi từ khi bạn mở trang. Hãy tải lại câu hỏi và chọn đáp án lại trước khi gửi.";
     if (error.response.status === 429)
       return "Bạn thao tác quá nhanh. Vui lòng thử lại sau.";
   }

@@ -124,6 +124,7 @@ export function ProfilePage() {
           >
             <Pencil size={16} /> Chỉnh sửa hồ sơ
           </Link>
+          <Link className="button button-secondary" to="/settings/password">Đổi mật khẩu</Link>
         </div>
         <div className="profile-tabs">
           <span aria-current="page">Giới thiệu</span>

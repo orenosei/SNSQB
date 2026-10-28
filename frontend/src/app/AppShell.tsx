@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -9,34 +9,38 @@ import {
   LogOut,
   Menu,
   MessageCircle,
+  Bell,
+  Video,
   UserRound,
   Users,
   Search,
   Pencil,
+  ClipboardCheck,
   X,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import { Brand } from "../components/Brand";
 import { Avatar } from "../components/Avatar";
+import { Loading } from "../components/Feedback";
 import { logout } from "../features/auth/api";
 import { setSession } from "../features/auth/session";
 import { useProfile } from "../features/profile/api";
+import { useQuery } from "@tanstack/react-query";
+import { getNotifications } from "../features/notifications/api";
 
-const futureModules = [
-  { label: "Ngân hàng câu hỏi", icon: BookOpen },
-  { label: "Tin nhắn", icon: MessageCircle },
-  { label: "Đề thi", icon: FileCheck2 },
-];
 const socialNavigation = [
   { label: "Bảng tin", icon: House, to: "/" },
   { label: "Bài viết của tôi", icon: Pencil, to: "/my-posts" },
   { label: "Bạn bè", icon: Users, to: "/friends" },
   { label: "Tìm kiếm", icon: Search, to: "/search" },
+  { label: "Tin nhắn", icon: MessageCircle, to: "/chat" },
+  { label: "Video bài giảng", icon: Video, to: "/videos" },
 ];
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const profile = useProfile();
+  const notifications = useQuery({ queryKey: ["notifications", "badge"], queryFn: () => getNotifications(), refetchInterval: 30000 });
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -125,6 +129,7 @@ export function AppShell() {
           />
           <span>{profile.data?.full_name || "Trang cá nhân"}</span>
         </NavLink>
+        <NavLink to="/notifications" className="icon-button notification-shortcut" aria-label={`Thông báo${notifications.data?.unread_count ? `, ${notifications.data.unread_count} chưa đọc` : ""}`}><Bell size={21}/>{!!notifications.data?.unread_count && <span className="notification-badge">{notifications.data.unread_count}</span>}</NavLink>
       </header>
       {menuOpen && (
         <button
@@ -164,19 +169,57 @@ export function AppShell() {
               <ChevronRight size={16} />
             </NavLink>
             <div className="nav-divider" />
-            {futureModules.map(({ label, icon: Icon }) => (
+            <NavLink
+              to="/question-bank"
+              className={({ isActive }) =>
+                `nav-item ${isActive || location.pathname.startsWith("/practice/") ? "nav-active" : ""}`
+              }
+            >
+              <BookOpen size={21} />
+              <span>Ngân hàng câu hỏi</span>
+            </NavLink>
+            <NavLink
+              to="/submissions"
+              className={({ isActive }) =>
+                `nav-item ${isActive ? "nav-active" : ""}`
+              }
+            >
+              <GraduationCap size={21} />
+              <span>Bộ câu hỏi của tôi</span>
+            </NavLink>
+            {profile.data?.role === "LECTURER" ? (
+              <>
+                <NavLink
+                  to="/lecturer/reviews"
+                  className={({ isActive }) =>
+                    `nav-item ${isActive ? "nav-active" : ""}`
+                  }
+                >
+                  <ClipboardCheck size={21} />
+                  <span>Duyệt câu hỏi</span>
+                </NavLink>
+                <NavLink
+                  to="/lecturer/exams"
+                  className={({ isActive }) =>
+                    `nav-item ${isActive ? "nav-active" : ""}`
+                  }
+                >
+                  <FileCheck2 size={21} />
+                  <span>Đề thi</span>
+                </NavLink>
+              </>
+            ) : (
               <button
-                key={label}
-                type="button"
                 className="nav-item nav-unavailable"
                 disabled
-                title="Chưa khả dụng — sẽ được triển khai ở giai đoạn sau"
+                title="Chỉ dành cho giảng viên"
               >
-                <Icon size={21} />
-                <span>{label}</span>
-                <span className="soon-label">Sắp có</span>
+                <FileCheck2 size={21} />
+                <span>Đề thi</span>
+                <span className="soon-label">Giảng viên</span>
               </button>
-            ))}
+            )}
+            <NavLink to="/notifications" className={({ isActive }) => `nav-item ${isActive ? "nav-active" : ""}`}><Bell size={21}/><span>Thông báo</span>{!!notifications.data?.unread_count && <span className="soon-label">{notifications.data.unread_count}</span>}</NavLink>
           </nav>
           <p className="nav-note">Các mục “Sắp có” chưa khả dụng.</p>
         </div>
@@ -201,12 +244,14 @@ export function AppShell() {
             <span>{signOut.isPending ? "Đang đăng xuất…" : "Đăng xuất"}</span>
           </button>
           <p className="sidebar-version">
-            SNSQB <span>·</span> Phiên bản 0.2
+            SNSQB <span>·</span> Phiên bản 0.3
           </p>
         </div>
       </aside>
       <main className="app-main" id="main-content" tabIndex={-1}>
-        <Outlet />
+        <Suspense fallback={<Loading label="Đang mở không gian học tập…" />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

@@ -18,3 +18,7 @@ export function useSearch(query: string, type: "USER" | "POST") {
     getNextPageParam: (last, _pages, cursor) => nextCursor(last, cursor),
   });
 }
+
+export interface SavedSearches { saved_searches?: Array<{saved_search_id?:number;query_text?:string;last_searched_at?:string}>; trending_searches?:string[] }
+export async function getSavedSearches() { return unwrap(await api.get<ApiEnvelope<SavedSearches>>("/search/saved")); }
+export async function deleteSavedSearch(id:number) { return unwrap(await api.delete<ApiEnvelope<unknown>>(`/search/saved/${id}`)); }

@@ -13,6 +13,11 @@ import { useUserPosts } from "../posts/api";
 import { PostCard } from "../posts/PostCard";
 import { usePublicProfile, useRelationship } from "./api";
 import { RelationshipActions } from "./RelationshipActions";
+import { ReportButton } from "../reports/ReportButton";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+import { createDirectConversation } from "../chat/api";
+import { errorMessage } from "../../lib/api";
 
 export function UserPage() {
   const { userId } = useParams();
@@ -20,6 +25,9 @@ export function UserPage() {
   const me = useProfile();
   const profile = usePublicProfile(id);
   const relation = useRelationship(id);
+  const navigate = useNavigate();
+  const client = useQueryClient();
+  const chat = useMutation({ mutationFn: createDirectConversation, onSuccess: async value => { await client.invalidateQueries({queryKey:["conversations"]}); if(value.conversation_id) navigate(`/chat?id=${value.conversation_id}`); } });
   if (!id)
     return (
       <div className="social-page">
@@ -83,6 +91,8 @@ export function UserPage() {
                 </span>
               </div>
               <RelationshipActions userId={id} profile={data} />
+              <div className="profile-extra-actions"><button className="button button-secondary" disabled={chat.isPending} onClick={() => chat.mutate(id)}>Nhắn tin</button><ReportButton targetType="USER" targetId={id}/></div>
+              {chat.isError && <ErrorNotice message={errorMessage(chat.error)}/>}
             </div>
           </section>
           {relation.data?.relationship_with_me?.blocked === true ? (
