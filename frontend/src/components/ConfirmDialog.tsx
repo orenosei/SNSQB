@@ -44,6 +44,7 @@ export function ConfirmDialog({
           <AlertTriangle size={24} />
         </span>
         <button
+          type="button"
           className="icon-button"
           aria-label="Đóng xác nhận"
           disabled={pending}
@@ -57,6 +58,7 @@ export function ConfirmDialog({
       {error && <ErrorNotice message={error} />}
       <div className="form-actions">
         <button
+          type="button"
           autoFocus
           className="button button-secondary"
           disabled={pending}
@@ -65,6 +67,7 @@ export function ConfirmDialog({
           Hủy
         </button>
         <button
+          type="button"
           className="button button-primary"
           disabled={pending}
           onClick={onConfirm}
