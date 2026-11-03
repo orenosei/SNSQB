@@ -28,6 +28,7 @@ import {
   refreshAcademic,
 } from "./api";
 import { AcademicPage, QuestionContent, SubjectSelect } from "./components";
+import { DiscussionToggle } from "../posts/DiscussionToggle";
 import {
   emptyQuestion,
   imageLines,
@@ -290,6 +291,7 @@ export function SubmissionDetailPage() {
           </div>
         </>
       )}
+      {query.data && <DiscussionToggle id={id} type="SESSION"/>}
       {confirm && (
         <ConfirmDialog
           title="Xóa bộ câu hỏi?"

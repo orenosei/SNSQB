@@ -13,7 +13,8 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate, useNavigate, useLocation } from "react-router";
+import { supportedDestination } from "../../lib/notificationTarget";
 import { Brand } from "../../components/Brand";
 import { ErrorNotice } from "../../components/Feedback";
 import { errorMessage, requireTokens } from "../../lib/api";
@@ -23,6 +24,8 @@ import { getDeviceId, setSession, useSession } from "./session";
 export function LoginPage() {
   const session = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
+  const destination = supportedDestination(typeof location.state?.from === "string" ? location.state.from : undefined) || "/me";
   const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,10 +48,10 @@ export function LoginPage() {
     onSuccess: (tokens) => {
       queryClient.clear();
       setSession(tokens);
-      navigate("/me", { replace: true });
+      navigate(destination, { replace: true });
     },
   });
-  if (session.tokens) return <Navigate to="/me" replace />;
+  if (session.tokens) return <Navigate to={destination} replace />;
 
   function submit(event: FormEvent) {
     event.preventDefault();

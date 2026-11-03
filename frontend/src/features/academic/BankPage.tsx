@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router";
-import { ArrowRight, BookOpen, Layers, Plus, Search, X } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Plus, X } from "lucide-react";
+import { SearchForm } from "../../components/SearchForm";
 import { Loading } from "../../components/Feedback";
 import {
   EmptyState,
@@ -12,6 +13,7 @@ import type { QuestionSearchResultDto } from "../social/types";
 import { useBankSearch, useSubjects } from "./api";
 import { AcademicPage, QuestionContent, StatusBadge } from "./components";
 import { QuestionInsights } from "./QuestionInsights";
+import { DiscussionToggle } from "../posts/DiscussionToggle";
 
 export function BankPage() {
   const [params, setParams] = useSearchParams();
@@ -61,24 +63,7 @@ export function BankPage() {
         </div>
         <Layers size={64} className="banner-decoration" />
       </div>
-      <form
-        className="surface search-form"
-        onSubmit={submit}
-        role="search"
-        aria-label="Tìm kiếm học tập"
-      >
-        <Search size={21} />
-        <label className="sr-only" htmlFor="academic-search">
-          Tìm câu hỏi hoặc bộ câu hỏi
-        </label>
-        <input
-          id="academic-search"
-          placeholder="Tìm theo từ khóa, nội dung hoặc mã câu hỏi…"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-        />
-        <button className="button button-primary">Tìm kiếm</button>
-      </form>
+      <SearchForm label="Tìm câu hỏi hoặc bộ câu hỏi" value={draft} onChange={setDraft} onSubmit={submit} placeholder="Tìm theo từ khóa, nội dung hoặc mã câu hỏi…"/>
       <nav className="social-tabs" aria-label="Loại nội dung học tập">
         {(["SESSION", "QUESTION"] as const).map((value) => (
           <button
@@ -143,6 +128,7 @@ export function BankPage() {
           {insights && validId(selected.question_id) && (
             <QuestionInsights questionId={selected.question_id} />
           )}
+          {validId(selected.question_id) && <DiscussionToggle key={selected.question_id} id={selected.question_id} type="QUESTION"/>}
         </section>
       ) : query.isPending ? (
         <Loading label="Đang tải ngân hàng câu hỏi…" />

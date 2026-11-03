@@ -1,13 +1,16 @@
 import { BookOpen, RefreshCw } from "lucide-react";
 import { ErrorNotice } from "./Feedback";
 import { errorMessage } from "../lib/api";
+import type { ReactNode } from "react";
 
 export function EmptyState({
   title,
   description,
+  action,
 }: {
   title: string;
   description: string;
+  action?: ReactNode;
 }) {
   return (
     <div className="surface empty-state">
@@ -16,6 +19,7 @@ export function EmptyState({
       </span>
       <h2>{title}</h2>
       <p>{description}</p>
+      {action && <div className="empty-state-action">{action}</div>}
     </div>
   );
 }

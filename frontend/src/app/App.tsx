@@ -1,5 +1,5 @@
 import { lazy, useEffect } from "react";
-import { Navigate, Outlet, Route, Routes, Link } from "react-router";
+import { Navigate, Outlet, Route, Routes, Link, useLocation } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "./AppShell";
 import { LoginPage } from "../features/auth/LoginPage";
@@ -73,10 +73,14 @@ const ExamDetailPage = lazy(() =>
     default: module.ExamDetailPage,
   })),
 );
+const DevicesPage = lazy(() => import("../features/devices/DevicesPage").then(module => ({default: module.DevicesPage})));
+const ClassesPage = lazy(() => import("../features/course-classes/ClassPages").then(module => ({default: module.ClassesPage})));
+const ClassDetailPage = lazy(() => import("../features/course-classes/ClassPages").then(module => ({default: module.ClassDetailPage})));
 
 function ProtectedRoute() {
   const { tokens } = useSession();
-  return tokens ? <Outlet /> : <Navigate to="/login" replace />;
+  const location = useLocation();
+  return tokens ? <Outlet /> : <Navigate to="/login" state={{from: location.pathname + location.search}} replace />;
 }
 
 export function App() {
@@ -102,6 +106,9 @@ export function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
           <Route path="/settings/password" element={<ChangePasswordPage />} />
+          <Route path="/settings/devices" element={<DevicesPage />} />
+          <Route path="/lecturer/course-classes" element={<LecturerOnly><ClassesPage/></LecturerOnly>} />
+          <Route path="/lecturer/course-classes/:courseClassId" element={<LecturerOnly><ClassDetailPage/></LecturerOnly>} />
           <Route path="/videos" element={<VideoPage />} />
           <Route path="/question-bank" element={<BankPage />} />
           <Route path="/submissions" element={<SubmissionsPage />} />
