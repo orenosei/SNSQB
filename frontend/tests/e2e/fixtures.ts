@@ -42,6 +42,14 @@ export const test = base.extend<{ apiMock: void }>({
           "",
         );
         const method = route.request().method();
+        if (path.startsWith("/ws"))
+          return route.fulfill({ status: 503, body: "Offline UI mock" });
+        if (path === "/activity-feeds/new-count" && method === "GET")
+          return route.fulfill({ json: ok({ new_count: 0 }) });
+        if (path === "/search/saved" && method === "GET")
+          return route.fulfill({
+            json: ok({ saved_searches: [], trending_searches: [] }),
+          });
         if (path === "/auth/login" && method === "POST")
           return route.fulfill({
             json: ok({ ...tokens, user_id: 101, role: "STUDENT" }),
@@ -58,7 +66,13 @@ export const test = base.extend<{ apiMock: void }>({
         if (path === "/users/me" && method === "GET")
           return route.fulfill({ json: ok(profile) });
         if (path === "/notifications" && method === "GET")
-          return route.fulfill({ json: ok({ items: [], unread_count: 0, pagination: { has_next: false } }) });
+          return route.fulfill({
+            json: ok({
+              items: [],
+              unread_count: 0,
+              pagination: { has_next: false },
+            }),
+          });
         throw new Error(`Unexpected API request: ${method} ${path}`);
       });
       await use();
@@ -67,17 +81,27 @@ export const test = base.extend<{ apiMock: void }>({
   ],
 });
 
-export async function signIn(page: Page) {
+export async function signIn(page: Page, destination = "/me") {
   await page.goto("/login");
   await page.getByLabel("Email", { exact: true }).fill(profile.email);
   await page
     .getByLabel("Mật khẩu", { exact: true })
     .fill("dedicated-mock-password");
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
-  await expect(page).toHaveURL("/me");
+  await expect(page).toHaveURL(destination);
 }
 export async function openNavigation(page: Page) {
-  const toggle = page.getByRole("button", { name: "Mở điều hướng" });
-  if (await toggle.isVisible()) await toggle.click();
+  const toggle = page.getByRole("button", {
+    name: "Mở điều hướng",
+    exact: true,
+  });
+  // URL updates can precede the authenticated shell's commit. isVisible alone does not wait.
+  await page.getByRole("banner").waitFor({ state: "visible" });
+  if (await toggle.isVisible()) {
+    await toggle.click();
+    await expect(
+      page.getByRole("dialog", { name: "Điều hướng SNSQB" }),
+    ).toBeVisible();
+  }
 }
 export { expect };

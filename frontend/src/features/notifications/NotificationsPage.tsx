@@ -8,6 +8,8 @@ import { Link } from "react-router";
 import { Loading, ErrorNotice } from "../../components/Feedback";
 import { errorMessage } from "../../lib/api";
 import { formatTime, nextCursor, validId } from "../../lib/cursor";
+import { notificationDestination } from "../../lib/notificationTarget";
+import { QueryError, LoadMore } from "../../components/SocialFeedback";
 import {
   getNotifications,
   markAllNotificationsRead,
@@ -42,9 +44,13 @@ export function NotificationsPage() {
           <p className="eyebrow text-brand">CẬP NHẬT MỚI</p>
           <h1>Thông báo</h1>
           <p className="muted">
-            {unread
-              ? `${unread} thông báo chưa đọc`
-              : "Bạn đã xem hết thông báo"}
+            {query.isPending
+              ? "Đang cập nhật thông báo…"
+              : query.isError && !query.data
+                ? "Chưa thể cập nhật thông báo"
+                : unread
+                  ? `${unread} thông báo chưa đọc`
+                  : "Bạn đã xem hết thông báo"}
           </p>
         </div>
         <button
@@ -63,9 +69,7 @@ export function NotificationsPage() {
       )}
       {query.isPending ? (
         <Loading label="Đang tải thông báo…" />
-      ) : query.isError ? (
-        <ErrorNotice message={errorMessage(query.error)} />
-      ) : !items.length ? (
+      ) : !items.length && !query.isError ? (
         <div className="surface notification-empty">
           <Bell size={35} />
           <h2>Chưa có thông báo</h2>
@@ -83,11 +87,24 @@ export function NotificationsPage() {
                 <strong>{item.title || "Thông báo"}</strong>
                 <p>{item.body}</p>
                 <small>{formatTime(item.created_at)}</small>
-                {item.target?.url?.startsWith("/") && (
-                  <Link to={item.target.url} className="text-button">
+                {notificationDestination(item.target) ? (
+                  <Link
+                    to={notificationDestination(item.target)!}
+                    className="text-button"
+                    onClick={() => {
+                      if (
+                        !item.read_at &&
+                        validId(item.notification_id) &&
+                        !markOne.isPending
+                      )
+                        markOne.mutate(item.notification_id);
+                    }}
+                  >
                     Xem chi tiết
                   </Link>
-                )}
+                ) : item.target ? (
+                  <small>Chi tiết này chưa khả dụng trong ứng dụng.</small>
+                ) : null}
               </div>
               {!item.read_at && (
                 <button
@@ -102,15 +119,22 @@ export function NotificationsPage() {
           ))}
         </div>
       )}
-      {query.hasNextPage && (
-        <button
-          className="text-button"
-          disabled={query.isFetchingNextPage}
-          onClick={() => void query.fetchNextPage()}
-        >
-          Xem thêm
-        </button>
+      {query.isError && (
+        <QueryError
+          error={query.error}
+          pending={query.isFetching}
+          retry={() =>
+            void (query.isFetchNextPageError
+              ? query.fetchNextPage()
+              : query.refetch())
+          }
+        />
       )}
+      <LoadMore
+        hasNext={!!query.hasNextPage}
+        pending={query.isFetchingNextPage}
+        load={() => void query.fetchNextPage()}
+      />
     </div>
   );
 }

@@ -41,9 +41,10 @@ export const getAcademic = async <T>(
 ) => unwrap(await api.get<ApiEnvelope<T>>(path, { params, signal }));
 const post = async <T>(path: string, body?: unknown) =>
   unwrap(await api.post<ApiEnvelope<T>>(path, body));
-export const useSubjects = () =>
+export const useSubjects = (enabled = true) =>
   useQuery({
     queryKey: ["academic", "subjects"],
+    enabled,
     queryFn: ({ signal }) =>
       getAcademic<SubjectResponse[]>("/subjects", undefined, signal),
   });

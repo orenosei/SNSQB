@@ -3,7 +3,7 @@ import type { MediaItem, MediaUploadResponse } from "../social/types";
 
 export async function uploadMedia(
   file: File,
-  purpose: "POST" | "COMMENT" | "QUESTION",
+  purpose: "POST" | "COMMENT" | "QUESTION" | "AVATAR" | "COVER",
 ): Promise<MediaItem> {
   const form = new FormData();
   form.append("file", file);

@@ -6,6 +6,7 @@ import { ErrorNotice, Loading } from "../../components/Feedback";
 import { errorMessage } from "../../lib/api";
 import { profileKey, updateProfile, useProfile } from "./api";
 import type { Profile, UpdateProfileRequest } from "./types";
+import { ProfileImageField } from "./ProfileImageField";
 
 export function EditProfilePage() {
   const profile = useProfile();
@@ -36,6 +37,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
     cover_url: profile.cover_url || "",
   });
   const [validation, setValidation] = useState("");
+  const [uploads, setUploads] = useState(0);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -50,7 +52,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
   }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (mutation.isPending) return;
+    if (mutation.isPending || uploads > 0) return;
     setValidation("");
     if (form.timezone) {
       try {
@@ -176,25 +178,20 @@ function ProfileForm({ profile }: { profile: Profile }) {
           <div className="form-section-heading">
             <h2>Ảnh hồ sơ</h2>
             <p className="muted text-sm">
-              Sử dụng đường dẫn ảnh có sẵn. Tải ảnh lên sẽ được bổ sung sau.
+              Chọn ảnh từ thiết bị hoặc sử dụng đường dẫn ảnh có sẵn.
             </p>
           </div>
           {(["avatar_url", "cover_url"] as const).map((key) => (
-            <div className="field" key={key}>
-              <label htmlFor={key}>
-                {key === "avatar_url"
-                  ? "Đường dẫn ảnh đại diện"
-                  : "Đường dẫn ảnh bìa"}
-              </label>
-              <input
-                id={key}
-                type="url"
-                pattern="https?://.*"
-                placeholder="https://…"
-                value={form[key]}
-                onChange={(event) => change(key, event.target.value)}
-              />
-            </div>
+            <ProfileImageField
+              key={key}
+              field={key}
+              value={form[key]}
+              disabled={mutation.isPending || uploads > 0}
+              onChange={(value) => change(key, value)}
+              onUploading={(pending) =>
+                setUploads((count) => Math.max(0, count + (pending ? 1 : -1)))
+              }
+            />
           ))}
         </fieldset>
         {validation && <ErrorNotice message={validation} />}
@@ -215,7 +212,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
           <button
             type="submit"
             className="button button-primary"
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || uploads > 0}
           >
             {mutation.isPending ? (
               <>

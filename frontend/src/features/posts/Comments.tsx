@@ -1,4 +1,11 @@
-import { useId, useRef, useState, type FormEvent } from "react";
+import {
+  createContext,
+  useContext,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Send, X } from "lucide-react";
 import { Link } from "react-router";
@@ -11,7 +18,17 @@ import { formatTime, validId } from "../../lib/cursor";
 import { useProfile } from "../profile/api";
 import { uploadMedia } from "../media/api";
 import type { CommentResponseDto } from "../social/types";
-import { addComment, editComment, deleteComment, useComments } from "./api";
+import {
+  addComment,
+  editComment,
+  deleteComment,
+  useComments,
+  commentKey,
+} from "./api";
+import { ReportButton } from "../reports/ReportButton";
+
+type DiscussionTarget = "POST" | "QUESTION" | "SESSION";
+const TargetContext = createContext<DiscussionTarget>("POST");
 
 function CommentEditor({
   postId,
@@ -26,6 +43,7 @@ function CommentEditor({
   onDone?: () => void;
   onCancel?: () => void;
 }) {
+  const targetType = useContext(TargetContext);
   const [content, setContent] = useState(initial?.content || "");
   const [media, setMedia] = useState(initial?.media_url || "");
   const [validation, setValidation] = useState("");
@@ -47,7 +65,7 @@ function CommentEditor({
       validId(initial?.comment_id)
         ? editComment(initial.comment_id, { content, media_url: media })
         : addComment({
-            target_type: "POST",
+            target_type: targetType,
             target_id: postId,
             parent_comment_id: parentId,
             content,
@@ -57,8 +75,9 @@ function CommentEditor({
       setContent("");
       setMedia("");
       await Promise.all([
-        client.invalidateQueries({ queryKey: ["comments", postId] }),
+        client.invalidateQueries({ queryKey: commentKey(postId, targetType) }),
         client.invalidateQueries({ queryKey: ["posts"] }),
+        client.invalidateQueries({ queryKey: ["video-posts"] }),
       ]);
       onDone?.();
     },
@@ -185,6 +204,7 @@ function CommentThread({
   postId: number;
   depth?: number;
 }) {
+  const targetType = useContext(TargetContext);
   const me = useProfile();
   const client = useQueryClient();
   const [editing, setEditing] = useState(false);
@@ -196,6 +216,7 @@ function CommentThread({
     comment.comment_id,
     "oldest",
     showReplies && validId(comment.comment_id),
+    targetType,
   );
   const owner =
     validId(comment.author?.user_id) &&
@@ -205,8 +226,9 @@ function CommentThread({
     onSuccess: async () => {
       setConfirm(false);
       await Promise.all([
-        client.invalidateQueries({ queryKey: ["comments", postId] }),
+        client.invalidateQueries({ queryKey: commentKey(postId, targetType) }),
         client.invalidateQueries({ queryKey: ["posts"] }),
+        client.invalidateQueries({ queryKey: ["video-posts"] }),
       ]);
     },
   });
@@ -254,6 +276,12 @@ function CommentThread({
             {!comment.deleted && validId(comment.comment_id) && (
               <>
                 <button onClick={() => setReplying(!replying)}>Trả lời</button>
+                {!owner && (
+                  <ReportButton
+                    targetType="COMMENT"
+                    targetId={comment.comment_id!}
+                  />
+                )}
                 {owner && (
                   <>
                     <button onClick={() => setEditing(!editing)}>
@@ -350,9 +378,24 @@ function CommentThread({
   );
 }
 
-export function CommentSection({ postId }: { postId: number }) {
+export function CommentSection({
+  postId,
+  targetType = "POST",
+}: {
+  postId: number;
+  targetType?: DiscussionTarget;
+}) {
+  return (
+    <TargetContext.Provider value={targetType}>
+      <DiscussionContent key={`${targetType}:${postId}`} postId={postId} />
+    </TargetContext.Provider>
+  );
+}
+
+function DiscussionContent({ postId }: { postId: number }) {
+  const targetType = useContext(TargetContext);
   const [sort, setSort] = useState("newest");
-  const query = useComments(postId, undefined, sort);
+  const query = useComments(postId, undefined, sort, true, targetType);
   return (
     <section className="surface comments-section" aria-label="Bình luận">
       <div className="section-title">

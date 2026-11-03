@@ -27,6 +27,7 @@ export function ReactionPicker({
       await Promise.all([
         client.invalidateQueries({ queryKey: ["posts"] }),
         client.invalidateQueries({ queryKey: ["search"] }),
+        client.invalidateQueries({ queryKey: ["video-posts"] }),
       ]);
     },
   });
