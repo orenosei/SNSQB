@@ -1,0 +1,23 @@
+:root {
+  --brand-primary: #154f46;
+  --brand-hover: #103e37;
+  --brand-wash: #e9f1eb;
+  --ink-blue: #243c53;
+  --accent: #a56416;
+  --paper: #f7f5ef;
+  --surface: #ffffff;
+  --surface-quiet: #efefe7;
+  --text: #182a27;
+  --text-secondary: #52615c;
+  --text-muted: #68756f;
+  --border: #d8dfd7;
+  --success: #216447;
+  --danger: #a42c37;
+  --warning: #85540b;
+  --info: #285e86;
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-dialog: 16px;
+  --shadow-card: 0 2px 8px #18332706;
+  --shadow-float: 0 16px 60px #18332724;
+}

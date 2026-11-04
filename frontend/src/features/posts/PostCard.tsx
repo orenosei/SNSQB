@@ -19,6 +19,7 @@ import { deletePost, refreshPosts } from "./api";
 import { ReactionPicker } from "./ReactionPicker";
 import { visibilityLabels } from "./PostForm";
 import { ReportButton } from "../reports/ReportButton";
+import { LecturerNoteEditor } from "./LecturerNoteEditor";
 
 export function PostCard({
   post,
@@ -31,6 +32,7 @@ export function PostCard({
   const client = useQueryClient();
   const navigate = useNavigate();
   const [confirm, setConfirm] = useState(false);
+  const [noting, setNoting] = useState(false);
   const owner =
     validId(post.author?.user_id) && post.author.user_id === me.data?.user_id;
   const id = post.post_id;
@@ -173,6 +175,17 @@ export function PostCard({
             <span>{detail ? "Thảo luận bên dưới" : "Xem bài viết"}</span>
           </Link>
           {!owner && <ReportButton targetType="POST" targetId={id} />}
+          {me.data?.role === "LECTURER" && (
+            <button
+              type="button"
+              className="text-button lecturer-note-trigger"
+              onClick={() => setNoting(true)}
+            >
+              {post.lecturer_note
+                ? "Sửa nhận xét chuyên môn"
+                : "Thêm nhận xét chuyên môn"}
+            </button>
+          )}
         </>
       )}
       {confirm && (
@@ -184,6 +197,13 @@ export function PostCard({
           error={remove.isError ? errorMessage(remove.error) : undefined}
           onConfirm={() => remove.mutate()}
           onClose={() => setConfirm(false)}
+        />
+      )}
+      {noting && validId(id) && (
+        <LecturerNoteEditor
+          postId={id}
+          initial={post.lecturer_note}
+          onClose={() => setNoting(false)}
         />
       )}
     </article>

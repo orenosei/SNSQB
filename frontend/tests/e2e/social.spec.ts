@@ -271,7 +271,7 @@ test("friend request is sent by one session and accepted by another", async ({
     ).toBeVisible();
     await page.reload(); // Memory-only auth requires signing in again after a full reload.
     await expect(page).toHaveURL("/login");
-    await signIn(page);
+    await signIn(page, "/users/202");
     await goTo(page, "/users/202");
     await page
       .getByRole("button", { name: "Hủy kết bạn", exact: true })
@@ -448,6 +448,9 @@ test("feed empty/error, search error and mutation draft preservation are recover
     route.fulfill({ status: 503, json: { code: "ERROR" } }),
   );
   await goTo(page, "/search?query=Nam&type=USER");
+  await expect(
+    page.getByRole("heading", { name: "Tìm kiếm", exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole("alert")).toBeVisible();
 });
 
@@ -489,8 +492,8 @@ test("social pages stay responsive and protected navigation exposes only impleme
     page.getByRole("link", { name: "Bảng tin", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Tin nhắn Sắp có", exact: true }),
-  ).toBeDisabled();
+    page.getByRole("link", { name: "Tin nhắn", exact: true }),
+  ).toBeVisible();
 });
 
 test("comment validation and failed writes preserve drafts without automatic retry", async ({

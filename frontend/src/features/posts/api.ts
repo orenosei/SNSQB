@@ -58,9 +58,10 @@ export function useComments(
   parentId?: number,
   sort = "newest",
   enabled = true,
+  targetType: "POST" | "QUESTION" | "SESSION" = "POST",
 ) {
   return useInfiniteQuery({
-    queryKey: ["comments", postId, parentId, sort],
+    queryKey: [...commentKey(postId, targetType), parentId, sort],
     enabled,
     initialPageParam: undefined as number | undefined,
     queryFn: async ({ pageParam, signal }) =>
@@ -69,7 +70,7 @@ export function useComments(
           "/comments",
           {
             params: {
-              target_type: "POST",
+              target_type: targetType,
               target_id: postId,
               parent_comment_id: parentId,
               sort,
@@ -83,6 +84,10 @@ export function useComments(
     getNextPageParam: (last, _pages, cursor) => nextCursor(last, cursor),
   });
 }
+export const commentKey = (
+  id: number,
+  type: "POST" | "QUESTION" | "SESSION" = "POST",
+) => (type === "POST" ? ["comments", id] : ["comments", type, id]);
 export const addComment = async (body: CreateCommentRequest) =>
   unwrap(await api.post<ApiEnvelope<CommentResponseDto>>("/comments", body));
 export const editComment = async (id: number, body: UpdateCommentRequest) =>
@@ -97,5 +102,13 @@ export async function refreshPosts(client: QueryClient) {
     client.invalidateQueries({ queryKey: ["posts"] }),
     client.invalidateQueries({ queryKey: ["feed"] }),
     client.invalidateQueries({ queryKey: ["search"] }),
+    client.invalidateQueries({ queryKey: ["video-posts"] }),
   ]);
 }
+
+export const updateLecturerNote = async (id: number, content: string) =>
+  unwrap(
+    await api.put<ApiEnvelope<unknown>>(`/posts/${id}/lecturer-notes`, {
+      content,
+    }),
+  );

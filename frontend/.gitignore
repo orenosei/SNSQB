@@ -7,3 +7,6 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+debug.log
+test-results-api/
+test-results-realtime/

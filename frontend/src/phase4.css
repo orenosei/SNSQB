@@ -12,7 +12,7 @@
   border-radius: 999px;
   align-items: center;
   justify-content: center;
-  background: #b92e4d;
+  background: var(--brand-primary);
   color: white;
   font-size: 12px;
   padding: 0 4px;
@@ -76,7 +76,7 @@
 }
 .chat-conversation:hover,
 .chat-conversation.selected {
-  background: #f7eef1;
+  background: var(--brand-wash);
 }
 .chat-conversation span {
   min-width: 0;
@@ -161,7 +161,7 @@
   padding: 16px;
 }
 .notification-item.unread {
-  border-left: 4px solid #b92e4d;
+  border-left: 4px solid var(--brand-primary);
 }
 .notification-item > div {
   flex: 1;
@@ -214,7 +214,7 @@
   align-items: center;
   gap: 8px;
   border-radius: 999px;
-  background: #f7eef1;
+  background: var(--brand-wash);
   padding: 6px 12px;
 }
 .profile-extra-actions {
