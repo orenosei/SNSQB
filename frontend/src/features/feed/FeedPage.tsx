@@ -13,7 +13,7 @@ import { usePost } from "../posts/api";
 import { PostCard } from "../posts/PostCard";
 import { PostForm } from "../posts/PostForm";
 import type { ActivityFeedItemDto } from "../social/types";
-import { useFeed } from "./api";
+import { useFeed, useNewFeedCount } from "./api";
 
 function FeedItem({ item }: { item: ActivityFeedItemDto }) {
   const post = usePost(
@@ -49,15 +49,33 @@ function FeedItem({ item }: { item: ActivityFeedItemDto }) {
           {item.action_type ? labels[item.action_type] : "có hoạt động mới"}.
         </p>
         <time>{formatTime(item.created_at)}</time>
-        <span className="activity-unavailable">
-          Chi tiết hoạt động này chưa khả dụng.
-        </span>
+        {validId(item.target_id) && item.target_type === "SESSION" ? (
+          <Link className="text-button" to={`/practice/${item.target_id}`}>
+            Khám phá bộ câu hỏi →
+          </Link>
+        ) : validId(item.target_id) && item.target_type === "USER" ? (
+          <Link className="text-button" to={`/users/${item.target_id}`}>
+            Xem thành viên →
+          </Link>
+        ) : (
+          <span className="activity-unavailable">
+            Chi tiết hoạt động này chưa khả dụng.
+          </span>
+        )}
       </div>
     </div>
   );
 }
 export function FeedPage() {
   const query = useFeed();
+  const [since, setSince] = useState(Date.now);
+  const [filter, setFilter] = useState("ALL");
+  const newFeed = useNewFeedCount(since, !!query.data);
+  async function refresh() {
+    const startedAt = Date.now();
+    const result = await query.refetch();
+    if (!result.isError) setSince(startedAt);
+  }
   const [created, setCreated] = useState<number>();
   const seen = new Set<number>();
   const items = (
@@ -68,6 +86,14 @@ export function FeedPage() {
     seen.add(item.target_id);
     return true;
   });
+  const visibleItems = items.filter(
+    (item) =>
+      filter === "ALL" ||
+      (filter === "POST" && item.action_type === "CREATED_POST") ||
+      (filter === "SESSION" &&
+        item.action_type === "SESSION_RESOLVED_APPROVED") ||
+      (filter === "VIDEO" && item.action_type === "PUBLISHED_LECTURE_VIDEO"),
+  );
   return (
     <div className="feed-layout">
       <div className="feed-main">
@@ -83,12 +109,42 @@ export function FeedPage() {
             className="icon-button"
             aria-label="Làm mới bảng tin"
             disabled={query.isFetching}
-            onClick={() => void query.refetch()}
+            onClick={() => void refresh()}
           >
             <RefreshCw size={19} />
           </button>
         </div>
-        <PostForm onSaved={setCreated} />
+        <details className="surface composer-fold" open>
+          <summary>
+            <BookOpen size={21} />
+            <span>Một ý tưởng để sẻ chia?</span>
+            <strong>Viết bài</strong>
+          </summary>
+          <PostForm onSaved={setCreated} />
+        </details>
+        {!!newFeed.data?.new_count && (
+          <div className="new-feed-notice">
+            <button
+              className="button button-primary"
+              disabled={query.isFetching}
+              onClick={() => void refresh()}
+            >
+              {newFeed.data.new_count} hoạt động mới · Cập nhật bảng tin
+            </button>
+          </div>
+        )}
+        {newFeed.isError && (
+          <p className="muted feed-update-error">
+            Chưa thể kiểm tra hoạt động mới.{" "}
+            <button
+              className="text-button"
+              disabled={newFeed.isFetching}
+              onClick={() => void newFeed.refetch()}
+            >
+              Thử lại cập nhật
+            </button>
+          </p>
+        )}
         {validId(created) && (
           <div className="notice notice-success" role="status">
             Đã đăng bài viết.{" "}
@@ -99,25 +155,74 @@ export function FeedPage() {
           <span>Mới từ cộng đồng</span>
           <span>Dành cho bạn</span>
         </div>
+        <nav className="social-tabs" aria-label="Lọc hoạt động đã tải">
+          {[
+            { key: "ALL", label: "Tất cả" },
+            { key: "POST", label: "Chia sẻ" },
+            { key: "SESSION", label: "Bộ câu hỏi" },
+            { key: "VIDEO", label: "Video" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              className={filter === tab.key ? "tab-active" : ""}
+              aria-pressed={filter === tab.key}
+              onClick={() => setFilter(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+        {filter !== "ALL" && (
+          <p className="field-hint feed-filter-hint">
+            Đang lọc trong các hoạt động đã tải. Chọn “Xem thêm” để tìm trong
+            các hoạt động cũ hơn.
+          </p>
+        )}
         {query.isPending ? (
           <PostSkeletons />
         ) : (
           <>
-            {!items.length && !query.isError && (
+            {!visibleItems.length && !query.isError && (
               <EmptyState
-                title="Kết nối để khám phá thêm"
-                description="Bảng tin chưa có hoạt động. Hãy tìm bạn học, kết bạn hoặc theo dõi để mở rộng không gian học tập."
+                title={
+                  filter === "ALL"
+                    ? "Kết nối để khám phá thêm"
+                    : "Chưa có hoạt động phù hợp trong phần đã tải"
+                }
+                description={
+                  filter === "ALL"
+                    ? "Bảng tin chưa có hoạt động. Hãy tìm bạn học, kết bạn hoặc theo dõi để mở rộng không gian học tập."
+                    : "Tải thêm hoạt động hoặc quay lại tất cả để khám phá cộng đồng."
+                }
+                action={
+                  filter === "ALL" ? (
+                    <Link className="button button-secondary" to="/search">
+                      Tìm bạn học
+                    </Link>
+                  ) : (
+                    <button
+                      className="button button-secondary"
+                      onClick={() => setFilter("ALL")}
+                    >
+                      Xem tất cả
+                    </button>
+                  )
+                }
               />
             )}
             <div className="post-list">
-              {items.map((item, index) => (
+              {visibleItems.map((item, index) => (
                 <FeedItem key={item.feed_id || index} item={item} />
               ))}
             </div>
             {query.isError && (
               <QueryError
                 error={query.error}
-                retry={() => void query.refetch()}
+                retry={() =>
+                  void (query.isFetchNextPageError
+                    ? query.fetchNextPage()
+                    : query.refetch())
+                }
               />
             )}
             <LoadMore

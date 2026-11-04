@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #b91c35;
+  --color-brand: var(--brand-primary);
   --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
 }
 
 :root {
   font-family: var(--font-sans);
-  color: #172033;
-  background: #f6f7f9;
+  color: var(--text);
+  background: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -71,7 +71,7 @@ select {
   border-radius: 9px;
   padding: 12px 14px;
   background: white;
-  color: #172033;
+  color: var(--text);
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
@@ -84,15 +84,15 @@ select:hover {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: #b91c35;
-  box-shadow: 0 0 0 3px #b91c3510;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-wash);
 }
 input::placeholder,
 textarea::placeholder {
   color: #818997;
 }
 input[aria-invalid="true"] {
-  border-color: #b91c35;
+  border-color: var(--brand-primary);
 }
 textarea {
   resize: vertical;
@@ -112,7 +112,7 @@ svg {
   flex-shrink: 0;
 }
 .muted {
-  color: #657084;
+  color: var(--text-secondary);
 }
 .eyebrow {
   font-size: 10px;
@@ -120,7 +120,7 @@ svg {
   font-weight: 750;
 }
 .text-brand {
-  color: #b91c35;
+  color: var(--brand-primary);
 }
 .brand {
   display: inline-flex;
@@ -136,7 +136,7 @@ svg {
   place-items: center;
   height: 45px;
   width: 45px;
-  background: #b91c35;
+  background: var(--brand-primary);
   color: white;
   border-radius: 13px;
 }
@@ -175,7 +175,7 @@ svg {
     box-shadow 0.15s;
 }
 .button-primary {
-  background: #b91c35;
+  background: var(--brand-primary);
   color: white;
   box-shadow: 0 4px 8px #b91c3514;
 }
@@ -205,7 +205,7 @@ svg {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #657084;
+  color: var(--text-secondary);
   border-radius: 9px;
 }
 .icon-button:hover {
@@ -251,7 +251,7 @@ svg {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #657084;
+  color: var(--text-secondary);
 }
 .field {
   display: flex;
@@ -279,8 +279,8 @@ svg {
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  background: #f9ebee;
-  color: #b91c35;
+  background: var(--brand-wash);
+  color: var(--brand-primary);
 }
 
 /* Login */
@@ -444,7 +444,7 @@ svg {
   border-radius: 9px;
 }
 .card-progress i:first-child {
-  background: #b91c35;
+  background: var(--brand-primary);
   width: 37px;
 }
 .floating-icon {
@@ -578,7 +578,7 @@ svg {
 }
 .login-footer > span {
   margin-inline: 9px;
-  color: #b91c35;
+  color: var(--brand-primary);
 }
 .mobile-brand {
   display: none;
@@ -591,7 +591,7 @@ svg {
   top: 0;
   inset-inline: 0;
   background: #fff;
-  border-bottom: 1px solid #e6e9ef;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -637,7 +637,7 @@ svg {
   align-items: center;
   justify-content: center;
   color: #a1324c;
-  background: #f7e7ed;
+  background: var(--brand-wash);
   border: 2px solid #fff;
   border-radius: 50%;
   font-weight: 750;
@@ -664,7 +664,7 @@ svg {
   left: 0;
   width: 244px;
   background: #fff;
-  border-right: 1px solid #e6e9ef;
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -690,7 +690,7 @@ svg {
   border: 0;
   background: transparent;
   border-radius: 9px;
-  color: #657084;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   width: 100%;
@@ -702,8 +702,8 @@ svg {
   flex: 1;
 }
 .nav-active {
-  background: #faedf0;
-  color: #b91c35;
+  background: var(--brand-wash);
+  color: var(--brand-primary);
 }
 .nav-active > svg:last-child {
   width: 14px;
@@ -765,8 +765,8 @@ svg {
   font-size: 12px;
 }
 .logout-button:hover {
-  background: #faedf0;
-  color: #b91c35;
+  background: var(--brand-wash);
+  color: var(--brand-primary);
 }
 .sidebar-version {
   font-size: 9px;
@@ -816,7 +816,7 @@ svg {
   border-radius: 20px;
 }
 .heading-tag .status-dot {
-  color: #b91c35;
+  color: var(--brand-primary);
   width: 5px;
   height: 5px;
 }
@@ -906,7 +906,7 @@ svg {
   overflow-wrap: anywhere;
 }
 .verified-icon {
-  color: #b91c35;
+  color: var(--brand-primary);
 }
 .identity-info p {
   font-size: 12px;
@@ -931,10 +931,10 @@ svg {
   font-size: 12px;
 }
 .profile-tabs > span:first-child {
-  color: #b91c35;
+  color: var(--brand-primary);
   font-weight: 700;
   padding: 16px 8px 13px;
-  border-bottom: 3px solid #b91c35;
+  border-bottom: 3px solid var(--brand-primary);
 }
 .private-label {
   color: #8a92a0;
@@ -975,7 +975,7 @@ svg {
 }
 .section-icon {
   color: #aa435b;
-  background: #fbf0f3;
+  background: var(--brand-wash);
   border-radius: 8px;
   padding: 7px;
 }
@@ -1207,7 +1207,7 @@ svg {
   margin-bottom: 24px;
 }
 .back-link:hover {
-  color: #b91c35;
+  color: var(--brand-primary);
 }
 .edit-form {
   padding: 32px;
@@ -1226,7 +1226,7 @@ svg {
   gap: 20px;
 }
 .form-section-heading {
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   padding-top: 25px;
   margin: 32px 0 24px;
 }
@@ -1243,7 +1243,7 @@ svg {
   justify-content: flex-end;
   gap: 10px;
   padding-top: 23px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
 }
 .form-actions a[aria-disabled="true"] {
   opacity: 0.6;

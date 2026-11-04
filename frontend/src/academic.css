@@ -23,7 +23,7 @@
 }
 .academic-nav a.active {
   background: #f8e9ee;
-  color: #b91c35;
+  color: var(--brand-primary);
   font-weight: 700;
 }
 .academic-heading {
@@ -137,7 +137,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 20px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   width: 100%;
   margin-top: auto;
 }
@@ -464,7 +464,7 @@
   padding: 0;
   margin: 0;
   flex-shrink: 0;
-  accent-color: #b91c35;
+  accent-color: var(--brand-primary);
   box-shadow: none;
 }
 .academic-form-grid {
@@ -521,7 +521,7 @@
   height: 7px;
   border-radius: 8px;
   border: 0;
-  accent-color: #b91c35;
+  accent-color: var(--brand-primary);
   overflow: hidden;
 }
 .practice-progress progress::-webkit-progress-bar {
@@ -529,7 +529,7 @@
   border-radius: 8px;
 }
 .practice-progress progress::-webkit-progress-value {
-  background: #b91c35;
+  background: var(--brand-primary);
   border-radius: 8px;
 }
 .practice-layout {
@@ -569,7 +569,7 @@
   white-space: pre-wrap;
 }
 .choice-selected {
-  background: #fbf0f3;
+  background: var(--brand-wash);
   border-color: #d5a1b0;
 }
 .practice-choice .option-key {
@@ -599,7 +599,7 @@
   gap: 12px;
   padding-top: 24px;
   margin-top: 25px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   margin-bottom: 20px;
 }
 .practice-navigation .button {
@@ -631,8 +631,8 @@
   color: #8b95a5;
 }
 .question-map button[aria-current="step"] {
-  border-color: #b91c35;
-  color: #b91c35;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 .question-map button.question-done {
   background: #f0f7f3;
@@ -714,7 +714,7 @@
 .question-insights {
   padding-top: 25px;
   margin-top: 25px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
 }
 .question-insights h3 {
   font-size: 16px;
@@ -917,7 +917,7 @@
 .topic-weights {
   padding-top: 30px;
   margin-top: 30px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
 }
 .topic-weights > .academic-help {
   margin: 0 0 20px;

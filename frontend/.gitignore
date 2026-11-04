@@ -8,3 +8,6 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 frontend_sample
+debug.log
+test-results-api/
+test-results-realtime/

@@ -22,7 +22,12 @@ test.describe("Real STOMP connection", () => {
     await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
     await expect(page).toHaveURL("/me");
 
-    await page.goto("/chat");
+    const toggle = page.getByRole("button", { name: "Mở điều hướng" });
+    if (await toggle.isVisible()) await toggle.click();
+    await page
+      .getByRole("link", { name: "Tin nhắn", exact: true })
+      .last()
+      .click();
     await expect(page.getByText("Đã kết nối", { exact: true })).toBeVisible({
       timeout: 15_000,
     });

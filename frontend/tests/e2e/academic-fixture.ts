@@ -294,6 +294,22 @@ export async function installAcademicMock(
     const url = new URL(request.url());
     const path = url.pathname.replace("/api/v1", "");
     const method = request.method();
+    if (path.startsWith("/ws"))
+      return route.fulfill({ status: 503, body: "Offline UI mock" });
+    if (path === "/notifications")
+      return route.fulfill({
+        json: success({
+          items: [],
+          unread_count: 0,
+          pagination: { has_next: false },
+        }),
+      });
+    if (path === "/search/saved")
+      return route.fulfill({
+        json: success({ saved_searches: [], trending_searches: [] }),
+      });
+    if (path === "/activity-feeds/new-count")
+      return route.fulfill({ json: success({ new_count: 0 }) });
     state.operations.push(`${method} ${path}`);
     const reply = (value: unknown, status = 200) =>
       route.fulfill({ status, json: success(value) });

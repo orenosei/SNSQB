@@ -1,15 +1,18 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-import { api, errorMessage, type ApiEnvelope, unwrap } from "../../lib/api";
+import { api, type ApiEnvelope, unwrap } from "../../lib/api";
 import { nextCursor } from "../../lib/cursor";
-import { Loading, ErrorNotice } from "../../components/Feedback";
+import { Loading } from "../../components/Feedback";
 import { PostCard } from "../posts/PostCard";
 import type { PostResponseDto, CursorPaginationDto } from "../social/types";
+import { useProfile } from "../profile/api";
+import { QueryError } from "../../components/SocialFeedback";
 interface VideoList {
   items?: PostResponseDto[];
   pagination?: CursorPaginationDto;
 }
 export function VideoPage() {
+  const me = useProfile();
   const query = useInfiniteQuery({
     queryKey: ["video-posts"],
     initialPageParam: undefined as number | undefined,
@@ -30,12 +33,15 @@ export function VideoPage() {
           <h1>Video bài giảng</h1>
           <p className="muted">Nội dung do giảng viên chia sẻ.</p>
         </div>
+        {me.data?.role === "LECTURER" && (
+          <Link className="button button-primary" to="/posts/new?type=video">
+            Đăng video bài giảng
+          </Link>
+        )}
       </div>
       {query.isPending ? (
         <Loading label="Đang tải video…" />
-      ) : query.isError ? (
-        <ErrorNotice message={errorMessage(query.error)} />
-      ) : !items.length ? (
+      ) : !items.length && !query.isError ? (
         <div className="surface notification-empty">
           <h2>Chưa có video</h2>
           <p>Video bài giảng sẽ xuất hiện tại đây.</p>
@@ -49,6 +55,16 @@ export function VideoPage() {
             <PostCard key={item.post_id} post={item} />
           ))}
         </div>
+      )}
+      {query.isError && (
+        <QueryError
+          error={query.error}
+          retry={() =>
+            void (query.isFetchNextPageError
+              ? query.fetchNextPage()
+              : query.refetch())
+          }
+        />
       )}
       {query.hasNextPage && (
         <button
