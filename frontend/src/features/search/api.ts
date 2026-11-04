@@ -3,7 +3,16 @@ import { api, type ApiEnvelope, unwrap } from "../../lib/api";
 import { nextCursor } from "../../lib/cursor";
 import type { GlobalSearchResponseDto } from "../social/types";
 
-export function useSearch(query: string, type: "USER" | "POST") {
+export const searchTypes = [
+  "ALL",
+  "USER",
+  "POST",
+  "QUESTION",
+  "SESSION",
+  "SUBJECT",
+] as const;
+export type SearchType = (typeof searchTypes)[number];
+export function useSearch(query: string, type: SearchType) {
   return useInfiniteQuery({
     queryKey: ["search", query, type],
     enabled: !!query.trim(),
@@ -19,6 +28,17 @@ export function useSearch(query: string, type: "USER" | "POST") {
   });
 }
 
-export interface SavedSearches { saved_searches?: Array<{saved_search_id?:number;query_text?:string;last_searched_at?:string}>; trending_searches?:string[] }
-export async function getSavedSearches() { return unwrap(await api.get<ApiEnvelope<SavedSearches>>("/search/saved")); }
-export async function deleteSavedSearch(id:number) { return unwrap(await api.delete<ApiEnvelope<unknown>>(`/search/saved/${id}`)); }
+export interface SavedSearches {
+  saved_searches?: Array<{
+    saved_search_id?: number;
+    query_text?: string;
+    last_searched_at?: string;
+  }>;
+  trending_searches?: string[];
+}
+export async function getSavedSearches() {
+  return unwrap(await api.get<ApiEnvelope<SavedSearches>>("/search/saved"));
+}
+export async function deleteSavedSearch(id: number) {
+  return unwrap(await api.delete<ApiEnvelope<unknown>>(`/search/saved/${id}`));
+}

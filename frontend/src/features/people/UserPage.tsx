@@ -18,6 +18,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { createDirectConversation } from "../chat/api";
 import { errorMessage } from "../../lib/api";
+import { useState } from "react";
+import { UserContributions } from "./UserContributions";
 
 export function UserPage() {
   const { userId } = useParams();
@@ -27,7 +29,13 @@ export function UserPage() {
   const relation = useRelationship(id);
   const navigate = useNavigate();
   const client = useQueryClient();
-  const chat = useMutation({ mutationFn: createDirectConversation, onSuccess: async value => { await client.invalidateQueries({queryKey:["conversations"]}); if(value.conversation_id) navigate(`/chat?id=${value.conversation_id}`); } });
+  const chat = useMutation({
+    mutationFn: createDirectConversation,
+    onSuccess: async (value) => {
+      await client.invalidateQueries({ queryKey: ["conversations"] });
+      if (value.conversation_id) navigate(`/chat?id=${value.conversation_id}`);
+    },
+  });
   if (!id)
     return (
       <div className="social-page">
@@ -91,8 +99,19 @@ export function UserPage() {
                 </span>
               </div>
               <RelationshipActions userId={id} profile={data} />
-              <div className="profile-extra-actions"><button className="button button-secondary" disabled={chat.isPending} onClick={() => chat.mutate(id)}>Nhắn tin</button><ReportButton targetType="USER" targetId={id}/></div>
-              {chat.isError && <ErrorNotice message={errorMessage(chat.error)}/>}
+              <div className="profile-extra-actions">
+                <button
+                  className="button button-secondary"
+                  disabled={chat.isPending}
+                  onClick={() => chat.mutate(id)}
+                >
+                  Nhắn tin
+                </button>
+                <ReportButton targetType="USER" targetId={id} />
+              </div>
+              {chat.isError && (
+                <ErrorNotice message={errorMessage(chat.error)} />
+              )}
             </div>
           </section>
           {relation.data?.relationship_with_me?.blocked === true ? (
@@ -103,12 +122,40 @@ export function UserPage() {
           ) : (
             relation.isSuccess &&
             relation.data?.relationship_with_me?.blocked === false && (
-              <PublicPosts userId={id} />
+              <PublicContent key={id} userId={id} />
             )
           )}
         </>
       )}
     </div>
+  );
+}
+function PublicContent({ userId }: { userId: number }) {
+  const [tab, setTab] = useState<"posts" | "sessions">("posts");
+  return (
+    <>
+      <nav className="social-tabs" aria-label="Nội dung thành viên">
+        <button
+          aria-pressed={tab === "posts"}
+          className={tab === "posts" ? "tab-active" : ""}
+          onClick={() => setTab("posts")}
+        >
+          Bài viết
+        </button>
+        <button
+          aria-pressed={tab === "sessions"}
+          className={tab === "sessions" ? "tab-active" : ""}
+          onClick={() => setTab("sessions")}
+        >
+          Bộ câu hỏi
+        </button>
+      </nav>
+      {tab === "posts" ? (
+        <PublicPosts userId={userId} />
+      ) : (
+        <UserContributions userId={userId} />
+      )}
+    </>
   );
 }
 function PublicPosts({ userId }: { userId: number }) {

@@ -5,4 +5,20 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: { global: "globalThis" },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          realtime: ["@stomp/stompjs", "sockjs-client"],
+          vendor: [
+            "react",
+            "react-dom",
+            "react-router",
+            "@tanstack/react-query",
+            "axios",
+          ],
+        },
+      },
+    },
+  },
 });

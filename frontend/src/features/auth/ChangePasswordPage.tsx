@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { api, errorMessage, type ApiEnvelope, unwrap } from "../../lib/api";
 import { ErrorNotice } from "../../components/Feedback";
+import { FieldFeedback } from "../../components/FieldFeedback";
 async function changePassword(payload: {
   old_password: string;
   new_password: string;
@@ -26,6 +27,7 @@ export function ChangePasswordPage() {
   });
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (change.isPending) return;
     setValidation("");
     if (!oldPassword || !newPassword) {
       setValidation("Nhập đầy đủ mật khẩu.");
@@ -53,43 +55,60 @@ export function ChangePasswordPage() {
         </div>
       </div>
       <form className="surface settings-form" onSubmit={submit}>
-        <label>
-          Mật khẩu hiện tại
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
+        <fieldset disabled={change.isPending} className="settings-fields">
+          <label>
+            Mật khẩu hiện tại
+            <input
+              type="password"
+              required
+              autoComplete="current-password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
+          </label>
+          <label>
+            Mật khẩu mới
+            <input
+              type="password"
+              required
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </label>
+          <label>
+            Xác nhận mật khẩu mới
+            <input
+              type="password"
+              required
+              aria-invalid={!!confirm && confirm !== newPassword}
+              aria-describedby="password-confirm-feedback"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </label>
+          <FieldFeedback
+            id="password-confirm-feedback"
+            message={
+              confirm && confirm !== newPassword
+                ? "Mật khẩu xác nhận không khớp."
+                : undefined
+            }
           />
-        </label>
-        <label>
-          Mật khẩu mới
-          <input
-            type="password"
-            autoComplete="new-password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-        </label>
-        <label>
-          Xác nhận mật khẩu mới
-          <input
-            type="password"
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-          />
-        </label>
-        {validation && <ErrorNotice message={validation} />}{" "}
-        {change.isError && <ErrorNotice message={errorMessage(change.error)} />}{" "}
-        {change.isSuccess && (
-          <p role="status" className="notice notice-success">
-            Đã đổi mật khẩu thành công.
-          </p>
-        )}
-        <button className="button button-primary" disabled={change.isPending}>
-          Đổi mật khẩu
-        </button>
+          {validation && <ErrorNotice message={validation} />}{" "}
+          {change.isError && (
+            <ErrorNotice message={errorMessage(change.error)} />
+          )}{" "}
+          {change.isSuccess && (
+            <p role="status" className="notice notice-success">
+              Đã đổi mật khẩu thành công.
+            </p>
+          )}
+          <button className="button button-primary" disabled={change.isPending}>
+            {change.isPending ? "Đang cập nhật…" : "Đổi mật khẩu"}
+          </button>
+        </fieldset>
       </form>
     </div>
   );

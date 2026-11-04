@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { ArrowLeft, Plus } from "lucide-react";
 import { ErrorNotice, Loading } from "../../components/Feedback";
 import {
@@ -43,6 +43,7 @@ export function PostDetailPage() {
   );
 }
 export function PostEditorPage() {
+  const [params] = useSearchParams();
   const { postId } = useParams();
   const navigate = useNavigate();
   const me = useProfile();
@@ -85,6 +86,9 @@ export function PostEditorPage() {
         </div>
       </div>
       <PostForm
+        defaultType={
+          params.get("type") === "video" ? "LEARNING_VIDEO" : "SOCIAL_POST"
+        }
         initial={query.data}
         onSaved={(savedId) =>
           navigate(validId(savedId) ? `/posts/${savedId}` : "/my-posts")
