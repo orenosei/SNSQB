@@ -123,6 +123,22 @@ export async function installSocialMock(
     const url = new URL(request.url());
     const path = url.pathname.replace("/api/v1", "");
     const method = request.method();
+    if (path.startsWith("/ws"))
+      return route.fulfill({ status: 503, body: "Offline UI mock" });
+    if (path === "/notifications")
+      return route.fulfill({
+        json: success({
+          items: [],
+          unread_count: 0,
+          pagination: { has_next: false },
+        }),
+      });
+    if (path === "/search/saved")
+      return route.fulfill({
+        json: success({ saved_searches: [], trending_searches: [] }),
+      });
+    if (path === "/activity-feeds/new-count")
+      return route.fulfill({ json: success({ new_count: 0 }) });
     const body = () => request.postDataJSON();
     state.operations.push(`${method} ${path}`);
     const reply = (data: unknown) => route.fulfill({ json: success(data) });
@@ -136,16 +152,14 @@ export async function installSocialMock(
     if (path === "/auth/logout") return reply(null);
     if (path === "/users/me" && method === "GET") return reply(current);
     if (path === "/activity-feeds") {
-      const items = [...state.posts.values()]
-        .filter(allowed)
-        .map((post) => ({
-          feed_id: post.post_id! + 900,
-          target_type: "POST",
-          target_id: post.post_id,
-          action_type: "CREATED_POST",
-          actor: post.author,
-          created_at: timestamp,
-        }));
+      const items = [...state.posts.values()].filter(allowed).map((post) => ({
+        feed_id: post.post_id! + 900,
+        target_type: "POST",
+        target_id: post.post_id,
+        action_type: "CREATED_POST",
+        actor: post.author,
+        created_at: timestamp,
+      }));
       return reply(
         cursorPage(
           items,

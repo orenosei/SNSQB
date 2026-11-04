@@ -16,6 +16,7 @@ import type {
   SessionQuestionsResponse,
 } from "./types";
 import { QuestionInsights } from "./QuestionInsights";
+import { DiscussionToggle } from "../posts/DiscussionToggle";
 
 interface SavedAnswer {
   selected: string[];
@@ -430,6 +431,7 @@ function PracticeSession({ id }: { id: number }) {
                   canRate={!question.my_interaction?.rated}
                 />
               )}
+              {validId(question.question_id) && <DiscussionToggle key={question.question_id} id={question.question_id} type="QUESTION"/>}
             </section>
             <aside className="surface question-map">
               <h2>Lộ trình của bạn</h2>

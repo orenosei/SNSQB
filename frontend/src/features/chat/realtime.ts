@@ -38,13 +38,14 @@ export function connectChat(
       });
     },
     onWebSocketClose: () => onStatus(false),
+    onWebSocketError: () => onStatus(false),
     onStompError: () => onStatus(false),
   });
   client.activate();
   return {
     client,
     subscribeTyping(id: number, onTyping: (event: ChatEvent) => void) {
-      typingSubscription?.unsubscribe();
+      if (client.connected) typingSubscription?.unsubscribe();
       typingSubscription = undefined;
       if (client.connected)
         typingSubscription = client.subscribe(
@@ -57,14 +58,26 @@ export function connectChat(
             }
           },
         );
+      const subscription = typingSubscription;
+      return () => {
+        if (subscription) {
+          if (client.connected) subscription.unsubscribe();
+          if (typingSubscription === subscription)
+            typingSubscription = undefined;
+        }
+      };
     },
     send(destination: string, body: object) {
       if (!client.connected) return false;
-      client.publish({ destination, body: JSON.stringify(body) });
-      return true;
+      try {
+        client.publish({ destination, body: JSON.stringify(body) });
+        return true;
+      } catch {
+        return false;
+      }
     },
     close() {
-      typingSubscription?.unsubscribe();
+      if (client.connected) typingSubscription?.unsubscribe();
       void client.deactivate();
     },
   };

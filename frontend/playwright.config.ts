@@ -16,7 +16,9 @@ export default defineConfig({
   workers: 2,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: realtime
+      ? process.env.SNSQB_REALTIME_E2E_ORIGIN || "http://127.0.0.1:4173"
+      : "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
@@ -42,16 +44,19 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: apiOnly
-    ? undefined
-    : {
-        command: "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort",
-        url: "http://127.0.0.1:4173",
-        reuseExistingServer: false,
-        env: {
-          VITE_API_BASE_URL: realtime
-            ? process.env.SNSQB_TEST_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
-            : "http://127.0.0.1:4173/api/v1",
+  webServer:
+    apiOnly || realtime
+      ? undefined
+      : {
+          command:
+            "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4173 --strictPort",
+          url: "http://127.0.0.1:4173",
+          reuseExistingServer: false,
+          env: {
+            VITE_API_BASE_URL: realtime
+              ? process.env.SNSQB_TEST_API_BASE_URL ||
+                "https://snsqb.duckdns.org/api/v1"
+              : "http://127.0.0.1:4173/api/v1",
+          },
         },
-      },
 });

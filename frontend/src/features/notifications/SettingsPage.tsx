@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { api, errorMessage, type ApiEnvelope, unwrap } from "../../lib/api";
 import { ErrorNotice, Loading } from "../../components/Feedback";
+import { QueryError } from "../../components/SocialFeedback";
 
 interface PushSettings {
   push_enabled?: boolean;
@@ -25,11 +26,22 @@ export function NotificationSettingsPage() {
     queryFn: fetchSettings,
   });
   if (query.isPending) return <Loading label="Đang tải cài đặt…" />;
-  if (query.isError) return <ErrorNotice message={errorMessage(query.error)} />;
+  if (query.isError)
+    return (
+      <QueryError error={query.error} retry={() => void query.refetch()} />
+    );
   return <PushSettingsForm initial={query.data} />;
 }
 function PushSettingsForm({ initial }: { initial: PushSettings }) {
-  const [settings, setSettings] = useState<PushSettings>(initial);
+  const [settings, setSettings] = useState<PushSettings>(() => ({
+    ...initial,
+    quiet_hours: {
+      enabled: false,
+      ...initial.quiet_hours,
+      start_time: initial.quiet_hours?.start_time || "22:00",
+      end_time: initial.quiet_hours?.end_time || "07:00",
+    },
+  }));
   const client = useQueryClient();
   const save = useMutation({
     mutationFn: updateSettings,
@@ -38,6 +50,7 @@ function PushSettingsForm({ initial }: { initial: PushSettings }) {
   });
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (save.isPending) return;
     save.mutate(settings);
   }
   return (
@@ -52,104 +65,108 @@ function PushSettingsForm({ initial }: { initial: PushSettings }) {
         </div>
       </div>
       <form className="surface settings-form" onSubmit={submit}>
-        {(
-          [
-            ["push_enabled", "Nhận thông báo đẩy"],
-            ["sound_enabled", "Âm thanh"],
-            ["vibration_enabled", "Rung"],
-          ] as const
-        ).map(([key, label]) => (
-          <label key={key} className="settings-toggle">
+        <fieldset disabled={save.isPending} className="settings-fields">
+          {(
+            [
+              ["push_enabled", "Nhận thông báo đẩy"],
+              ["sound_enabled", "Âm thanh"],
+              ["vibration_enabled", "Rung"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} className="settings-toggle">
+              <input
+                type="checkbox"
+                checked={!!settings[key]}
+                onChange={(e) =>
+                  setSettings({ ...settings, [key]: e.target.checked })
+                }
+              />
+              {label}
+            </label>
+          ))}
+          {Object.entries(settings.categories || {}).map(([key, value]) => (
+            <label key={key} className="settings-toggle">
+              <input
+                type="checkbox"
+                checked={!!value.enabled}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    categories: {
+                      ...settings.categories,
+                      [key]: { ...value, enabled: e.target.checked },
+                    },
+                  })
+                }
+              />
+              {value.description || key}
+            </label>
+          ))}
+          <h2>Khung giờ yên tĩnh</h2>
+          <label className="settings-toggle">
             <input
               type="checkbox"
-              checked={!!settings[key]}
-              onChange={(e) =>
-                setSettings({ ...settings, [key]: e.target.checked })
-              }
-            />
-            {label}
-          </label>
-        ))}
-        {Object.entries(settings.categories || {}).map(([key, value]) => (
-          <label key={key} className="settings-toggle">
-            <input
-              type="checkbox"
-              checked={!!value.enabled}
+              checked={!!settings.quiet_hours?.enabled}
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  categories: {
-                    ...settings.categories,
-                    [key]: { ...value, enabled: e.target.checked },
+                  quiet_hours: {
+                    ...settings.quiet_hours,
+                    enabled: e.target.checked,
                   },
                 })
               }
             />
-            {value.description || key}
+            Bật khung giờ yên tĩnh
           </label>
-        ))}
-        <h2>Khung giờ yên tĩnh</h2>
-        <label className="settings-toggle">
-          <input
-            type="checkbox"
-            checked={!!settings.quiet_hours?.enabled}
-            onChange={(e) =>
-              setSettings({
-                ...settings,
-                quiet_hours: {
-                  ...settings.quiet_hours,
-                  enabled: e.target.checked,
-                },
-              })
-            }
-          />
-          Bật khung giờ yên tĩnh
-        </label>
-        {settings.quiet_hours?.enabled && (
-          <div className="settings-times">
-            <label>
-              Bắt đầu{" "}
-              <input
-                type="time"
-                value={settings.quiet_hours.start_time || "22:00"}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    quiet_hours: {
-                      ...settings.quiet_hours,
-                      start_time: e.target.value,
-                    },
-                  })
-                }
-              />
-            </label>
-            <label>
-              Kết thúc{" "}
-              <input
-                type="time"
-                value={settings.quiet_hours.end_time || "07:00"}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    quiet_hours: {
-                      ...settings.quiet_hours,
-                      end_time: e.target.value,
-                    },
-                  })
-                }
-              />
-            </label>
-          </div>
-        )}
-        {save.isError && <ErrorNotice message={errorMessage(save.error)} />}{" "}
-        {save.isSuccess && (
-          <p role="status" className="notice notice-success">
-            Đã lưu cài đặt.
-          </p>
-        )}
-        <button className="button button-primary" disabled={save.isPending}>
-          Lưu cài đặt
-        </button>
+          {settings.quiet_hours?.enabled && (
+            <div className="settings-times">
+              <label>
+                Bắt đầu{" "}
+                <input
+                  type="time"
+                  required
+                  value={settings.quiet_hours.start_time || "22:00"}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      quiet_hours: {
+                        ...settings.quiet_hours,
+                        start_time: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Kết thúc{" "}
+                <input
+                  type="time"
+                  required
+                  value={settings.quiet_hours.end_time || "07:00"}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      quiet_hours: {
+                        ...settings.quiet_hours,
+                        end_time: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+            </div>
+          )}
+          {save.isError && <ErrorNotice message={errorMessage(save.error)} />}{" "}
+          {save.isSuccess && (
+            <p role="status" className="notice notice-success">
+              Đã lưu cài đặt.
+            </p>
+          )}
+          <button className="button button-primary" disabled={save.isPending}>
+            {save.isPending ? "Đang lưu…" : "Lưu cài đặt"}
+          </button>
+        </fieldset>
       </form>
     </div>
   );

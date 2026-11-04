@@ -18,8 +18,8 @@
   gap: 10px;
   width: min(38vw, 440px);
   padding-left: 14px;
-  border: 1px solid #edf0f4;
-  background: #f6f7f9;
+  border: 1px solid var(--border);
+  background: var(--paper);
   border-radius: 24px;
   color: #8a93a0;
 }
@@ -134,7 +134,7 @@
 .feed-unavailable a {
   display: inline-block;
   margin-top: 12px;
-  color: #b91c35;
+  color: var(--brand-primary);
 }
 .activity-card {
   display: flex;
@@ -281,7 +281,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   padding-block: 5px;
 }
 .reaction-button {
@@ -301,7 +301,7 @@
 }
 .reaction-selected {
   background: #fbecf1;
-  color: #b91c35;
+  color: var(--brand-primary);
   font-weight: 700;
 }
 .reaction-button:disabled {
@@ -318,7 +318,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   padding: 14px 0;
   color: #7e8999;
   font-size: 11px;
@@ -350,7 +350,7 @@
   font-size: 9px;
   padding: 3px 6px;
   margin-top: 3px;
-  background: #f6f7f9;
+  background: var(--paper);
   border-color: #eceef2;
   border-radius: 5px;
 }
@@ -367,7 +367,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
   padding-top: 17px;
   margin-top: 12px;
 }
@@ -394,7 +394,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f6f7f9;
+  background: var(--paper);
   padding: 6px 10px;
   border-radius: 7px;
   margin-top: 7px;
@@ -452,7 +452,7 @@
   gap: 7px;
 }
 .text-button:hover {
-  color: #b91c35;
+  color: var(--brand-primary);
   text-decoration: underline;
 }
 .post-skeleton {
@@ -479,7 +479,7 @@
 }
 .post-skeleton > p {
   height: 65px;
-  background: #f6f7f9;
+  background: var(--paper);
   margin-top: 20px;
   border-radius: 9px;
 }
@@ -489,7 +489,7 @@
   border: 1px solid #e1e6ed;
   border-radius: 15px;
   box-shadow: 0 25px 100px #17203340;
-  color: #172033;
+  color: var(--text);
   background: white;
   margin: auto;
 }
@@ -525,7 +525,7 @@
 .comment-sort select {
   padding: 6px 8px;
   font-size: 10px;
-  border-color: #edf0f4;
+  border-color: var(--border);
 }
 .comment-editor {
   margin-bottom: 22px;
@@ -675,7 +675,7 @@
 }
 .social-tabs button.tab-active {
   background: #faedf1;
-  color: #b91c35;
+  color: var(--brand-primary);
   font-weight: 700;
 }
 .people-grid {
@@ -797,7 +797,7 @@
   gap: 9px;
   flex-wrap: wrap;
   padding-top: 20px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
 }
 .relationship-actions .button {
   font-size: 11px;
@@ -847,7 +847,7 @@
   color: #8a93a0;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #edf0f4;
+  border-top: 1px solid var(--border);
 }
 @media (max-width: 1200px) {
   .feed-layout {

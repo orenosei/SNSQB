@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Flag } from "lucide-react";
 import { api, errorMessage, type ApiEnvelope, unwrap } from "../../lib/api";
 import { ErrorNotice } from "../../components/Feedback";
+import { Modal } from "../../components/Modal";
 
 type Target = "POST" | "USER" | "COMMENT";
 type Reason = "HARASSMENT" | "HATE_STATEMENT" | "SPAM" | "OTHER";
@@ -32,6 +33,7 @@ export function ReportButton({
   });
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (report.isPending) return;
     if (description.length > 500) return;
     report.mutate({
       target_type: targetType,
@@ -44,7 +46,7 @@ export function ReportButton({
     <>
       <button
         className="text-button report-trigger"
-        onClick={() => setOpen(true)}
+        onClick={() => { report.reset(); setOpen(true); }}
       >
         <Flag size={15} /> Báo cáo
       </button>
@@ -54,24 +56,12 @@ export function ReportButton({
         </span>
       )}
       {open && (
-        <div
-          className="report-overlay"
-          role="presentation"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setOpen(false);
-          }}
-        >
-          <div
-            className="surface report-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Báo cáo vi phạm"
-          >
-            <h2>Báo cáo vi phạm</h2>
+        <Modal title="Báo cáo vi phạm" className="report-dialog" pending={report.isPending} onClose={() => setOpen(false)}>
             <p className="muted">
               Cho chúng tôi biết lý do bạn báo cáo nội dung này.
             </p>
             <form onSubmit={submit}>
+              <fieldset disabled={report.isPending}>
               <label>
                 Lý do
                 <select
@@ -99,6 +89,7 @@ export function ReportButton({
                 <button
                   type="button"
                   className="button button-secondary"
+                  disabled={report.isPending}
                   onClick={() => setOpen(false)}
                 >
                   Hủy
@@ -110,9 +101,9 @@ export function ReportButton({
                   Gửi báo cáo
                 </button>
               </div>
+              </fieldset>
             </form>
-          </div>
-        </div>
+        </Modal>
       )}
     </>
   );
