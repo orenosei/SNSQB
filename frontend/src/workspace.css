@@ -222,6 +222,7 @@ input[type="radio"] {
   color: var(--text-muted);
 }
 .workspace-shell .nav-item {
+  position: relative;
   font-size: 0.8125rem;
   padding: 9px 10px;
   gap: 10px;
@@ -229,6 +230,29 @@ input[type="radio"] {
   border-radius: 6px;
   margin-bottom: 3px;
   color: var(--text-secondary);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+.workspace-shell .nav-item > svg {
+  flex-shrink: 0;
+}
+.workspace-shell .nav-item::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(50% - 9px);
+  width: 3px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--brand-primary);
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
 }
 .workspace-shell .nav-item:hover {
   background: #e9ece4;
@@ -236,7 +260,14 @@ input[type="radio"] {
 .workspace-shell .nav-active {
   background: #e2ebe2;
   color: var(--brand-primary);
-  font-weight: 700;
+}
+.workspace-shell .nav-active::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+.workspace-shell .nav-item:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -2px;
 }
 .workspace-shell .nav-divider {
   margin: 16px 10px;
