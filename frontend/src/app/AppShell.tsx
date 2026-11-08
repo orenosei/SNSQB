@@ -142,15 +142,14 @@ export function AppShell() {
       <span>{signOut.isPending ? "Đang đăng xuất…" : "Đăng xuất"}</span>
     </button>
   );
-  const mobileNavigation = (
+  const navigationGroups = (
     <>
-      <NavigationGroup label="HỌC TẬP" links={learningLinks} />
       <NavigationGroup label="CỘNG ĐỒNG" links={communityLinks} />
+      <NavigationGroup label="HỌC TẬP" links={learningLinks} />
       {isLecturer && (
         <NavigationGroup label="GIẢNG DẠY" links={teachingLinks} />
       )}
       <NavigationGroup label="TÀI KHOẢN" links={accountLinks} />
-      {logoutButton}
     </>
   );
   return (
@@ -246,41 +245,7 @@ export function AppShell() {
           </NavLink>
         </header>
         <aside className="sidebar" aria-label="Điều hướng không gian">
-          <div className="sidebar-top">
-            <NavigationGroup
-              label={
-                mode === "learning"
-                  ? "GÓC HỌC TẬP"
-                  : mode === "teaching"
-                    ? "GIẢNG DẠY"
-                    : mode === "account"
-                      ? "TÀI KHOẢN"
-                      : "CỘNG ĐỒNG"
-              }
-              links={
-                mode === "learning"
-                  ? learningLinks
-                  : mode === "teaching"
-                    ? teachingLinks
-                    : mode === "account"
-                      ? accountLinks
-                      : communityLinks
-              }
-            />
-            <div className="nav-divider" />
-            {mode !== "learning" && (
-              <NavigationGroup label="HỌC TẬP" links={learningLinks} />
-            )}{" "}
-            {mode !== "community" && (
-              <NavigationGroup label="CỘNG ĐỒNG" links={communityLinks} />
-            )}{" "}
-            {isLecturer && mode !== "teaching" && (
-              <NavigationGroup label="GIẢNG DẠY" links={teachingLinks} />
-            )}{" "}
-            {mode !== "account" && (
-              <NavigationGroup label="TÀI KHOẢN" links={accountLinks} />
-            )}
-          </div>
+          <div className="sidebar-top">{navigationGroups}</div>
           <div className="sidebar-bottom">
             <div className="workspace-signature">
               <span className="status-dot" />
@@ -299,7 +264,8 @@ export function AppShell() {
             }}
           >
             <nav id="mobile-navigation" aria-label="Điều hướng chính">
-              {mobileNavigation}
+              {navigationGroups}
+              {logoutButton}
             </nav>
           </Modal>
         )}
