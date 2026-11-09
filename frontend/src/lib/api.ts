@@ -44,13 +44,8 @@ export function requireTokens(data: RefreshTokenResponse | undefined): Tokens {
   };
 }
 
-// Production is served through Vercel's same-origin rewrite. This deliberately
-// ignores an accidentally configured absolute VITE_API_BASE_URL in Vercel,
-// which would send browser requests back to the CORS-protected backend.
 const baseURL = (
-  import.meta.env.PROD
-    ? "/api/v1"
-    : import.meta.env.VITE_API_BASE_URL || "/api/v1"
+  import.meta.env.VITE_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
 ).replace(/\/+$/, "");
 const options = {
   baseURL,
