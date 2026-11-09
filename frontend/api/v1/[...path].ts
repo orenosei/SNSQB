@@ -7,8 +7,12 @@ export default async function handler(req: any, res: any) {
   }
 
   const incoming = new URL(req.url || "/api/v1", "https://vercel-proxy.invalid");
-  const path = incoming.pathname.replace(/^\/api\/v1\/?/, "");
-  const query = incoming.search;
+  const path = incoming.pathname.startsWith("/api/v1")
+    ? incoming.pathname.replace(/^\/api\/v1\/?/, "")
+    : String(req.query?.path ?? "").replace(/^\/+/, "");
+  incoming.searchParams.delete("path");
+  const query = incoming.searchParams.toString();
+  const targetQuery = query ? `?${query}` : "";
   const method = String(req.method || "GET").toUpperCase();
   const headers = new Headers();
 
@@ -33,7 +37,7 @@ export default async function handler(req: any, res: any) {
     : undefined;
 
   try {
-    const response = await fetch(`${BACKEND}/${path}${query}`, {
+    const response = await fetch(`${BACKEND}/${path}${targetQuery}`, {
       method,
       headers,
       body,
