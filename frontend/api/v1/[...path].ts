@@ -6,12 +6,10 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  const path = Array.isArray(req.query?.path)
-    ? req.query.path.join("/")
-    : String(req.query?.path ?? "");
-  const query = typeof req.url === "string" && req.url.includes("?")
-    ? req.url.slice(req.url.indexOf("?"))
-    : "";
+  const incoming = new URL(req.url || "/api/v1", "https://vercel-proxy.invalid");
+  const path = incoming.pathname.replace(/^\/api\/v1\/?/, "");
+  const query = incoming.search;
+  const method = String(req.method || "GET").toUpperCase();
   const headers = new Headers();
 
   for (const [name, value] of Object.entries(req.headers ?? {})) {
@@ -25,7 +23,7 @@ export default async function handler(req: any, res: any) {
     headers.set(name, Array.isArray(value) ? value.join(", ") : String(value));
   }
 
-  const hasBody = !["GET", "HEAD"].includes(req.method);
+  const hasBody = !["GET", "HEAD"].includes(method);
   const body = hasBody
     ? typeof req.body === "string"
       ? req.body
@@ -36,7 +34,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const response = await fetch(`${BACKEND}/${path}${query}`, {
-      method: req.method,
+      method,
       headers,
       body,
     });
