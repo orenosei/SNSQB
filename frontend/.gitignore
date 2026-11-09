@@ -11,3 +11,4 @@ frontend_sample
 debug.log
 test-results-api/
 test-results-realtime/
+.DS_Store
