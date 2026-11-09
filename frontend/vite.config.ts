@@ -5,15 +5,6 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: { global: "globalThis" },
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://snsqb.duckdns.org",
-        changeOrigin: true,
-        secure: true,
-      },
-    },
-  },
   build: {
     rollupOptions: {
       output: {

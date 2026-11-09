@@ -14,7 +14,7 @@ Copy-Item .env.example .env
 npm.cmd run dev
 ```
 
-By default, browser REST requests use the same-origin `/api/v1` path. Vite proxies this path during local development and [`vercel.json`](./vercel.json) proxies it in production, avoiding browser CORS failures. Set `VITE_API_BASE_URL` only when you intentionally need to call a backend directly; it is a public frontend setting, so never place passwords or private keys in a `VITE_*` variable. Restart Vite after changing it.
+Configure `VITE_API_BASE_URL` in `.env`. This is a public frontend setting: never place passwords or private keys in a `VITE_*` variable. Restart Vite after changing it.
 
 Tokens stay in memory. A full reload requires login again; the application returns to the requested supported destination. Unconfirmed chat messages and drafts remain in the authenticated in-memory cache across SPA navigation and are cleared on logout.
 
