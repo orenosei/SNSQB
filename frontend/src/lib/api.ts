@@ -45,7 +45,10 @@ export function requireTokens(data: RefreshTokenResponse | undefined): Tokens {
 }
 
 const baseURL = (
-  import.meta.env.VITE_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
+  // Production HTTP requests use the same-origin proxy configured in vercel.json.
+  import.meta.env.PROD
+    ? "/api/v1"
+    : import.meta.env.VITE_API_BASE_URL || "https://snsqb.duckdns.org/api/v1"
 ).replace(/\/+$/, "");
 const options = {
   baseURL,

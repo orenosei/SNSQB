@@ -16,6 +16,8 @@ npm.cmd run dev
 
 Configure `VITE_API_BASE_URL` in `.env`. This is a public frontend setting: never place passwords or private keys in a `VITE_*` variable. Restart Vite after changing it.
 
+Production HTTP requests use `/api/v1` on the frontend origin. With Vercel Root Directory set to `frontend`, `vercel.json` routes these requests to `api/proxy.js` before the SPA fallback. The function forwards API bodies and authorization to `https://snsqb.duckdns.org/api/v1` without forwarding the browser Origin header, avoiding browser CORS for HTTP API calls. To change the production HTTP backend, update the function's backend constant. Realtime connections still use `VITE_API_BASE_URL` and require the backend to allow the frontend origin.
+
 Tokens stay in memory. A full reload requires login again; the application returns to the requested supported destination. Unconfirmed chat messages and drafts remain in the authenticated in-memory cache across SPA navigation and are cleared on logout.
 
 ## Checks
