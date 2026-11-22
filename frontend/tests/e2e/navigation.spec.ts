@@ -12,8 +12,6 @@ for (const role of ["STUDENT", "LECTURER"] as const) {
       "/",
       "/my-posts",
       "/friends",
-      "/search",
-      "/chat",
       "/question-bank",
       "/submissions",
       "/videos",
@@ -28,7 +26,6 @@ for (const role of ["STUDENT", "LECTURER"] as const) {
     const destinations = [
       "/question-bank",
       "/notifications",
-      "/search",
       ...(role === "LECTURER" ? ["/lecturer/reviews"] : []),
     ];
 
@@ -74,3 +71,24 @@ for (const role of ["STUDENT", "LECTURER"] as const) {
     }
   });
 }
+
+test("header keeps search, messages and notifications in order on narrow and wide screens", async ({ page }) => {
+  await signIn(page);
+  const header = page.getByRole("banner");
+  const messages = header.getByRole("link", { name: "Tin nhắn", exact: true });
+  const notifications = header.getByRole("link", { name: "Thông báo", exact: true });
+
+  for (const width of [320, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 657 });
+    const search = width <= 1150
+      ? header.getByRole("link", { name: "Tìm kiếm", exact: true })
+      : header.getByRole("search");
+    await expect(search).toBeVisible();
+    await expect(messages).toBeInViewport({ ratio: 1 });
+    await expect(notifications).toBeInViewport({ ratio: 1 });
+    expect((await search.boundingBox())!.x).toBeLessThan((await messages.boundingBox())!.x);
+    expect((await messages.boundingBox())!.x).toBeLessThan((await notifications.boundingBox())!.x);
+  }
+
+  await expect(messages).toHaveAttribute("href", "/chat");
+});
