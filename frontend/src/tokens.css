@@ -21,8 +21,9 @@
   --cover-muted: #d2e1d4;
   --cover-rule: #608476;
   --cover-accent: #edca89;
-  --font-body: "Segoe UI", system-ui, sans-serif;
-  --font-display: "Lora Variable", Georgia, "Times New Roman", serif;
+  --weight-h1: 750;
+  --weight-h2: 650;
+  --weight-h3: 600;
   --space-2: .5rem;
   --space-3: .75rem;
   --space-4: 1rem;

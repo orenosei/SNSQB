@@ -2,7 +2,7 @@
 
 @theme {
   --color-brand: var(--brand-primary);
-  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-sans: "Montserrat Variable", system-ui, sans-serif;
 }
 
 :root {
@@ -330,7 +330,7 @@ svg {
 }
 .story-content h1 {
   font-size: clamp(32px, 3.35vw, 54px);
-  font-weight: 750;
+  font-weight: var(--weight-h1);
   letter-spacing: -1.9px;
   line-height: 1.22;
 }
@@ -511,7 +511,7 @@ svg {
   font-size: 30px;
   line-height: 1.3;
   letter-spacing: -0.9px;
-  font-weight: 750;
+  font-weight: var(--weight-h2);
 }
 .login-description {
   font-size: 14px;
@@ -800,7 +800,7 @@ svg {
 }
 .page-heading h1 {
   font-size: 26px;
-  font-weight: 750;
+  font-weight: var(--weight-h1);
   line-height: 1.3;
   letter-spacing: -0.7px;
 }
@@ -901,7 +901,7 @@ svg {
 }
 .profile-name h2 {
   font-size: 23px;
-  font-weight: 750;
+  font-weight: var(--weight-h2);
   letter-spacing: -0.5px;
   overflow-wrap: anywhere;
 }
@@ -970,7 +970,7 @@ svg {
 }
 .section-title h2 {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   letter-spacing: -0.2px;
 }
 .section-icon {
@@ -1126,7 +1126,7 @@ svg {
 }
 .next-card h2 {
   font-size: 20px;
-  font-weight: 650;
+  font-weight: var(--weight-h2);
   line-height: 1.5;
   color: #6a3d55;
   letter-spacing: -0.5px;
@@ -1186,7 +1186,7 @@ svg {
 }
 .not-found h1 {
   font-size: 27px;
-  font-weight: 700;
+  font-weight: var(--weight-h1);
   margin-block: 15px;
 }
 .not-found p {
@@ -1232,7 +1232,7 @@ svg {
 }
 .form-section-heading h2 {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-bottom: 7px;
 }
 .form-section-heading p {
