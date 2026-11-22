@@ -60,7 +60,6 @@ export function ProfilePage() {
     <div className="page-container">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">KHÔNG GIAN CÁ NHÂN</p>
           <h1>Hồ sơ của bạn</h1>
         </div>
         <span className="heading-tag">

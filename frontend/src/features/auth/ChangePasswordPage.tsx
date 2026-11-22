@@ -50,7 +50,6 @@ export function ChangePasswordPage() {
       </Link>
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">BẢO MẬT</p>
           <h1>Đổi mật khẩu</h1>
         </div>
       </div>

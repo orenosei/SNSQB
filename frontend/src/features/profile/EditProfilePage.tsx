@@ -91,7 +91,6 @@ function ProfileForm({ profile }: { profile: Profile }) {
       </Link>
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">THỂ HIỆN BẢN THÂN</p>
           <h1>Chỉnh sửa hồ sơ</h1>
           <p className="muted mt-2">
             Một vài thông tin để mọi người hiểu bạn hơn.

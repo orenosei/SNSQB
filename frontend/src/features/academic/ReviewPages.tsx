@@ -48,7 +48,6 @@ export function ReviewListPage() {
     <AcademicPage>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">KHÔNG GIAN GIẢNG VIÊN</p>
           <h1>Duyệt câu hỏi</h1>
           <p className="muted">
             Góp ý để mỗi câu hỏi trở nên chính xác và hữu ích hơn.
@@ -196,7 +195,6 @@ function ReviewSession({ id }: { id: number }) {
       </Link>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">THẨM ĐỊNH HỌC THUẬT</p>
           <h1>Duyệt phiên #{id}</h1>
         </div>
       </div>

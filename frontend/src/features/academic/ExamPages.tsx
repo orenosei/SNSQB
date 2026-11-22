@@ -126,7 +126,6 @@ export function ExamsPage() {
     <AcademicPage>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">KHÔNG GIAN GIẢNG VIÊN</p>
           <h1>Đề thi của tôi</h1>
           <p className="muted">Biên soạn đề từ những câu hỏi đã được duyệt.</p>
         </div>
@@ -391,7 +390,6 @@ export function ExamCreatePage() {
       </Link>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">BIÊN SOẠN ĐỀ THI</p>
           <h1>Tạo đề thi tự động</h1>
           <p className="muted">
             Máy chủ chọn câu hỏi đã duyệt theo yêu cầu của bạn.

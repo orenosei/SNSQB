@@ -63,7 +63,6 @@ export function SearchPage() {
     <div className="social-page search-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">KHÁM PHÁ CỘNG ĐỒNG</p>
           <h1>Tìm kiếm</h1>
           <p className="muted social-subtitle">
             Tìm bạn học, bài viết, câu hỏi và môn học trong cùng một không gian.
