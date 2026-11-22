@@ -1,20 +1,17 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowRight,
   BookOpen,
-  Check,
   Eye,
   EyeOff,
   GraduationCap,
-  Layers,
   LoaderCircle,
   LockKeyhole,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { Navigate, useNavigate, useLocation } from "react-router";
 import { supportedDestination } from "../../lib/notificationTarget";
+import { useSurfaceEntrance } from "../../app/useSurfaceEntrance";
 import { Brand } from "../../components/Brand";
 import { ErrorNotice } from "../../components/Feedback";
 import { errorMessage, requireTokens } from "../../lib/api";
@@ -33,6 +30,8 @@ export function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
+  const storyRef = useRef<HTMLDivElement>(null);
+  useSurfaceEntrance(storyRef, location.pathname);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const mutation = useMutation({
@@ -77,62 +76,14 @@ export function LoginPage() {
     <div className="login-page">
       <section className="login-story" aria-label="Giới thiệu SNSQB">
         <Brand light />
-        <div className="story-content">
-          <div className="eyebrow story-eyebrow">
-            <span className="status-dot" /> KHÔNG GIAN HỌC TẬP CỦA CHÚNG MÌNH
-          </div>
-          <h1>
-            Tri thức tốt hơn
-            <br />
-            khi được <span>sẻ chia.</span>
-          </h1>
-          <p>
-            Kết nối với bạn học, chia sẻ câu hỏi và cùng nhau tiến bộ mỗi ngày.
-          </p>
-          <div className="study-illustration" aria-hidden="true">
-            <div className="orbit orbit-one" />
-            <div className="orbit orbit-two" />
-            <div className="floating-icon icon-users">
-              <Users size={27} />
-            </div>
-            <div className="floating-icon icon-sparkles">
-              <Sparkles size={26} />
-            </div>
-            <div className="study-card card-back">
-              <Layers size={30} />
-              <div className="decor-line" />
-              <div className="decor-line short" />
-            </div>
-            <div className="study-card card-front">
-              <span className="study-card-label">
-                <BookOpen size={16} /> HỌC CÙNG NHAU
-              </span>
-              <strong>
-                Mỗi câu hỏi,
-                <br />
-                một góc nhìn mới.
-              </strong>
-              <div className="study-answer">
-                <span>
-                  <Check size={15} />
-                </span>{" "}
-                Hiểu sâu hơn mỗi ngày
-              </div>
-              <div className="card-progress">
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-            </div>
-            <div className="study-caption">
-              <GraduationCap size={19} /> Từ sinh viên, dành cho sinh viên
-            </div>
-          </div>
-        </div>
-        <div className="story-footer">
-          <span>Một cộng đồng. Nhiều điều để học.</span>
-          <span>EST. 2026</span>
+        <div className="story-content" ref={storyRef}>
+          <h1>Cùng hỏi.<br />Cùng hiểu.</h1>
+          <p>Không gian học tập của sinh viên và giảng viên.</p>
+          <ul className="study-index">
+            <li><BookOpen size={20} aria-hidden="true" /> Ngân hàng câu hỏi</li>
+            <li><GraduationCap size={20} aria-hidden="true" /> Luyện tập theo môn</li>
+            <li><Users size={20} aria-hidden="true" /> Trao đổi với cộng đồng</li>
+          </ul>
         </div>
       </section>
       <main className="login-main" id="main-content">
@@ -140,13 +91,9 @@ export function LoginPage() {
           <Brand />
         </div>
         <div className="login-form-wrap">
-          <span className="welcome-icon">
-            <GraduationCap size={29} />
-          </span>
-          <p className="eyebrow text-brand">CHÀO MỪNG TRỞ LẠI</p>
           <h2>Hôm nay, mình học gì?</h2>
           <p className="muted login-description">
-            Đăng nhập để bắt đầu hành trình của bạn.
+            Sử dụng tài khoản do trường hoặc quản trị viên cấp.
           </p>
           {session.notice && (
             <div className="notice" role="status">
@@ -225,28 +172,16 @@ export function LoginPage() {
                   <LoaderCircle size={19} className="animate-spin" /> Đang đăng
                   nhập…
                 </>
-              ) : (
-                <>
-                  Đăng nhập <ArrowRight size={19} />
-                </>
-              )}
+) : "Đăng nhập"}
             </button>
           </form>
           <div className="account-help">
             <LockKeyhole size={19} aria-hidden="true" />
-            <p>
-              Tài khoản được nhà trường hoặc quản trị viên cung cấp. Nếu cần hỗ
-              trợ đăng nhập, hãy liên hệ đơn vị cấp tài khoản.
-            </p>
-          </div>
-          <div className="login-bottom">
-            <span className="small-divider" />
-            <span>Cùng nhau học tốt hơn</span>
-            <span className="small-divider" />
+            <p>Cần hỗ trợ? Hãy liên hệ đơn vị cấp tài khoản.</p>
           </div>
         </div>
         <footer className="login-footer">
-          SNSQB <span>·</span> Mạng xã hội ngân hàng câu hỏi sinh viên
+          Mạng xã hội ngân hàng câu hỏi sinh viên
         </footer>
       </main>
     </div>

@@ -60,7 +60,6 @@ function PushSettingsForm({ initial }: { initial: PushSettings }) {
       </Link>
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">TÙY CHỌN CỦA BẠN</p>
           <h1>Cài đặt thông báo</h1>
         </div>
       </div>

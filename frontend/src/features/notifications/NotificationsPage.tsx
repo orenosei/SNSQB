@@ -41,7 +41,6 @@ export function NotificationsPage() {
     <div className="social-page notification-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">CẬP NHẬT MỚI</p>
           <h1>Thông báo</h1>
           <p className="muted">
             {query.isPending

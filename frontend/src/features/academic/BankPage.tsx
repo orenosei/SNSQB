@@ -40,11 +40,7 @@ export function BankPage() {
     <AcademicPage>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">HỌC SÂU HƠN, HIỂU RỘNG HƠN</p>
           <h1>Ngân hàng câu hỏi</h1>
-          <p className="muted">
-            Từ một câu hỏi hay đến những kiến thức vững vàng.
-          </p>
         </div>
         <Link className="button button-primary" to="/submissions/new">
           <Plus size={17} />
@@ -56,12 +52,11 @@ export function BankPage() {
           <BookOpen size={30} />
         </span>
         <div>
-          <h2>Mỗi câu hỏi, một bước tiến.</h2>
+          <h2>Tìm và luyện tập</h2>
           <p>
-            Khám phá các bộ câu hỏi từ cộng đồng và luyện tập theo nhịp của bạn.
+            Tìm câu hỏi theo từ khóa hoặc chọn môn học trong danh mục bên dưới.
           </p>
         </div>
-        <Layers size={64} className="banner-decoration" />
       </div>
       <SearchForm label="Tìm câu hỏi hoặc bộ câu hỏi" value={draft} onChange={setDraft} onSubmit={submit} placeholder="Tìm theo từ khóa, nội dung hoặc mã câu hỏi…"/>
       <nav className="social-tabs" aria-label="Loại nội dung học tập">

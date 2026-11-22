@@ -1,0 +1,445 @@
+/* Hallmark review — Editorial study workspace anchored by ruled paper and ink. */
+/* Critique — Give forms and study content the first reading position. */
+body {
+  font-family: var(--font-body);
+  caret-color: var(--brand-primary);
+}
+
+::selection {
+  color: var(--text);
+  background: var(--brand-wash);
+}
+
+h1, h2 {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.eyebrow {
+  font-size: .8125rem;
+  letter-spacing: normal;
+}
+
+.workspace-shell .app-header {
+  background: var(--surface);
+  border-block-start: 3px solid var(--brand-primary);
+}
+
+.workspace-shell .app-header .brand-subtitle {
+  font-size: .75rem;
+  letter-spacing: normal;
+}
+
+.workspace-shell .sidebar {
+  background: var(--rail);
+}
+
+.workspace-nav-group .sidebar-label {
+  color: var(--text-muted);
+  font-size: .8125rem;
+  font-weight: 600;
+}
+
+.workspace-shell .nav-item {
+  min-height: 44px;
+  font-size: .875rem;
+  border-radius: var(--radius-control);
+}
+
+.workspace-shell .nav-item:hover {
+  background: var(--surface-quiet);
+}
+
+.workspace-shell .nav-active {
+  background: var(--brand-wash);
+}
+
+.workspace-shell .nav-active::before {
+  inset-inline-start: auto;
+  inset-inline-end: 8px;
+  top: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+}
+
+.workspace-shell .header-search {
+  padding-inline: 0 2px;
+  height: 44px;
+  border-radius: var(--radius-control);
+}
+
+.workspace-shell .header-search input {
+  padding-inline-start: 12px;
+}
+
+.workspace-shell .header-search .icon-button {
+  width: 44px;
+  min-width: 44px;
+}
+
+.workspace-switcher a {
+  transition: color var(--motion-fast) var(--motion-ease), border-color var(--motion-fast) var(--motion-ease);
+}
+
+.page-heading,
+.academic-heading {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-5);
+}
+
+.page-heading h1,
+.academic-heading h1,
+.login-form-wrap h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.95rem, 3vw, 3rem);
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.surface {
+  box-shadow: none;
+}
+
+.button,
+.icon-button,
+.nav-item,
+.social-tabs button,
+.composer-fold summary {
+  transition: background-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.button:not(:disabled):active,
+.icon-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  background: var(--surface-quiet);
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.feed-layout {
+  max-width: 1192px;
+}
+
+.feed-heading {
+  align-items: center;
+}
+
+.feed-section-label {
+  font-weight: 650;
+  color: var(--text);
+}
+
+.composer-fold summary:hover,
+.social-tabs button:hover {
+  background: var(--surface-quiet);
+}
+
+.social-tabs button,
+.academic-nav a,
+.post-meta,
+.collection-card > p {
+  color: var(--text-secondary);
+}
+
+.social-tabs button.tab-active {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.activity-card {
+  border-left: 1px solid var(--border);
+}
+
+.feed-links {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+
+.feed-links a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding-inline: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--brand-primary);
+}
+
+.feed-links a:hover {
+  background: var(--brand-wash);
+}
+
+.feed-aside h2 {
+  margin-bottom: var(--space-3);
+}
+
+.bank-banner {
+  color: var(--text);
+  background: var(--rail);
+  border-radius: 0;
+  border-block: 1px solid var(--border);
+}
+
+.bank-banner h2,
+.bank-banner p {
+  color: inherit;
+}
+
+.bank-banner > span {
+  display: grid;
+  flex: none;
+  background: var(--brand-wash);
+  color: var(--brand-primary);
+}
+
+.bank-banner .banner-decoration {
+  display: none;
+}
+
+.collection-card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+}
+
+.collection-card .text-button {
+  min-height: 44px;
+}
+
+.practice-choice:has(:focus-visible) {
+  outline: 2px solid var(--info);
+  outline-offset: 3px;
+}
+
+.workspace-table th,
+.workspace-table td,
+.question-map,
+.device-activity {
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-table thead {
+  background: var(--rail);
+}
+
+.workspace-modal[open] {
+  animation: dialog-enter var(--motion-dialog) var(--motion-ease) both;
+}
+
+.workspace-modal[open]::backdrop {
+  animation: backdrop-enter var(--motion-dialog) var(--motion-ease) both;
+}
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes backdrop-enter {
+  from { opacity: 0; }
+}
+
+.login-page {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.login-story {
+  padding: clamp(28px, 5vw, 76px);
+  background: var(--cover);
+}
+
+.login-story::before {
+  content: none;
+}
+
+.login-story .brand-subtitle {
+  color: var(--cover-muted);
+}
+
+.login-story .brand:focus-visible {
+  outline-color: var(--cover-accent);
+}
+
+.story-content {
+  max-width: 560px;
+  padding: var(--space-6) 0;
+}
+
+.login-story h1 {
+  color: var(--cover-text);
+  font-family: var(--font-display);
+  font-size: clamp(2.7rem, 5.8vw, 5.65rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.story-content > p {
+  color: var(--cover-muted);
+  font-size: 1rem;
+  max-width: 45ch;
+}
+
+.study-index {
+  display: grid;
+  list-style: none;
+  padding: 0;
+  margin: clamp(32px, 6vh, 64px) 0 0;
+  border-top: 1px solid var(--cover-rule);
+}
+
+.study-index li {
+  min-height: 51px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px solid var(--cover-rule);
+  color: var(--cover-text);
+}
+
+.study-index svg {
+  color: var(--cover-accent);
+}
+
+.login-main {
+  background: var(--surface);
+}
+
+.login-form-wrap {
+  max-width: 440px;
+}
+
+.login-form-wrap .login-description {
+  margin-top: var(--space-3);
+}
+
+.login-form input {
+  border-color: var(--text-muted);
+}
+
+.login-submit {
+  justify-content: center;
+  box-shadow: none;
+}
+
+.login-footer,
+.login-form-wrap .account-help {
+  color: var(--text-secondary);
+}
+
+.login-page .brand-subtitle {
+  font-size: .75rem;
+  letter-spacing: normal;
+}
+
+.login-submit {
+  justify-content: center;
+  box-shadow: none;
+}
+
+.login-footer,
+.login-form-wrap .account-help {
+  color: var(--text-secondary);
+}
+
+.login-page .brand-subtitle {
+  font-size: .75rem;
+  letter-spacing: normal;
+}
+
+.login-form-wrap .account-help {
+  display: flex;
+  gap: var(--space-3);
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  font-size: .875rem;
+  padding: var(--space-4) 0 0;
+}
+
+.account-help svg {
+  color: var(--brand-primary);
+  flex: none;
+}
+
+@media (min-width: 1200px) {
+  .feed-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(224px, 260px);
+    gap: clamp(32px, 4vw, 64px);
+  }
+
+  .feed-aside {
+    display: block;
+    align-self: start;
+    padding-top: var(--space-5);
+  }
+}
+
+@media (max-width: 767px) {
+  .login-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login-form-wrap {
+    margin: 0 auto auto;
+    padding-block: clamp(40px, 8vh, 72px) var(--space-6);
+  }
+
+  .login-form-wrap {
+    margin: 0 auto auto;
+    padding-block: clamp(40px, 8vh, 72px) var(--space-6);
+  }
+
+  .feed-heading {
+    flex-wrap: nowrap;
+  }
+
+  .social-tabs button {
+    padding-inline: var(--space-3);
+  }
+}
+/* The account and communication screens share the same paper and ink. */
+.profile-cover,
+.public-cover {
+  background-color: var(--cover);
+  background-image: none;
+}
+
+.chat-messages {
+  background: var(--paper);
+}
+
+.chat-bubble.mine {
+  background: var(--brand-wash);
+}
+
+.notification-item.unread {
+  border-color: var(--border);
+  background: var(--brand-wash);
+}
+
+.academic-form .form-actions {
+  background: var(--surface);
+}
+
+.question-map button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-modal[open],
+  .workspace-modal[open]::backdrop {
+    animation: none;
+  }
+}
+
