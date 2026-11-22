@@ -71,7 +71,7 @@
 }
 .feed-welcome h2 {
   font-size: 21px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   line-height: 1.5;
   margin-top: 20px;
   letter-spacing: -0.5px;
@@ -91,7 +91,7 @@
 }
 .feed-shortcuts h2 {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-bottom: 15px;
 }
 .feed-shortcuts a {
@@ -418,7 +418,7 @@
 }
 .empty-state h2 {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-top: 20px;
   letter-spacing: -0.3px;
 }
@@ -504,7 +504,7 @@
 }
 .confirm-dialog h2 {
   font-size: 21px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
 }
 .confirm-dialog > p {
   margin: 14px 0 23px;
@@ -703,7 +703,7 @@
 }
 .user-card h2 {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   overflow-wrap: anywhere;
 }
 .user-card-identity p {
@@ -765,7 +765,7 @@
 }
 .public-identity h1 {
   font-size: 25px;
-  font-weight: 750;
+  font-weight: var(--weight-h1);
   letter-spacing: -0.6px;
   margin-top: 15px;
   overflow-wrap: anywhere;
@@ -807,7 +807,7 @@
 }
 .public-posts > h2 {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin: 25px 0 18px;
 }
 .search-form {

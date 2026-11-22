@@ -1,7 +1,6 @@
 /* Hallmark review — Editorial study workspace anchored by ruled paper and ink. */
 /* Critique — Give forms and study content the first reading position. */
 body {
-  font-family: var(--font-body);
   caret-color: var(--brand-primary);
 }
 
@@ -9,6 +8,12 @@ body {
   color: var(--text);
   background: var(--brand-wash);
 }
+
+h1 { font-weight: var(--weight-h1); }
+
+h2 { font-weight: var(--weight-h2); }
+
+h3, h4, h5, h6 { font-weight: var(--weight-h3); }
 
 h1, h2 {
   text-wrap: balance;
@@ -90,9 +95,7 @@ h1, h2 {
 .page-heading h1,
 .academic-heading h1,
 .login-form-wrap h2 {
-  font-family: var(--font-display);
   font-size: clamp(1.95rem, 3vw, 3rem);
-  font-weight: 600;
   line-height: 1.12;
 }
 
@@ -274,9 +277,8 @@ h1, h2 {
 
 .login-story h1 {
   color: var(--cover-text);
-  font-family: var(--font-display);
   font-size: clamp(2.7rem, 5.8vw, 5.65rem);
-  font-weight: 500;
+  font-weight: var(--weight-h1);
   line-height: 1.02;
   letter-spacing: -.035em;
 }
