@@ -487,12 +487,12 @@ test("social pages stay responsive and protected navigation exposes only impleme
     height: 900,
   });
   await goTo(page, "/friends?tab=following");
+  await expect(
+    page.getByRole("link", { name: "Tin nhắn", exact: true }),
+  ).toBeVisible();
   await openNavigation(page);
   await expect(
     page.getByRole("link", { name: "Bảng tin", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "Tin nhắn", exact: true }),
   ).toBeVisible();
 });
 

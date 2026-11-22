@@ -35,8 +35,6 @@ const communityLinks = [
   { label: "Bảng tin", icon: House, to: "/" },
   { label: "Bài viết của tôi", icon: Pencil, to: "/my-posts" },
   { label: "Bạn bè", icon: Users, to: "/friends" },
-  { label: "Tìm kiếm", icon: Search, to: "/search" },
-  { label: "Tin nhắn", icon: MessageCircle, to: "/chat" },
 ];
 const learningLinks = [
   { label: "Ngân hàng câu hỏi", icon: BookOpen, to: "/question-bank" },
@@ -221,6 +219,20 @@ export function AppShell() {
               <Search size={17} />
             </button>
           </form>
+          <NavLink
+            to="/search"
+            className="icon-button search-shortcut"
+            aria-label="Tìm kiếm"
+          >
+            <Search size={21} />
+          </NavLink>
+          <NavLink
+            to="/chat"
+            className="icon-button message-shortcut"
+            aria-label="Tin nhắn"
+          >
+            <MessageCircle size={21} />
+          </NavLink>
           <NavLink
             to="/notifications"
             className="icon-button notification-shortcut"
