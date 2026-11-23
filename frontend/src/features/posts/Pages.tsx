@@ -81,7 +81,6 @@ export function PostEditorPage() {
       </Link>
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">CHIA SẺ TRI THỨC</p>
           <h1>{id ? "Chỉnh sửa bài viết" : "Một điều mới để sẻ chia"}</h1>
         </div>
       </div>
@@ -105,7 +104,6 @@ export function MyPostsPage() {
     <div className="social-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">GÓC CHIA SẺ</p>
           <h1>Bài viết của bạn</h1>
         </div>
         <Link to="/posts/new" className="button button-primary">

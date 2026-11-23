@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { ArrowRight, BookOpen, RefreshCw, Users } from "lucide-react";
+import { BookOpen, Pencil, RefreshCw, Users } from "lucide-react";
 import { Avatar } from "../../components/Avatar";
 import {
   EmptyState,
@@ -97,13 +97,9 @@ export function FeedPage() {
   return (
     <div className="feed-layout">
       <div className="feed-main">
-        <div className="page-heading">
+        <div className="page-heading feed-heading">
           <div>
-            <p className="eyebrow text-brand">KẾT NỐI TRI THỨC</p>
             <h1>Bảng tin học tập</h1>
-            <p className="muted social-subtitle">
-              Một góc nhìn mới, một điều hay mỗi ngày.
-            </p>
           </div>
           <button
             className="icon-button"
@@ -116,8 +112,8 @@ export function FeedPage() {
         </div>
         <details className="surface composer-fold" open>
           <summary>
-            <BookOpen size={21} />
-            <span>Một ý tưởng để sẻ chia?</span>
+            <Pencil size={19} aria-hidden="true" />
+            <span>Chia sẻ với cộng đồng</span>
             <strong>Viết bài</strong>
           </summary>
           <PostForm onSaved={setCreated} />
@@ -153,7 +149,6 @@ export function FeedPage() {
         )}
         <div className="feed-section-label">
           <span>Mới từ cộng đồng</span>
-          <span>Dành cho bạn</span>
         </div>
         <nav className="social-tabs" aria-label="Lọc hoạt động đã tải">
           {[
@@ -233,32 +228,13 @@ export function FeedPage() {
           </>
         )}
       </div>
-      <aside className="feed-aside">
-        <div className="surface feed-welcome">
-          <span className="welcome-icon">
-            <BookOpen size={25} />
-          </span>
-          <h2>Mỗi câu hỏi đều mở ra một kết nối.</h2>
-          <p>
-            Chia sẻ điều bạn biết. Cùng nhau tìm lời giải cho điều bạn chưa
-            biết.
-          </p>
-          <Link to="/search" className="text-button">
-            Khám phá cộng đồng <ArrowRight size={16} />
-          </Link>
-        </div>
-        <div className="surface feed-shortcuts">
-          <h2>Không gian của bạn</h2>
-          <Link to="/my-posts">
-            <BookOpen size={19} />
-            Bài viết đã chia sẻ <ArrowRight size={15} />
-          </Link>
-          <Link to="/friends">
-            <Users size={19} />
-            Bạn bè & lời mời <ArrowRight size={15} />
-          </Link>
-        </div>
-        <p className="feed-aside-footer">SNSQB · Học hỏi. Kết nối. Sẻ chia.</p>
+      <aside className="feed-aside" aria-labelledby="feed-links-heading">
+        <h2 id="feed-links-heading">Không gian của bạn</h2>
+        <nav className="feed-links" aria-labelledby="feed-links-heading">
+          <Link to="/search"><BookOpen size={19} aria-hidden="true" /> Khám phá cộng đồng</Link>
+          <Link to="/my-posts"><Pencil size={19} aria-hidden="true" /> Bài viết đã chia sẻ</Link>
+          <Link to="/friends"><Users size={19} aria-hidden="true" /> Bạn bè &amp; lời mời</Link>
+        </nav>
       </aside>
     </div>
   );

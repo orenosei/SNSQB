@@ -67,7 +67,6 @@ export function SubmissionsPage() {
     <AcademicPage>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">GÓC ĐÓNG GÓP</p>
           <h1>Bộ câu hỏi của tôi</h1>
           <p className="muted">
             Quản lý những điều bạn đã chia sẻ cùng cộng đồng.
@@ -479,7 +478,6 @@ function SubmissionForm({
       </Link>
       <div className="academic-heading">
         <div>
-          <p className="eyebrow text-brand">ĐÓNG GÓP TRI THỨC</p>
           <h1>{id ? "Chỉnh sửa bộ câu hỏi" : "Tạo bộ câu hỏi"}</h1>
           <p className="muted">Biên soạn rõ ràng, chia sẻ có trách nhiệm.</p>
         </div>

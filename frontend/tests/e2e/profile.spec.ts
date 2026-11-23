@@ -13,7 +13,6 @@ test("renders profile fields and enabled messaging navigation", async ({
     path: testInfo.outputPath("profile.png"),
     fullPage: true,
   });
-  await openNavigation(page);
   await expect(page.getByRole("link", { name: "Tin nhắn" })).toBeVisible();
 });
 

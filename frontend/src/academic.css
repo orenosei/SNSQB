@@ -36,7 +36,7 @@
 .academic-heading h1 {
   font-size: 28px;
   letter-spacing: -0.7px;
-  font-weight: 750;
+  font-weight: var(--weight-h1);
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
@@ -75,7 +75,7 @@
 }
 .bank-banner h2 {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   color: #6d4056;
   letter-spacing: -0.6px;
 }
@@ -114,7 +114,7 @@
 }
 .collection-card h2 {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   line-height: 1.6;
   margin: 13px 0 8px;
   overflow-wrap: anywhere;
@@ -225,7 +225,7 @@
 .question-detail h2,
 .question-detail h3 {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: var(--weight-h3);
 }
 .question-detail .section-title {
   justify-content: space-between;
@@ -610,7 +610,7 @@
 }
 .question-map h2 {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-bottom: 18px;
 }
 .question-map > div {
@@ -679,7 +679,7 @@
 }
 .results-heading h2 {
   font-size: 23px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   color: #263348;
 }
 .results-heading p {
@@ -718,7 +718,7 @@
 }
 .question-insights h3 {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: var(--weight-h3);
 }
 .question-insights .loading-state {
   min-height: 100px;
@@ -768,7 +768,7 @@
 }
 .review-start h2 {
   font-size: 23px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   color: #354158;
 }
 .review-start p {
@@ -823,7 +823,7 @@
 }
 .lecturer-question-editor > h2 {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-bottom: 27px;
 }
 .export-panel {
@@ -832,7 +832,7 @@
 }
 .export-panel h2 {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
 }
 .export-panel > .academic-help {
   margin-top: 11px;
@@ -892,7 +892,7 @@
 .class-selection h2,
 .topic-weights h2 {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--weight-h2);
   margin-bottom: 17px;
 }
 .class-selection .check-label {

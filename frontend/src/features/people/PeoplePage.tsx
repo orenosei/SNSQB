@@ -169,7 +169,6 @@ export function PeoplePage() {
     <div className="social-page people-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">CỘNG ĐỒNG HỌC TẬP</p>
           <h1>Kết nối của bạn</h1>
         </div>
         <Link className="button button-secondary" to="/search">

@@ -4,12 +4,15 @@ import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { App } from "./app/App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import "@fontsource-variable/montserrat/wght.css";
+import "@fontsource-variable/montserrat/wght-italic.css";
 import "./styles.css";
 import "./social.css";
 import "./academic.css";
 import "./phase4.css";
 import "./tokens.css";
 import "./workspace.css";
+import "./editorial.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

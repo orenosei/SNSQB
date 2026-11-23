@@ -56,7 +56,6 @@ test("conversation list, history and direct conversation creation", async ({
     route.fulfill({ status: 503, body: "Offline mock" }),
   );
   await signIn(page);
-  await openNavigation(page);
   await page.getByRole("link", { name: "Tin nhắn" }).click();
   await expect(page.getByRole("heading", { name: "Tin nhắn" })).toBeVisible();
   await page

@@ -12,7 +12,7 @@ export function Brand({ light = false }: { light?: boolean }) {
         <BookOpen size={25} strokeWidth={2.2} />
       </span>
       <span>
-        SNSQB<span className="brand-subtitle">HỌC HỎI · KẾT NỐI · SẺ CHIA</span>
+        SNSQB<span className="brand-subtitle">Không gian học tập</span>
       </span>
     </Link>
   );

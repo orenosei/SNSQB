@@ -1,4 +1,4 @@
-﻿import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -29,13 +29,12 @@ import { setSession } from "../features/auth/session";
 import { useProfile } from "../features/profile/api";
 import { getNotifications } from "../features/notifications/api";
 import { ChatConnectionProvider } from "../features/chat/ChatConnection";
+import { useSurfaceEntrance } from "./useSurfaceEntrance";
 
 const communityLinks = [
   { label: "Bảng tin", icon: House, to: "/" },
   { label: "Bài viết của tôi", icon: Pencil, to: "/my-posts" },
   { label: "Bạn bè", icon: Users, to: "/friends" },
-  { label: "Tìm kiếm", icon: Search, to: "/search" },
-  { label: "Tin nhắn", icon: MessageCircle, to: "/chat" },
 ];
 const learningLinks = [
   { label: "Ngân hàng câu hỏi", icon: BookOpen, to: "/question-bank" },
@@ -95,6 +94,8 @@ export function AppShell() {
   const location = useLocation();
   const client = useQueryClient();
   const path = location.pathname;
+  const surfaceRef = useRef<HTMLElement>(null);
+  useSurfaceEntrance(surfaceRef, path);
   const mode = path.startsWith("/lecturer/")
     ? "teaching"
     : path.startsWith("/settings/") ||
@@ -144,12 +145,12 @@ export function AppShell() {
   );
   const navigationGroups = (
     <>
-      <NavigationGroup label="CỘNG ĐỒNG" links={communityLinks} />
-      <NavigationGroup label="HỌC TẬP" links={learningLinks} />
+      <NavigationGroup label="Cộng đồng" links={communityLinks} />
+      <NavigationGroup label="Học tập" links={learningLinks} />
       {isLecturer && (
-        <NavigationGroup label="GIẢNG DẠY" links={teachingLinks} />
+        <NavigationGroup label="Giảng dạy" links={teachingLinks} />
       )}
-      <NavigationGroup label="TÀI KHOẢN" links={accountLinks} />
+      <NavigationGroup label="Tài khoản" links={accountLinks} />
     </>
   );
   return (
@@ -181,6 +182,7 @@ export function AppShell() {
             </NavLink>
             <NavLink
               to="/"
+              end
               className={mode === "community" ? "workspace-active" : ""}
             >
               Cộng đồng
@@ -207,7 +209,6 @@ export function AppShell() {
                 navigate(`/search?query=${encodeURIComponent(value)}&type=ALL`);
             }}
           >
-            <Search size={17} />
             <input
               name="query"
               aria-label="Tìm kiếm nhanh"
@@ -218,6 +219,20 @@ export function AppShell() {
               <Search size={17} />
             </button>
           </form>
+          <NavLink
+            to="/search"
+            className="icon-button search-shortcut"
+            aria-label="Tìm kiếm"
+          >
+            <Search size={21} />
+          </NavLink>
+          <NavLink
+            to="/chat"
+            className="icon-button message-shortcut"
+            aria-label="Tin nhắn"
+          >
+            <MessageCircle size={21} />
+          </NavLink>
           <NavLink
             to="/notifications"
             className="icon-button notification-shortcut"
@@ -247,10 +262,6 @@ export function AppShell() {
         <aside className="sidebar" aria-label="Điều hướng không gian">
           <div className="sidebar-top">{navigationGroups}</div>
           <div className="sidebar-bottom">
-            <div className="workspace-signature">
-              <span className="status-dot" />
-              Mỗi ngày, thêm một điều hay.
-            </div>
             {logoutButton}
           </div>
         </aside>
@@ -258,10 +269,7 @@ export function AppShell() {
           <Modal
             title="Điều hướng SNSQB"
             className="navigation-modal"
-            onClose={() => {
-              setMenuOpen(false);
-              document.getElementById("menu-toggle")?.focus();
-            }}
+            onClose={() => setMenuOpen(false)}
           >
             <nav id="mobile-navigation" aria-label="Điều hướng chính">
               {navigationGroups}
@@ -269,7 +277,7 @@ export function AppShell() {
             </nav>
           </Modal>
         )}
-        <main className="app-main" id="main-content" tabIndex={-1}>
+        <main ref={surfaceRef} className="app-main" id="main-content" tabIndex={-1}>
           <Suspense fallback={<Loading label="Đang mở không gian học tập…" />}>
             <Outlet />
           </Suspense>

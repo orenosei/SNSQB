@@ -29,7 +29,6 @@ export function VideoPage() {
     <div className="social-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow text-brand">HỌC QUA VIDEO</p>
           <h1>Video bài giảng</h1>
           <p className="muted">Nội dung do giảng viên chia sẻ.</p>
         </div>
