@@ -1,0 +1,26 @@
+# Operating System
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Build and test outputs
+dist/
+playwright-report/
+test-results/
+test-results-*/
+*.tsbuildinfo
+
+# Environment and logs
+.env
+.env.*
+!.env.example
+*.log
+debug.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
