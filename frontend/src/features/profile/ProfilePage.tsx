@@ -95,7 +95,7 @@ export function ProfilePage() {
           </span>
         </div>
         <div className="profile-identity">
-          <Avatar large name={profile.full_name} url={profile.avatar_url} />
+          <Avatar large name={profile.full_name} url={profile.avatar_url} frame={profile.frame_url} />
           <div className="identity-info">
             <div className="profile-name">
               <h2>{profile.full_name || "Bạn chưa cập nhật họ tên"}</h2>
@@ -237,7 +237,7 @@ export function ProfilePage() {
               <div>
                 <Award size={20} />
                 <strong>{valueOrEmpty(profile.badges_count)}</strong>
-                <span>Huy hiệu</span>
+                <Link to="/badges?tab=mine">Huy hiệu</Link>
               </div>
             </div>
             <div className="points-row">
@@ -245,6 +245,7 @@ export function ProfilePage() {
               <strong>{valueOrEmpty(profile.gamification_points)}</strong>
             </div>
           </section>
+          <Link to="/settings/account-deletion" className="text-button">Xóa tài khoản <ChevronRight size={15} /></Link>
           <section className="surface connections-card">
             <div className="section-title">
               <span className="section-icon">

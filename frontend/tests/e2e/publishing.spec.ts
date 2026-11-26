@@ -202,8 +202,12 @@ test("chat preserves a published draft until a new server message is observed an
   await goTo(page, "/chat?id=7");
   await expect(page.getByText("Đã kết nối", { exact: true })).toBeVisible();
   await page.getByLabel("Nội dung tin nhắn").fill("Tin cần xác nhận");
+  const receiptCheck = page.waitForResponse((response) =>
+    new URL(response.url()).pathname.endsWith("/conversations/7/messages"),
+  );
   await page.getByRole("button", { name: "Gửi", exact: true }).click();
   await expect.poll(() => sent.length).toBe(1);
+  await receiptCheck;
   await expect(page.getByLabel("Nội dung tin nhắn")).toHaveValue(
     "Tin cần xác nhận",
   );

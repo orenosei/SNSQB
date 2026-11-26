@@ -14,12 +14,16 @@ for (const role of ["STUDENT", "LECTURER"] as const) {
       "/friends",
       "/question-bank",
       "/submissions",
+      "/practice-catalog",
       "/videos",
       ...(role === "LECTURER"
         ? ["/lecturer/reviews", "/lecturer/exams", "/lecturer/course-classes"]
         : []),
       "/me",
       "/notifications",
+      "/rewards",
+      "/badges",
+      "/cosmetics",
       "/settings/devices",
       "/settings/notifications",
     ];

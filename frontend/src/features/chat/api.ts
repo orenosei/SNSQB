@@ -15,7 +15,7 @@ export interface Message {
   sender_id?: number;
   sender_name?: string;
   content?: string;
-  message_type?: "TEXT" | "IMAGE" | "VIDEO" | "GIF";
+  message_type?: "TEXT" | "IMAGE" | "VIDEO" | "GIF" | "SYSTEM";
   media_urls?: string[];
   created_at?: string;
   revoked?: boolean;
@@ -57,4 +57,42 @@ export async function deleteMessage(id: number) {
       data: { scope: "EVERYONE" },
     }),
   );
+}
+
+export interface GroupInvitation {
+  invitation_id: number;
+  group_name?: string;
+  group_avatar_url?: string;
+  inviter_name?: string;
+  expires_at?: string;
+}
+export interface ChatPresence {
+  conversation_id: number;
+  active: boolean;
+}
+
+export async function getGroupInvitations(after: number | undefined, signal: AbortSignal) {
+  return unwrap(await api.get<ApiEnvelope<{ items?: GroupInvitation[]; pagination?: CursorPaginationDto }>>(
+    "/conversations/group/invitations", { params: { after, limit: 20 }, signal },
+  ));
+}
+
+export async function respondToInvitation(id: number, accept: boolean) {
+  const path = `/conversations/group/invitations/${id}`;
+  return accept
+    ? unwrap(await api.post<ApiEnvelope<number>>(`${path}/accept`))
+    : unwrap(await api.delete<ApiEnvelope<undefined>>(path));
+}
+
+export async function getChatPresence(ids: number[], signal: AbortSignal) {
+  const groups = [];
+  for (let start = 0; start < ids.length; start += 100) {
+    groups.push(ids.slice(start, start + 100));
+  }
+  const results = await Promise.all(groups.map(async (group) =>
+    unwrap(await api.get<ApiEnvelope<ChatPresence[]>>("/conversations/presence", {
+      signal, params: { conversation_ids: group.join(",") },
+    })),
+  ));
+  return Object.fromEntries(results.flat().map((entry) => [entry.conversation_id, entry.active]));
 }

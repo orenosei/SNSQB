@@ -74,7 +74,7 @@ export function UserPage() {
               <GraduationCap size={48} />
             </div>
             <div className="public-identity">
-              <Avatar large name={data?.full_name} url={data?.avatar_url} />
+              <Avatar large name={data?.full_name} url={data?.avatar_url} frame={data?.frame_url} />
               <h1>{data?.full_name || "Trang cá nhân"}</h1>
               <p className="muted">
                 {data?.role === "STUDENT"
@@ -150,6 +150,7 @@ function PublicContent({ userId }: { userId: number }) {
           Bộ câu hỏi
         </button>
       </nav>
+      <Link className="text-button" to={`/users/${userId}/badges`}>Xem huy hiệu</Link>
       {tab === "posts" ? (
         <PublicPosts userId={userId} />
       ) : (

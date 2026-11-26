@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
@@ -16,11 +17,13 @@ import {
   createDirectConversation,
   deleteMessage,
   getConversations,
+  getChatPresence,
   getMessages,
 } from "./api";
 import { useChatConnection } from "./ChatConnection";
 import { QueryError, LoadMore } from "../../components/SocialFeedback";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { GroupInvitations } from "./GroupInvitations";
 import { getSession } from "../auth/session";
 
 type PendingSends = Record<number, { content: string; knownIds: number[] }>;
@@ -30,6 +33,7 @@ export function ChatPage() {
   const sessionRevision = useRef(getSession().revision);
   const [params, setParams] = useSearchParams();
   const activeId = Number(params.get("id"));
+  const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [finding, setFinding] = useState(false);
   const [search, setSearch] = useState("");
   const [drafts, setDrafts] = useState<Record<number, string>>(
@@ -77,6 +81,14 @@ export function ChatPage() {
     .flatMap((p) => p.items || [])
     .find((c) => c.conversation_id === activeId);
   const entries = conversations.data?.pages.flatMap((p) => p.items || []) || [];
+  const directIds = [...new Set(entries.filter((entry) => entry.type === "DIRECT").map((entry) => entry.conversation_id).filter(validId))].sort((a, b) => a - b);
+  const presence = useQuery({
+    queryKey: ["chat-presence", directIds],
+    enabled: directIds.length > 0,
+    refetchInterval: 30000,
+    retry: false,
+    queryFn: ({ signal }) => getChatPresence(directIds, signal),
+  });
   const sorted = [
     ...(messages.data?.pages.flatMap((p) => p.messages || []) || []),
   ].filter((m) => validId(m.message_id));
@@ -237,6 +249,11 @@ export function ChatPage() {
             Soạn mới
           </button>
         </div>
+        <button className="text-button chat-invitations" onClick={() => setInvitationsOpen(true)}>Lời mời vào nhóm</button>
+        {invitationsOpen && <GroupInvitations onClose={() => setInvitationsOpen(false)} onOpen={(id) => {
+          setInvitationsOpen(false);
+          setParams({ id: String(id) });
+        }} />}
         {finding && (
           <div className="chat-find">
             <input
@@ -301,6 +318,11 @@ export function ChatPage() {
               <span>
                 <strong>{c.display_name || "Hội thoại"}</strong>
                 <small>{c.last_message?.content || "Chưa có tin nhắn"}</small>
+                {c.type === "DIRECT" && validId(c.conversation_id) && !presence.isError && presence.data?.[c.conversation_id] != null && (
+                  <small className={presence.data[c.conversation_id] ? "presence-active" : undefined}>
+                    {presence.data[c.conversation_id] ? "Đang hoạt động" : "Không hoạt động"}
+                  </small>
+                )}
               </span>
               {!!c.unread_count && (
                 <b className="chat-count">{c.unread_count}</b>
@@ -368,7 +390,9 @@ export function ChatPage() {
                   {!unique.length && (
                     <p className="muted">Chưa có tin nhắn. Hãy gửi lời chào!</p>
                   )}
-                  {unique.map((m) => (
+                  {unique.map((m) => m.message_type === "SYSTEM" ? (
+                    <p key={m.message_id} className="chat-system-message muted">{m.content}</p>
+                  ) : (
                     <div
                       key={m.message_id}
                       className={`chat-bubble ${m.sender_id === profile.data?.user_id ? "mine" : ""}`}

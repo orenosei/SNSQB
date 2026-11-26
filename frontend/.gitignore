@@ -12,3 +12,4 @@ debug.log
 test-results-api/
 test-results-realtime/
 .DS_Store
+docs

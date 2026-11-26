@@ -678,6 +678,19 @@ input[type="radio"] {
   height: 100dvh;
   border-radius: 0 16px 16px 0;
 }
+.navigation-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+.navigation-modal nav {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.navigation-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
 .navigation-modal .workspace-nav-group {
   margin-bottom: 18px;
 }

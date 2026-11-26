@@ -77,6 +77,28 @@ const DevicesPage = lazy(() => import("../features/devices/DevicesPage").then(mo
 const ClassesPage = lazy(() => import("../features/course-classes/ClassPages").then(module => ({default: module.ClassesPage})));
 const ClassDetailPage = lazy(() => import("../features/course-classes/ClassPages").then(module => ({default: module.ClassDetailPage})));
 
+const RewardsPage = lazy(() =>
+  import("../features/rewards/RewardsPages").then((module) => ({ default: module.RewardsPage })),
+);
+const BadgesPage = lazy(() =>
+  import("../features/rewards/BadgePages").then((module) => ({ default: module.BadgesPage })),
+);
+const BadgeDetailPage = lazy(() =>
+  import("../features/rewards/BadgePages").then((module) => ({ default: module.BadgeDetailPage })),
+);
+const UserBadgesPage = lazy(() =>
+  import("../features/rewards/BadgePages").then((module) => ({ default: module.UserBadgesPage })),
+);
+const CosmeticsPage = lazy(() =>
+  import("../features/rewards/CosmeticsPage").then((module) => ({ default: module.CosmeticsPage })),
+);
+const AccountDeletionPage = lazy(() =>
+  import("../features/account/AccountDeletionPage").then((module) => ({ default: module.AccountDeletionPage })),
+);
+const PracticeCatalogPage = lazy(() =>
+  import("../features/academic/PracticeCatalogPage").then((module) => ({ default: module.PracticeCatalogPage })),
+);
+
 function ProtectedRoute() {
   const { tokens } = useSession();
   const location = useLocation();
@@ -111,6 +133,13 @@ export function App() {
           <Route path="/lecturer/course-classes/:courseClassId" element={<LecturerOnly><ClassDetailPage/></LecturerOnly>} />
           <Route path="/videos" element={<VideoPage />} />
           <Route path="/question-bank" element={<BankPage />} />
+          <Route path="/practice-catalog" element={<PracticeCatalogPage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/badges" element={<BadgesPage />} />
+          <Route path="/badges/:badgeId" element={<BadgeDetailPage />} />
+          <Route path="/users/:userId/badges" element={<UserBadgesPage />} />
+          <Route path="/cosmetics" element={<CosmeticsPage />} />
+          <Route path="/settings/account-deletion" element={<AccountDeletionPage />} />
           <Route path="/submissions" element={<SubmissionsPage />} />
           <Route path="/submissions/new" element={<SubmissionEditorPage />} />
           <Route

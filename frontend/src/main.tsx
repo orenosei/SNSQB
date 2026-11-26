@@ -10,6 +10,7 @@ import "./styles.css";
 import "./social.css";
 import "./academic.css";
 import "./phase4.css";
+import "./rewards.css";
 import "./tokens.css";
 import "./workspace.css";
 import "./editorial.css";

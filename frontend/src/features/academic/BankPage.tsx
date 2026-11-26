@@ -54,8 +54,9 @@ export function BankPage() {
         <div>
           <h2>Tìm và luyện tập</h2>
           <p>
-            Tìm câu hỏi theo từ khóa hoặc chọn môn học trong danh mục bên dưới.
+            Tìm câu hỏi theo từ khóa hoặc mở kho luyện tập theo môn.
           </p>
+          <Link className="text-button" to="/practice-catalog">Mở kho luyện tập <ArrowRight size={16} /></Link>
         </div>
       </div>
       <SearchForm label="Tìm câu hỏi hoặc bộ câu hỏi" value={draft} onChange={setDraft} onSubmit={submit} placeholder="Tìm theo từ khóa, nội dung hoặc mã câu hỏi…"/>
@@ -221,14 +222,14 @@ export function BankPage() {
           <div className="subject-grid">
             {subjects.data?.map((subject) => (
               <Link
-                to={`/submissions?subject=${subject.subject_id}`}
+                to={`/practice-catalog?subject=${subject.subject_id}`}
                 className="surface subject-card"
                 key={subject.subject_id}
               >
                 <BookOpen size={20} />
                 <div>
                   <strong>{subject.name}</strong>
-                  <span>{subject.code} · Xem bộ của tôi theo môn</span>
+                  <span>{subject.code} · Mở kho luyện tập theo môn</span>
                 </div>
               </Link>
             ))}

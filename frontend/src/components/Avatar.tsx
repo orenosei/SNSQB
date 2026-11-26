@@ -14,13 +14,17 @@ export function Avatar({
   name,
   url,
   large = false,
+  frame,
 }: {
   name?: string;
   url?: string;
   large?: boolean;
+  frame?: string;
 }) {
   const [failedUrl, setFailedUrl] = useState<string>();
   const src = imageUrl(url);
+  const frameSrc = imageUrl(frame);
+  const [failedFrame, setFailedFrame] = useState<string>();
   const initials = (name || "Bạn")
     .trim()
     .split(/\s+/)
@@ -42,6 +46,9 @@ export function Avatar({
         />
       ) : (
         initials
+      )}
+      {frameSrc && failedFrame !== frameSrc && (
+        <img className="avatar-frame" src={frameSrc} alt="" referrerPolicy="no-referrer" onError={() => setFailedFrame(frameSrc)} />
       )}
     </span>
   );

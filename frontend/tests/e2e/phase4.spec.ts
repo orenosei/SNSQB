@@ -5,6 +5,8 @@ test("conversation list, history and direct conversation creation", async ({
 }) => {
   await page.route("**/api/v1/conversations**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/conversations/presence"))
+      return route.fulfill({ json: ok([]) });
     if (path.endsWith("/conversations") && route.request().method() === "GET")
       return route.fulfill({
         json: ok({

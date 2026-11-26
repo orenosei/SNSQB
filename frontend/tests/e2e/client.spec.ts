@@ -24,7 +24,7 @@ test("blocks unsupported and external URLs before transport", async ({
           api.get("/users/me", {
             baseURL: "https://outside.example.test/api/v1",
           }),
-        () => api.delete("/users/me"),
+        () => api.put("/users/me/deletion"),
         () => api.get("/sessions/my-enrolled-subjects"),
       ].map(async (invoke) => {
         try {

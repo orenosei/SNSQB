@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Award,
   BookOpen,
   Bell,
   ClipboardCheck,
@@ -15,6 +16,8 @@ import {
   School,
   Search,
   Settings,
+  ShoppingBag,
+  Trophy,
   UserRound,
   Users,
   Video,
@@ -39,6 +42,7 @@ const communityLinks = [
 const learningLinks = [
   { label: "Ngân hàng câu hỏi", icon: BookOpen, to: "/question-bank" },
   { label: "Bộ câu hỏi của tôi", icon: GraduationCap, to: "/submissions" },
+  { label: "Kho luyện tập", icon: BookOpen, to: "/practice-catalog" },
   { label: "Video bài giảng", icon: Video, to: "/videos" },
 ];
 const teachingLinks = [
@@ -49,6 +53,9 @@ const teachingLinks = [
 const accountLinks = [
   { label: "Hồ sơ cá nhân", icon: UserRound, to: "/me" },
   { label: "Thông báo", icon: Bell, to: "/notifications" },
+  { label: "Hoạt động & thành tích", icon: Trophy, to: "/rewards" },
+  { label: "Huy hiệu", icon: Award, to: "/badges" },
+  { label: "Vật phẩm trang trí", icon: ShoppingBag, to: "/cosmetics" },
   { label: "Thiết bị đăng nhập", icon: Monitor, to: "/settings/devices" },
   { label: "Cài đặt thông báo", icon: Settings, to: "/settings/notifications" },
 ];
@@ -99,10 +106,11 @@ export function AppShell() {
   const mode = path.startsWith("/lecturer/")
     ? "teaching"
     : path.startsWith("/settings/") ||
+        /^\/(rewards|badges|cosmetics)(\/|$)/.test(path) ||
         path === "/me" ||
         path === "/notifications"
       ? "account"
-      : /^\/(question-bank|submissions|practice|videos)(\/|$)/.test(path)
+      : /^\/(question-bank|submissions|practice|practice-catalog|videos)(\/|$)/.test(path)
         ? "learning"
         : "community";
   const isLecturer = profile.data?.role === "LECTURER";
@@ -255,6 +263,7 @@ export function AppShell() {
             <Avatar
               name={profile.data?.full_name}
               url={profile.data?.avatar_url}
+              frame={profile.data?.frame_url}
             />
             <span>{profile.data?.full_name || "Trang cá nhân"}</span>
           </NavLink>
@@ -273,8 +282,8 @@ export function AppShell() {
           >
             <nav id="mobile-navigation" aria-label="Điều hướng chính">
               {navigationGroups}
-              {logoutButton}
             </nav>
+            <div className="navigation-footer">{logoutButton}</div>
           </Modal>
         )}
         <main ref={surfaceRef} className="app-main" id="main-content" tabIndex={-1}>
