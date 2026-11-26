@@ -157,6 +157,8 @@ export const acceptFriendRequest = async (id: number) =>
       requester_id: id,
     }),
   );
+export const withdrawFriendRequest = async (id: number) =>
+  unwrap(await api.delete<ApiEnvelope<unknown>>(`/friendships/requests/sent/${id}`));
 export const declineFriendRequest = async (id: number) =>
   unwrap(
     await api.post<ApiEnvelope<FriendshipResponseDto>>("/friendships/decline", {

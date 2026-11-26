@@ -733,7 +733,7 @@ test("review opens only by explicit action and approve/reject never reopen it au
     .getByRole("button", { name: "Xác nhận", exact: true })
     .click();
   await expect(
-    page.getByText("Điểm thưởng đã được server cộng cho tác giả: 10.", {
+    page.getByText("Đã ghi quyết định phê duyệt.", {
       exact: true,
     }),
   ).toBeVisible();
@@ -850,7 +850,7 @@ test("lecturer generates an exam with classes/distribution and exports a server 
   await page
     .getByRole("button", { name: "Thêm trọng số chủ đề", exact: true })
     .click();
-  await page.getByLabel("Chủ đề 1", { exact: true }).fill("Tiến trình");
+  await page.getByRole("combobox", { name: "Chủ đề 1", exact: true }).selectOption("11");
   await page.getByLabel("Trọng số 1", { exact: true }).fill("1");
   const request = page.waitForRequest("**/exams/generate");
   await page.getByRole("button", { name: "Tạo đề thi", exact: true }).click();
@@ -864,7 +864,7 @@ test("lecturer generates an exam with classes/distribution and exports a server 
       hard: 0.2,
       unclassified: 0,
     },
-    topic_weights: { "Tiến trình": 1 },
+    topic_weights: { "11": 1 },
     shuffle_options: true,
     include_answer_key: false,
   });

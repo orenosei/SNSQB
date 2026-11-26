@@ -99,6 +99,8 @@ const PracticeCatalogPage = lazy(() =>
   import("../features/academic/PracticeCatalogPage").then((module) => ({ default: module.PracticeCatalogPage })),
 );
 
+const TopicsPage = lazy(() => import("../features/academic/TopicsPage").then((module) => ({ default: module.TopicsPage })));
+
 function ProtectedRoute() {
   const { tokens } = useSession();
   const location = useLocation();
@@ -132,6 +134,7 @@ export function App() {
           <Route path="/lecturer/course-classes" element={<LecturerOnly><ClassesPage/></LecturerOnly>} />
           <Route path="/lecturer/course-classes/:courseClassId" element={<LecturerOnly><ClassDetailPage/></LecturerOnly>} />
           <Route path="/videos" element={<VideoPage />} />
+          <Route path="/lecturer/topics" element={<LecturerOnly><TopicsPage /></LecturerOnly>} />
           <Route path="/question-bank" element={<BankPage />} />
           <Route path="/practice-catalog" element={<PracticeCatalogPage />} />
           <Route path="/rewards" element={<RewardsPage />} />

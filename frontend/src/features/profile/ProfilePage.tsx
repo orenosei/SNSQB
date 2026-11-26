@@ -15,6 +15,8 @@ import {
   UserRound,
 } from "lucide-react";
 import { Link, useLocation } from "react-router";
+import { isAxiosError } from "axios";
+import { VerifyEmailButton } from "../account/EmailVerification";
 import { Avatar, imageUrl } from "../../components/Avatar";
 import { ErrorNotice, Loading } from "../../components/Feedback";
 import { errorMessage } from "../../lib/api";
@@ -52,6 +54,7 @@ export function ProfilePage() {
         >
           Thử lại
         </button>
+        {isAxiosError(error) && error.response?.status === 403 && <VerifyEmailButton />}
       </div>
     );
   const cover = imageUrl(profile.cover_url);
@@ -123,6 +126,7 @@ export function ProfilePage() {
           >
             <Pencil size={16} /> Chỉnh sửa hồ sơ
           </Link>
+          {profile.verified === false && <VerifyEmailButton />}
           <Link className="button button-secondary" to="/settings/password">
             Đổi mật khẩu
           </Link>

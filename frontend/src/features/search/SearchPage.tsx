@@ -16,6 +16,7 @@ import {
   deleteSavedSearch,
   getSavedSearches,
   useSearch,
+  saveSearch,
   searchTypes,
 } from "./api";
 import { errorMessage } from "../../lib/api";
@@ -49,6 +50,10 @@ export function SearchPage() {
     queryFn: getSavedSearches,
   });
   const client = useQueryClient();
+  const recordSearch = useMutation({
+    mutationFn: saveSearch,
+    onSuccess: () => void client.invalidateQueries({ queryKey: ["saved-searches"] }),
+  });
   const removeSaved = useMutation({
     mutationFn: deleteSavedSearch,
     onSuccess: () =>
@@ -57,7 +62,10 @@ export function SearchPage() {
   const items = query.data?.pages.flatMap((page) => page.items || []) || [];
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (draft.trim()) setParams({ query: draft.trim(), type });
+    const keyword = draft.trim();
+    if (!keyword) return;
+    setParams({ query: keyword, type });
+    recordSearch.mutate(keyword);
   }
   return (
     <div className="social-page search-page">
@@ -77,6 +85,7 @@ export function SearchPage() {
         placeholder="Nhập tên, chủ đề hoặc nội dung…"
         required
       />
+      {recordSearch.isError && <p role="status" className="muted">Chưa lưu được lượt tìm kiếm này.</p>}
       {!!saved.data?.saved_searches?.length && (
         <section className="surface search-saved">
           <h2>Tìm kiếm gần đây</h2>

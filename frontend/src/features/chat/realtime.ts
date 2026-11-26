@@ -8,6 +8,7 @@ export interface ChatEvent {
   sender_id?: number;
   content?: string;
   is_typing?: boolean;
+  typing?: boolean;
 }
 export function connectChat(
   onEvent: (event: ChatEvent) => void,

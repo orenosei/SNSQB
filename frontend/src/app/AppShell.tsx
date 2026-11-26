@@ -30,6 +30,8 @@ import { Modal } from "../components/Modal";
 import { logout } from "../features/auth/api";
 import { setSession } from "../features/auth/session";
 import { useProfile } from "../features/profile/api";
+import { saveSearch } from "../features/search/api";
+import { pushConfigured } from "../features/notifications/firebaseConfig";
 import { getNotifications } from "../features/notifications/api";
 import { ChatConnectionProvider } from "../features/chat/ChatConnection";
 import { useSurfaceEntrance } from "./useSurfaceEntrance";
@@ -48,6 +50,7 @@ const learningLinks = [
 const teachingLinks = [
   { label: "Duyệt câu hỏi", icon: ClipboardCheck, to: "/lecturer/reviews" },
   { label: "Đề thi", icon: FileCheck2, to: "/lecturer/exams" },
+  { label: "Chủ đề môn học", icon: BookOpen, to: "/lecturer/topics" },
   { label: "Lớp học phần", icon: School, to: "/lecturer/course-classes" },
 ];
 const accountLinks = [
@@ -100,6 +103,21 @@ export function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const client = useQueryClient();
+  useEffect(() => {
+    if (!pushConfigured) return;
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+    void import("../features/notifications/webPush")
+      .then(({ watchWebPush }) => watchWebPush(() => {
+        void client.invalidateQueries({ queryKey: ["notifications"] });
+      }))
+      .then((cleanup) => {
+        if (cancelled) cleanup?.();
+        else unsubscribe = cleanup;
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; unsubscribe?.(); };
+  }, [client]);
   const path = location.pathname;
   const surfaceRef = useRef<HTMLElement>(null);
   useSurfaceEntrance(surfaceRef, path);
@@ -213,8 +231,12 @@ export function AppShell() {
               const value = String(
                 new FormData(event.currentTarget).get("query") || "",
               ).trim();
-              if (value)
-                navigate(`/search?query=${encodeURIComponent(value)}&type=ALL`);
+              if (!value) return;
+              navigate(`/search?query=${encodeURIComponent(value)}&type=ALL`);
+              void saveSearch(value).then(
+                () => client.invalidateQueries({ queryKey: ["saved-searches"] }),
+                () => undefined,
+              );
             }}
           >
             <input

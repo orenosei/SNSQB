@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { Check, ClipboardCheck, Pencil, X } from "lucide-react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
@@ -13,7 +13,8 @@ import { errorMessage } from "../../lib/api";
 import { routeId, validId } from "../../lib/cursor";
 import {
   usePendingReviews,
-  useSubjects,
+  useMyClasses,
+  getAcademic,
   openReview,
   approveQuestions,
   rejectQuestions,
@@ -22,12 +23,8 @@ import {
   refreshAcademic,
   requireResult,
 } from "./api";
-import {
-  AcademicPage,
-  QuestionContent,
-  StatusBadge,
-  SubjectSelect,
-} from "./components";
+import { AcademicPage, QuestionContent, StatusBadge } from "./components";
+import { DuplicateMatches, RefineQuestion } from "./QuestionActions";
 import {
   emptyQuestion,
   QuestionEditor,
@@ -40,9 +37,9 @@ import type {
 } from "./types";
 
 export function ReviewListPage() {
-  const [subject, setSubject] = useState("");
-  const subjects = useSubjects();
-  const query = usePendingReviews(routeId(subject));
+  const [courseClass, setCourseClass] = useState("");
+  const classes = useMyClasses();
+  const query = usePendingReviews(routeId(courseClass));
   const sessions = query.data?.pages.flatMap((page) => page.items || []) || [];
   return (
     <AcademicPage>
@@ -58,16 +55,25 @@ export function ReviewListPage() {
         </span>
       </div>
       <div className="surface academic-filters">
-        <SubjectSelect
-          subjects={subjects.data}
-          value={subject}
-          onChange={setSubject}
-        />
+        <label>
+          Lớp học phần
+          <select
+            value={courseClass}
+            onChange={(event) => setCourseClass(event.target.value)}
+          >
+            <option value="">Tất cả lớp được phân công</option>
+            {classes.data?.map((item) => (
+              <option key={item.course_class_id} value={item.course_class_id}>
+                {item.class_code} · {item.subject_name}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
-      {subjects.error && (
+      {classes.error && (
         <QueryError
-          error={subjects.error}
-          retry={() => void subjects.refetch()}
+          error={classes.error}
+          retry={() => void classes.refetch()}
         />
       )}
       {query.isPending ? (
@@ -134,25 +140,28 @@ export function ReviewDetailPage() {
 }
 function ReviewSession({ id }: { id: number }) {
   const client = useQueryClient();
+  const [questionTool, setQuestionTool] = useState<{
+    id: number;
+    type: "matches" | "ai";
+  }>();
   const [review, setReview] = useState<SessionDetailReviewResponse>();
   const [selected, setSelected] = useState<number[]>([]);
   const [reason, setReason] = useState("");
   const [confirm, setConfirm] = useState<"approve" | "reject" | "complete">();
   const [completed, setCompleted] = useState(false);
   const [editing, setEditing] = useState<SessionQuestionReviewDto>();
-  const [points, setPoints] = useState<number>();
   const open = useMutation({
     mutationFn: () => openReview(id!),
     onSuccess: (result) => {
-      setReview(requireResult(result));
+      const data = requireResult(result);
+      setReview(data);
+      setCompleted(data.session_status === "RESOLVED");
     },
   });
   const action = useMutation({
     mutationFn: async (kind: "approve" | "reject" | "complete") => {
-      if (kind === "approve") {
-        const result = await approveQuestions(selected);
-        setPoints(result?.points_earned);
-      } else if (kind === "reject") await rejectQuestions(selected, reason);
+      if (kind === "approve") await approveQuestions(selected);
+      else if (kind === "reject") await rejectQuestions(selected, reason);
       else await completeReview(id!);
       return kind;
     },
@@ -163,7 +172,8 @@ function ReviewSession({ id }: { id: number }) {
               ...current,
               items: current.items?.map((question) =>
                 (kind === "complete" && question.status === "PENDING") ||
-                (validId(question.question_id) &&
+                (kind !== "complete" &&
+                  validId(question.question_id) &&
                   selected.includes(question.question_id))
                   ? {
                       ...question,
@@ -235,16 +245,19 @@ function ReviewSession({ id }: { id: number }) {
                         }).format(warning.similarity_score)}{" "}
                     · {warning.tier}
                     <br />
-                    {warning.matched_snipet}
+                    {warning.matched_snippet || warning.matched_snipet}
                   </p>
                 ))}
               </div>
             </div>
           )}
-          {points !== undefined && (
-            <div className="notice notice-success" role="status">
-              Điểm thưởng đã được server cộng cho tác giả: {points}.
-            </div>
+          {review.quality_warning && (
+            <p className="notice">{review.quality_warning}</p>
+          )}
+          {action.isSuccess && action.data === "approve" && (
+            <p className="notice notice-success" role="status">
+              Đã ghi quyết định phê duyệt.
+            </p>
           )}
           {completed && (
             <div className="notice notice-success" role="status">
@@ -267,7 +280,9 @@ function ReviewSession({ id }: { id: number }) {
                         completed ||
                         action.isPending ||
                         !validId(question.question_id) ||
-                        question.status !== "PENDING" ||
+                        !["PENDING", "APPROVED", "REJECTED"].includes(
+                          question.status || "",
+                        ) ||
                         !!editing
                       }
                       checked={
@@ -310,6 +325,34 @@ function ReviewSession({ id }: { id: number }) {
                     · {question.edit_log.status}
                   </p>
                 )}
+                {id && validId(question.question_id) && (
+                  <div className="invite-actions">
+                    <button
+                      className="button button-secondary"
+                      onClick={() =>
+                        setQuestionTool({
+                          id: question.question_id!,
+                          type: "matches",
+                        })
+                      }
+                    >
+                      Xem đối sánh
+                    </button>
+                    {!completed && (
+                      <button
+                        className="button button-secondary"
+                        onClick={() =>
+                          setQuestionTool({
+                            id: question.question_id!,
+                            type: "ai",
+                          })
+                        }
+                      >
+                        Tinh chỉnh bằng AI
+                      </button>
+                    )}
+                  </div>
+                )}
                 {!completed && (
                   <button
                     className="button button-secondary"
@@ -323,13 +366,54 @@ function ReviewSession({ id }: { id: number }) {
               </article>
             ))}
           </div>
+          {id && questionTool?.type === "matches" && (
+            <DuplicateMatches
+              canRetry={
+                !completed &&
+                review.items?.find(
+                  (item) => item.question_id === questionTool.id,
+                )?.can_retry_duplicate_check === true
+              }
+              sessionId={id}
+              questionId={questionTool.id}
+              onClose={() => setQuestionTool(undefined)}
+            />
+          )}
+          {questionTool?.type === "ai" && (
+            <RefineQuestion
+              questionId={questionTool.id}
+              onClose={() => setQuestionTool(undefined)}
+              onApplied={(suggestion) => {
+                setReview(
+                  (current) =>
+                    current && {
+                      ...current,
+                      items: current.items?.map((item) =>
+                        item.question_id === questionTool.id
+                          ? {
+                              ...item,
+                              content: suggestion.content,
+                              options: suggestion.options,
+                              explanation: suggestion.explanation,
+                              correct_answer: suggestion.options
+                                ?.filter((option) => option.is_correct)
+                                .map((option) => option.key)
+                                .join(", "),
+                            }
+                          : item,
+                      ),
+                    },
+                );
+              }}
+            />
+          )}
           {!review.items?.length && (
             <EmptyState
               title="Phiên chưa có câu hỏi để duyệt"
               description="Máy chủ chưa trả về danh sách câu hỏi. Hãy trở lại danh sách phiên."
             />
           )}
-          {!completed && pending.length > 0 && (
+          {!completed && !!review.items?.length && (
             <div className="surface review-actions">
               <p>
                 Đã chọn {selected.length} câu. Còn {pending.length} câu đang chờ
@@ -382,14 +466,15 @@ function ReviewSession({ id }: { id: number }) {
           )}
           {!completed && review.items?.length && pending.length === 0 ? (
             <p className="notice notice-success">
-              Không còn câu hỏi chờ xử lý. Phiên được máy chủ hoàn tất khi tất
-              cả câu hỏi đã được xử lý.
+              Không còn câu hỏi chờ xử lý. Chọn chốt phiên để khóa các quyết
+              định.
             </p>
           ) : null}
           {editing && (
             <LecturerQuestionEditor
               key={editing.question_id}
               question={editing}
+              subjectId={review.subject_id}
               onCancel={() => setEditing(undefined)}
               onSaved={(updated) => {
                 setReview((current) =>
@@ -426,7 +511,7 @@ function ReviewSession({ id }: { id: number }) {
             confirm === "complete"
               ? "Tất cả câu hỏi còn PENDING sẽ tự động bị từ chối (REJECTED), phiên chuyển sang RESOLVED và thông báo cho tác giả. Hành động này không thể hoàn tác tại đây."
               : confirm === "approve"
-                ? "Các câu đã chọn sẽ vào ngân hàng chính thức và tác giả được cộng điểm theo kết quả từ máy chủ."
+                ? "Quyết định phê duyệt có hiệu lực với ngân hàng câu hỏi và điểm thưởng sau khi chốt phiên."
                 : "Các câu đã chọn sẽ bị từ chối. Hãy kiểm tra lý do trước khi xác nhận."
           }
           confirmLabel={
@@ -443,10 +528,12 @@ function ReviewSession({ id }: { id: number }) {
 }
 function LecturerQuestionEditor({
   question,
+  subjectId,
   onSaved,
   onCancel,
 }: {
   question: SessionQuestionReviewDto;
+  subjectId?: number;
   onSaved: (question: SessionQuestionReviewDto) => void;
   onCancel: () => void;
 }) {
@@ -460,6 +547,21 @@ function LecturerQuestionEditor({
         is_correct: option.is_correct ?? option.key === question.correct_answer,
       })) || [],
   }));
+  const [topic, setTopic] = useState(
+    question.topic_id ? String(question.topic_id) : "",
+  );
+  const topics = useQuery({
+    queryKey: ["academic", "topics", subjectId],
+    enabled: validId(subjectId),
+    queryFn: ({ signal }) =>
+      getAcademic<{ id: number; name: string; active?: boolean }[]>(
+        `/subjects/${subjectId}/topics`,
+        undefined,
+        signal,
+      ),
+  });
+  const topicChanged =
+    topic !== (question.topic_id ? String(question.topic_id) : "");
   const [autoApprove, setAutoApprove] = useState(false);
   const [validation, setValidation] = useState("");
   const [confirm, setConfirm] = useState(false);
@@ -471,12 +573,24 @@ function LecturerQuestionEditor({
         options: draft.options,
         explanation: draft.explanation,
         auto_approve: autoApprove,
+        ...(topicChanged
+          ? topic
+            ? { topic_id: Number(topic) }
+            : { clear_topic: true }
+          : {}),
       }),
     onSuccess: async (result) => {
       await refreshAcademic(client);
       onSaved({
         ...question,
         correct_answer: undefined,
+        ...(topicChanged
+          ? {
+              topic_id: Number(topic) || null,
+              topic_name: topics.data?.find((item) => item.id === Number(topic))
+                ?.name,
+            }
+          : {}),
         content: draft.content,
         options: draft.options,
         explanation: draft.explanation,
@@ -500,6 +614,37 @@ function LecturerQuestionEditor({
       aria-label="Biên tập câu hỏi"
     >
       <h2>Biên tập câu hỏi #{question.question_id}</h2>
+      {subjectId && (
+        <label>
+          Chủ đề câu hỏi
+          <select
+            value={topic}
+            disabled={topics.isPending || topics.isError || mutation.isPending}
+            onChange={(event) => setTopic(event.target.value)}
+          >
+            <option value="">Chưa phân loại</option>
+            {question.topic_id &&
+              !topics.data?.some(
+                (item) =>
+                  item.id === question.topic_id && item.active !== false,
+              ) && (
+                <option value={question.topic_id}>
+                  {question.topic_name || "Chủ đề hiện tại"}
+                </option>
+              )}
+            {topics.data
+              ?.filter((item) => item.active !== false)
+              .map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+          </select>
+        </label>
+      )}
+      {topics.isError && (
+        <QueryError error={topics.error} retry={() => void topics.refetch()} />
+      )}
       <QuestionEditor
         compact
         value={draft}
@@ -538,7 +683,7 @@ function LecturerQuestionEditor({
       {confirm && (
         <ConfirmDialog
           title="Lưu và duyệt câu hỏi?"
-          description="Câu hỏi sau biên tập sẽ được phê duyệt vào ngân hàng chính thức."
+          description="Quyết định phê duyệt được ghi ngay sau khi lưu. Câu hỏi vào ngân hàng sau khi chốt phiên."
           confirmLabel="Lưu và duyệt"
           pending={mutation.isPending}
           error={mutation.isError ? errorMessage(mutation.error) : undefined}

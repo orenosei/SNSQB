@@ -14,18 +14,21 @@ test("lecturer publishing requires a subject and video and uses the documented p
       json: ok([{ subject_id: 10, code: "IT3070", name: "Hệ điều hành" }]),
     }),
   );
-  await page.route("**/api/v1/medias/upload?**", (route) => {
-    expect(new URL(route.request().url()).searchParams.get("purpose")).toBe(
-      "POST",
-    );
-    return route.fulfill({
-      json: ok({
-        object_key: "test/lecture.mp4",
-        url: "http://127.0.0.1:4173/test-lecture.mp4",
-        media_type: "VIDEO",
-        file_size: 32,
-      }),
-    });
+  await page.route("**/api/v1/lecturer/medias/lecture-uploads/**", (route) => {
+    const request = route.request();
+    if (request.method() === "PUT") {
+      expect(request.postDataJSON()).toEqual({ file_name: "lecture.mp4", content_type: "video/mp4", file_size: 10 });
+      return route.fulfill({ json: ok({ part_size: 32, uploaded_parts: [] }) });
+    }
+    if (request.url().endsWith("/parts/1")) return route.fulfill({ json: ok({ upload_url: "https://r2.example.test/test-lecture" }) });
+    expect(request.url()).toMatch(/\/complete$/);
+    return route.fulfill({ json: ok({ key: "test/lecture.mp4", url: "http://127.0.0.1:4173/test-lecture.mp4", type: "VIDEO", size: 10, name: "lecture.mp4" }) });
+  });
+  await page.route("https://r2.example.test/test-lecture", (route) => {
+    expect(route.request().method()).toBe("PUT");
+    expect(route.request().headers().authorization).toBeUndefined();
+    expect(route.request().postDataBuffer()).toEqual(Buffer.from("test-video"));
+    return route.fulfill({ status: 200, headers: { "Access-Control-Allow-Origin": "*" } });
   });
   let payload: unknown;
   await page.route("**/api/v1/posts", (route) => {

@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, LoaderCircle, Send, X } from "lucide-react";
 import { Avatar } from "../../components/Avatar";
@@ -6,6 +6,7 @@ import { ErrorNotice } from "../../components/Feedback";
 import { errorMessage } from "../../lib/api";
 import { validId } from "../../lib/cursor";
 import { useProfile } from "../profile/api";
+import { uploadLecture, cancelLectureUpload } from "../media/lectureUpload";
 import { uploadMedia } from "../media/api";
 import type {
   MediaItem,
@@ -50,6 +51,40 @@ export function PostForm({
   const [media, setMedia] = useState<MediaItem[]>(initial?.media_urls || []);
   const [validation, setValidation] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const [lecture, setLecture] = useState<{ id: string; file: File }>();
+  const [progress, setProgress] = useState(0);
+  const controller = useRef<AbortController>(null);
+  useEffect(() => () => controller.current?.abort(), []);
+  const cancelUpload = useMutation({
+    mutationFn: cancelLectureUpload,
+    onSuccess: () => {
+      setLecture(undefined);
+      setProgress(0);
+    },
+  });
+  const publishVideo = useMutation({
+    mutationFn: async (session: { id: string; file: File }) => {
+      const abort = new AbortController();
+      controller.current = abort;
+      try {
+        return await uploadLecture(
+          session.id,
+          session.file,
+          abort.signal,
+          setProgress,
+        );
+      } finally {
+        if (controller.current === abort) controller.current = null;
+      }
+    },
+    onSuccess: (uploaded) => {
+      setMedia((items) => [
+        ...items.filter((item) => item.type !== "VIDEO"),
+        uploaded,
+      ]);
+      setLecture(undefined);
+    },
+  });
   const upload = useMutation({
     mutationFn: async (files: File[]) => {
       for (const file of files) {
@@ -78,7 +113,11 @@ export function PostForm({
       onSaved?.(post?.post_id ?? initial?.post_id);
     },
   });
-  const pending = upload.isPending || save.isPending;
+  const pending =
+    upload.isPending ||
+    save.isPending ||
+    publishVideo.isPending ||
+    cancelUpload.isPending;
   function submit(event: FormEvent) {
     event.preventDefault();
     if (pending) return;
@@ -213,6 +252,37 @@ export function PostForm({
         </ul>
       )}
       {validation && <ErrorNotice message={validation} />}
+      {lecture && (
+        <div className="invite-actions">
+          <progress aria-label="Tiến độ tải video" value={progress} max={1} />
+          {!publishVideo.isPending && !cancelUpload.isPending && (
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => publishVideo.mutate(lecture)}
+            >
+              Thử tải tiếp
+            </button>
+          )}
+          <button
+            type="button"
+            className="button button-secondary"
+            disabled={cancelUpload.isPending}
+            onClick={() => {
+              controller.current?.abort();
+              cancelUpload.mutate(lecture.id);
+            }}
+          >
+            Hủy tải video
+          </button>
+        </div>
+      )}
+      {publishVideo.isError && lecture && !cancelUpload.isPending && (
+        <ErrorNotice message={errorMessage(publishVideo.error)} />
+      )}
+      {cancelUpload.isError && (
+        <ErrorNotice message={errorMessage(cancelUpload.error)} />
+      )}
       {upload.isError && <ErrorNotice message={errorMessage(upload.error)} />}
       {save.isError && <ErrorNotice message={errorMessage(save.error)} />}
       <div className="composer-actions">
@@ -220,19 +290,25 @@ export function PostForm({
           ref={fileInput}
           className="sr-only"
           type="file"
-          multiple
+          multiple={!isVideo}
+          accept={isVideo ? "video/mp4,video/webm" : undefined}
           aria-label="Chọn tệp đính kèm"
           disabled={pending}
           onChange={(event) => {
             const files = Array.from(event.target.files || []);
-            if (files.length) upload.mutate(files);
+            if (files.length && isVideo) {
+              const session = { id: crypto.randomUUID(), file: files[0] };
+              setProgress(0);
+              setLecture(session);
+              publishVideo.mutate(session);
+            } else if (files.length) upload.mutate(files);
             event.target.value = "";
           }}
         />
         <button
           type="button"
           className="button attachment-button"
-          disabled={pending}
+          disabled={pending || !!lecture}
           onClick={() => fileInput.current?.click()}
         >
           {upload.isPending ? (

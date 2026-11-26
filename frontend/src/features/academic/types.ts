@@ -245,6 +245,10 @@ export interface QuestionEditLogDto {
 }
 
 export interface SessionQuestionReviewDto {
+  topic_id?: number | null;
+  topic_name?: string;
+  duplicate_check_status?: string;
+  can_retry_duplicate_check?: boolean;
   question_id?: number;
   content?: string;
   image_urls?: Array<string>;
@@ -266,10 +270,14 @@ export interface DuplicateWarning {
     | "TEXT_EMBEDDING"
     | "IMAGE_EMBEDDING";
   matched_snipet?: string;
+  matched_snippet?: string;
   media_url?: string;
 }
 
 export interface SessionDetailReviewResponse {
+  session_status?: "PENDING" | "REVIEWING" | "RESOLVED";
+  subject_id?: number;
+  quality_warning?: string;
   items?: Array<SessionQuestionReviewDto>;
   duplicate_warnings?: Array<DuplicateWarning>;
 }
@@ -288,6 +296,8 @@ export interface RejectQuestionsRequest {
 }
 
 export interface EditQuestionRequest {
+  topic_id?: number;
+  clear_topic?: boolean;
   content?: string;
   options?: Array<QuestionOption>;
   explanation?: string;

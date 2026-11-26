@@ -32,6 +32,8 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
     const refresh = () => {
       void client.invalidateQueries({ queryKey: ["conversations"] });
       void client.invalidateQueries({ queryKey: ["chat-messages"] });
+      void client.invalidateQueries({ queryKey: ["chat-members"] });
+      void client.invalidateQueries({ queryKey: ["chat-group-invitations"] });
     };
     const socket = connectChat(refresh, (status) => {
       setConnected(status);

@@ -16,6 +16,7 @@ import {
 import { api, type ApiEnvelope, errorMessage, unwrap } from "../../lib/api";
 import { formatTime, routeId, validId } from "../../lib/cursor";
 import { useSubjects } from "../academic/api";
+import { MoreGames } from "./MoreGames";
 import { readRewards, useRewardsPages } from "./api";
 import type { CursorPaginationDto } from "../social/types";
 
@@ -435,6 +436,7 @@ const tabs = [
   ["check-in", "Điểm danh"],
   ["leaderboard", "Xếp hạng"],
   ["predictions", "Dự đoán"],
+  ["games", "Minigame"],
 ] as const;
 
 export function RewardsPage() {
@@ -450,7 +452,7 @@ export function RewardsPage() {
       ) : active === "leaderboard" ? (
         <Leaderboard />
       ) : (
-        <Predictions />
+        active === "predictions" ? <Predictions /> : <MoreGames />
       )}
     </div>
   );

@@ -46,6 +46,7 @@ export const test = base.extend<{ apiMock: void }>({
           return route.fulfill({ status: 503, body: "Offline UI mock" });
         if (path === "/activity-feeds/new-count" && method === "GET")
           return route.fulfill({ json: ok({ new_count: 0 }) });
+        if (path === "/search/saved" && method === "POST") return route.fulfill({ json: ok(null) });
         if (path === "/search/saved" && method === "GET")
           return route.fulfill({
             json: ok({ saved_searches: [], trending_searches: [] }),

@@ -26,12 +26,13 @@ export default async function handler(req, res) {
     if (method !== "GET" && method !== "HEAD") {
       for await (const chunk of req) chunks.push(Buffer.from(chunk));
     }
+    const upstreamTimeout = /^\/api\/v1\/questions\/[1-9]\d*\/ai-refine$/.test(target.pathname) && method === "POST" ? 85000 : 14000;
     const response = await fetch(target, {
       method,
       headers,
       body: chunks.length ? Buffer.concat(chunks) : undefined,
       redirect: "manual",
-      signal: AbortSignal.timeout(14000),
+      signal: AbortSignal.timeout(upstreamTimeout),
     });
     res.status(response.status);
     const contentType = response.headers.get("content-type");

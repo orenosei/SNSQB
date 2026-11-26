@@ -347,7 +347,7 @@ test.describe("Real academic API", () => {
       expect(Number.isSafeInteger(questionId)).toBe(true);
       expect(
         (
-          await student.put(`${base}/questions/${questionId}`, {
+          await student.put(`${base}/lecturer/questions/${questionId}`, {
             data: {
               content: "Student lecturer-endpoint edit",
               auto_approve: false,
@@ -453,9 +453,9 @@ test.describe("Real academic API", () => {
   test("lecturer reads pending reviews, own classes and exam list", async () => {
     test.skip(!lecturer, "Cần tài khoản test giảng viên.");
     for (const path of [
-      "/sessions/pending",
+      "/lecturer/sessions/reviewable",
       "/lecturer/course-classes/my-classes",
-      "/exams/my-exams",
+      "/lecturer/exams/my-exams",
     ])
       expect(await result(await lecturer!.get(`${base}${path}`))).toBeTruthy();
   });
@@ -466,12 +466,12 @@ test.describe("Real academic API", () => {
     );
     await withDraft(async (id) => {
       const review = await result(
-        await lecturer!.get(`${base}/sessions/${id}`),
+        await lecturer!.get(`${base}/lecturer/sessions/${id}`),
       );
       expect(review.items.length).toBe(2);
       const question = review.items[0];
       const edited = await result(
-        await lecturer!.put(`${base}/questions/${question.question_id}`, {
+        await lecturer!.put(`${base}/lecturer/questions/${question.question_id}`, {
           data: {
             content: `${marker}: Lecturer edit?`,
             options: question.options,
@@ -482,13 +482,13 @@ test.describe("Real academic API", () => {
       );
       expect(edited.question_id).toBe(question.question_id);
       const approved = await result(
-        await lecturer!.post(`${base}/sessions/approve`, {
+        await lecturer!.post(`${base}/lecturer/sessions/approve`, {
           data: { question_ids: [question.question_id] },
         }),
       );
       expect(typeof approved.points_earned).toBe("number");
       await result(
-        await lecturer!.post(`${base}/sessions/${id}/complete-review`),
+        await lecturer!.post(`${base}/lecturer/sessions/${id}/complete-review`),
       );
       expect(
         (
@@ -506,10 +506,10 @@ test.describe("Real academic API", () => {
     );
     await withDraft(async (id) => {
       const review = await result(
-        await lecturer!.get(`${base}/sessions/${id}`),
+        await lecturer!.get(`${base}/lecturer/sessions/${id}`),
       );
       await result(
-        await lecturer!.post(`${base}/sessions/reject`, {
+        await lecturer!.post(`${base}/lecturer/sessions/reject`, {
           data: { question_ids: [review.items[0].question_id], reason: marker },
         }),
       );
@@ -530,7 +530,7 @@ test.describe("Real academic API", () => {
       ),
     ).toBe(true);
     const exam = await result(
-      await lecturer!.post(`${base}/exams/generate`, {
+      await lecturer!.post(`${base}/lecturer/exams/generate`, {
         data: {
           subject_id: subjectId,
           class_ids: [classId],
@@ -543,12 +543,12 @@ test.describe("Real academic API", () => {
     );
     expect(Number.isSafeInteger(exam.exam_id)).toBe(true);
     const read = await result(
-      await lecturer!.get(`${base}/exams/${exam.exam_id}`),
+      await lecturer!.get(`${base}/lecturer/exams/${exam.exam_id}`),
     );
     expect(read.exam_id).toBe(exam.exam_id);
     const exported = await result(
-      await lecturer!.get(`${base}/exams/${exam.exam_id}/export`, {
-        params: { format: "pdf", include_answer_key: false, paper_size: "A4" },
+      await lecturer!.get(`${base}/lecturer/exams/${exam.exam_id}/export`, {
+        params: { format: "pdf", include_answer_key: false },
       }),
     );
     expect(typeof exported.download_url).toBe("string");

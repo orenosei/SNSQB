@@ -71,9 +71,10 @@ export function useBankSearch(query: string, type: "QUESTION" | "SESSION") {
     getNextPageParam: (last, _pages, cursor) => nextCursor(last, cursor),
   });
 }
-export function useSubmissions(subject?: number, status?: string) {
+export function useSubmissions(subject?: number, status?: string, enabled = true) {
   return useInfiniteQuery({
     queryKey: ["academic", "submissions", subject, status],
+    enabled,
     initialPageParam: undefined as number | undefined,
     queryFn: ({ pageParam, signal }) =>
       getAcademic<SubmissionsResponse>(
@@ -156,15 +157,15 @@ export const useRatings = (id?: number) =>
     getNextPageParam: (last, _pages, cursor) => nextCursor(last, cursor),
   });
 
-export const usePendingReviews = (subject?: number) =>
+export const usePendingReviews = (courseClass?: number) =>
   useInfiniteQuery({
-    queryKey: ["academic", "reviews", subject],
+    queryKey: ["academic", "reviews", courseClass],
     initialPageParam: undefined as number | undefined,
     queryFn: ({ pageParam, signal }) =>
       getAcademic<PendingSessionsResponse>(
-        "/sessions/pending",
+        "/lecturer/sessions/reviewable",
         {
-          subject_id: subject,
+          course_class_id: courseClass,
           after: pageParam,
           limit: 10,
           sort_by: "created_at",
@@ -176,19 +177,19 @@ export const usePendingReviews = (subject?: number) =>
 // This GET changes state to REVIEWING. Invoke only after an explicit lecturer action,
 // with no automatic query retries, prefetch, mount or focus refetch.
 export const openReview = (id: number) =>
-  getAcademic<SessionDetailReviewResponse>(`/sessions/${id}`);
+  getAcademic<SessionDetailReviewResponse>(`/lecturer/sessions/${id}`);
 export const approveQuestions = (ids: number[]) =>
-  post<ApproveQuestionsResponse>("/sessions/approve", { question_ids: ids });
+  post<ApproveQuestionsResponse>("/lecturer/sessions/approve", { question_ids: ids });
 export const rejectQuestions = (ids: number[], reason: string) =>
-  post<unknown>("/sessions/reject", {
+  post<unknown>("/lecturer/sessions/reject", {
     question_ids: ids,
     ...(reason ? { reason } : {}),
   });
 export const completeReview = (id: number) =>
-  post<unknown>(`/sessions/${id}/complete-review`);
+  post<unknown>(`/lecturer/sessions/${id}/complete-review`);
 export const editQuestion = async (id: number, body: EditQuestionRequest) =>
   unwrap(
-    await api.put<ApiEnvelope<EditQuestionResponse>>(`/questions/${id}`, body),
+    await api.put<ApiEnvelope<EditQuestionResponse>>(`/lecturer/questions/${id}`, body),
   );
 
 export const useMyClasses = () =>
@@ -207,7 +208,7 @@ export const useExams = (subject?: number) =>
     initialPageParam: undefined as number | undefined,
     queryFn: ({ pageParam, signal }) =>
       getAcademic<ExamListResponse>(
-        "/exams/my-exams",
+        "/lecturer/exams/my-exams",
         { subject_id: subject, after: pageParam, limit: 10 },
         signal,
       ),
@@ -218,19 +219,18 @@ export const useExam = (id?: number) =>
     queryKey: ["academic", "exam", id],
     enabled: validId(id),
     queryFn: ({ signal }) =>
-      getAcademic<ExamDetailResponse>(`/exams/${id}`, undefined, signal),
+      getAcademic<ExamDetailResponse>(`/lecturer/exams/${id}`, undefined, signal),
   });
 export const generateExam = (body: GenerateExamRequest) =>
-  post<ExamDetailResponse>("/exams/generate", body);
+  post<ExamDetailResponse>("/lecturer/exams/generate", body);
 export const exportExam = (
   id: number,
   format: "pdf" | "xlsx",
   include_answer_key: boolean,
 ) =>
-  getAcademic<ExportResponse>(`/exams/${id}/export`, {
+  getAcademic<ExportResponse>(`/lecturer/exams/${id}/export`, {
     format,
     include_answer_key,
-    paper_size: "A4",
   });
 export const exportQuestionBank = (
   subject_id: number,

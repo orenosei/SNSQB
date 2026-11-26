@@ -8,8 +8,8 @@ import {
 import { useSearchParams } from "react-router";
 import { ArrowLeft, MessageCircle, Send, Trash2 } from "lucide-react";
 import { Loading, ErrorNotice } from "../../components/Feedback";
-import { Avatar } from "../../components/Avatar";
-import { errorMessage } from "../../lib/api";
+import { Avatar, imageUrl } from "../../components/Avatar";
+import { api, type ApiEnvelope, errorMessage, unwrap } from "../../lib/api";
 import { nextCursor, validId, formatTime } from "../../lib/cursor";
 import { useProfile } from "../profile/api";
 import { useSearch } from "../search/api";
@@ -19,10 +19,14 @@ import {
   getConversations,
   getChatPresence,
   getMessages,
+  type Conversation,
 } from "./api";
 import { useChatConnection } from "./ChatConnection";
 import { QueryError, LoadMore } from "../../components/SocialFeedback";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { uploadMedia } from "../media/api";
+import { CreateChatGroup, ManageChatGroup } from "./GroupEditor";
+import { HiddenChats, hiddenKey } from "./HiddenChats";
 import { GroupInvitations } from "./GroupInvitations";
 import { getSession } from "../auth/session";
 
@@ -32,7 +36,59 @@ export function ChatPage() {
   const client = useQueryClient();
   const sessionRevision = useRef(getSession().revision);
   const [params, setParams] = useSearchParams();
-  const activeId = Number(params.get("id"));
+  const [hiddenOpen, setHiddenOpen] = useState(false);
+  const [hiddenExpiry, setHiddenExpiry] = useState(0);
+  const [hiddenThread, setHiddenThread] = useState<Conversation>();
+  const [groupDialog, setGroupDialog] = useState<"create" | "manage">();
+  const [attachment, setAttachment] = useState<{ id: number; file: File }>();
+  const [uploadingChat, setUploadingChat] = useState(false);
+  const [activeError, setActiveError] = useState("");
+  const hiddenId = hiddenThread?.conversation_id;
+  const showingHidden = hiddenExpiry > Date.now() && validId(hiddenId);
+  const activeId = showingHidden ? hiddenId : Number(params.get("id"));
+  const activeConversation = useRef(activeId);
+  const privateIds = useRef(new Set<number>());
+  useEffect(() => {
+    activeConversation.current = activeId;
+    if (showingHidden) privateIds.current.add(activeId);
+    return () => {
+      activeConversation.current = 0;
+    };
+  }, [activeId, showingHidden]);
+  useEffect(() => {
+    if (!hiddenExpiry) return;
+    const timer = setTimeout(
+      () => {
+        setHiddenExpiry(0);
+        setHiddenThread(undefined);
+        setGroupDialog(undefined);
+        setAttachment(undefined);
+        client.removeQueries({ queryKey: hiddenKey });
+        if (hiddenId)
+          client.removeQueries({ queryKey: ["chat-messages", hiddenId] });
+      },
+      Math.max(0, hiddenExpiry - Date.now()),
+    );
+    return () => clearTimeout(timer);
+  }, [client, hiddenExpiry, hiddenId]);
+  const visibility = useMutation({
+    mutationFn: async ({ id, hide }: { id: number; hide: boolean }) =>
+      unwrap(
+        await api.patch<ApiEnvelope<unknown>>(
+          `/conversations/${id}/${hide ? "hide" : "unhide"}`,
+        ),
+      ),
+    onSuccess: async (_data, { id, hide }) => {
+      if (hide) privateIds.current.add(id);
+      client.removeQueries({ queryKey: ["chat-messages", id] });
+      setHiddenThread(undefined);
+      setParams(hide ? {} : { id: String(id) });
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["conversations"] }),
+        client.invalidateQueries({ queryKey: hiddenKey }),
+      ]);
+    },
+  });
   const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [finding, setFinding] = useState(false);
   const [search, setSearch] = useState("");
@@ -64,7 +120,8 @@ export function ChatPage() {
     getNextPageParam: (last, _pages, cursor) => nextCursor(last, cursor),
   });
   const messages = useInfiniteQuery({
-    queryKey: ["chat-messages", activeId],
+    queryKey: ["chat-messages", activeId, ...(showingHidden ? ["hidden"] : [])],
+    gcTime: showingHidden ? 0 : undefined,
     enabled: validId(activeId),
     refetchOnMount: "always",
     initialPageParam: undefined as number | undefined,
@@ -74,14 +131,37 @@ export function ChatPage() {
   // Drafts and unconfirmed sends are ephemeral and cleared with the authenticated cache.
   useEffect(() => {
     if (getSession().revision !== sessionRevision.current) return;
-    client.setQueryData(["chat-drafts"], drafts);
-    client.setQueryData(["chat-pending"], sent);
+    client.setQueryData(
+      ["chat-drafts"],
+      Object.fromEntries(
+        Object.entries(drafts).filter(
+          ([id]) => !privateIds.current.has(Number(id)),
+        ),
+      ),
+    );
+    client.setQueryData(
+      ["chat-pending"],
+      Object.fromEntries(
+        Object.entries(sent).filter(
+          ([id]) => !privateIds.current.has(Number(id)),
+        ),
+      ),
+    );
   }, [client, drafts, sent]);
-  const current = conversations.data?.pages
-    .flatMap((p) => p.items || [])
-    .find((c) => c.conversation_id === activeId);
+  const current =
+    (showingHidden ? hiddenThread : undefined) ||
+    conversations.data?.pages
+      .flatMap((p) => p.items || [])
+      .find((c) => c.conversation_id === activeId);
   const entries = conversations.data?.pages.flatMap((p) => p.items || []) || [];
-  const directIds = [...new Set(entries.filter((entry) => entry.type === "DIRECT").map((entry) => entry.conversation_id).filter(validId))].sort((a, b) => a - b);
+  const directIds = [
+    ...new Set(
+      entries
+        .filter((entry) => entry.type === "DIRECT")
+        .map((entry) => entry.conversation_id)
+        .filter(validId),
+    ),
+  ].sort((a, b) => a - b);
   const presence = useQuery({
     queryKey: ["chat-presence", directIds],
     enabled: directIds.length > 0,
@@ -110,8 +190,8 @@ export function ChatPage() {
     const unsubscribe = connection?.subscribeTyping(activeId, (event) => {
       if (event.sender_id !== profile.data?.user_id) {
         clearTimeout(typingTimer.current);
-        setTyping(!!event.is_typing);
-        if (event.is_typing)
+        setTyping(!!(event.typing ?? event.is_typing));
+        if (event.typing ?? event.is_typing)
           typingTimer.current = setTimeout(() => setTyping(false), 4000);
       }
     });
@@ -120,7 +200,7 @@ export function ChatPage() {
       clearTimeout(typingTimer.current);
       connection?.send("/app/chat.typing", {
         conversation_id: activeId,
-        is_typing: false,
+        typing: false,
       });
     };
   }, [activeId, connected, connection, profile.data?.user_id]);
@@ -154,6 +234,7 @@ export function ChatPage() {
   const create = useMutation({
     mutationFn: createDirectConversation,
     onSuccess: async (result) => {
+      setHiddenThread(undefined);
       await client.invalidateQueries({ queryKey: ["conversations"] });
       if (validId(result.conversation_id))
         setParams({ id: String(result.conversation_id) });
@@ -166,9 +247,10 @@ export function ChatPage() {
     onSuccess: () =>
       void client.invalidateQueries({ queryKey: ["chat-messages", activeId] }),
   });
-  function send(event: FormEvent) {
+  async function send(event: FormEvent) {
     event.preventDefault();
-    const content = draft.trim();
+    const file = attachment?.id === activeId ? attachment.file : undefined;
+    const content = draft.trim() || file?.name || "";
     if (
       !content ||
       !validId(activeId) ||
@@ -177,12 +259,42 @@ export function ChatPage() {
     )
       return;
     pendingSends.current.add(activeId);
+    setActiveError("");
+    let mediaUrls: string[] = [];
+    let messageType: "TEXT" | "IMAGE" | "GIF" | "VIDEO" = "TEXT";
+    if (file) {
+      setUploadingChat(true);
+      try {
+        const uploaded = await uploadMedia(file, "CHAT");
+        mediaUrls = [uploaded.url!];
+        messageType = file.type.startsWith("video/")
+          ? "VIDEO"
+          : file.type === "image/gif"
+            ? "GIF"
+            : "IMAGE";
+      } catch (cause) {
+        pendingSends.current.delete(activeId);
+        if (activeConversation.current === activeId)
+          setActiveError(errorMessage(cause));
+        return;
+      } finally {
+        setUploadingChat(false);
+      }
+      if (
+        activeConversation.current !== activeId ||
+        getSession().revision !== sessionRevision.current ||
+        (showingHidden && hiddenExpiry <= Date.now())
+      ) {
+        pendingSends.current.delete(activeId);
+        return;
+      }
+    }
     if (
       !connection?.send("/app/chat.send", {
         conversation_id: activeId,
         content,
-        message_type: "TEXT",
-        media_urls: [],
+        message_type: messageType,
+        media_urls: mediaUrls,
       })
     ) {
       pendingSends.current.delete(activeId);
@@ -193,6 +305,10 @@ export function ChatPage() {
       }));
       return;
     }
+    if (file)
+      setAttachment((current) =>
+        current?.file === file ? undefined : current,
+      );
     setSent((current) => ({
       ...current,
       [activeId]: {
@@ -207,7 +323,7 @@ export function ChatPage() {
     }));
     connection?.send("/app/chat.typing", {
       conversation_id: activeId,
-      is_typing: false,
+      typing: false,
     });
     const timer = setTimeout(() => {
       void client.invalidateQueries({ queryKey: ["chat-messages", activeId] });
@@ -249,11 +365,24 @@ export function ChatPage() {
             Soạn mới
           </button>
         </div>
-        <button className="text-button chat-invitations" onClick={() => setInvitationsOpen(true)}>Lời mời vào nhóm</button>
-        {invitationsOpen && <GroupInvitations onClose={() => setInvitationsOpen(false)} onOpen={(id) => {
-          setInvitationsOpen(false);
-          setParams({ id: String(id) });
-        }} />}
+        <button
+          className="text-button chat-invitations"
+          onClick={() => setInvitationsOpen(true)}
+        >
+          Lời mời vào nhóm
+        </button>
+        <button
+          className="text-button chat-invitations"
+          onClick={() => setGroupDialog("create")}
+        >
+          Tạo nhóm
+        </button>
+        <button
+          className="text-button chat-invitations"
+          onClick={() => setHiddenOpen(true)}
+        >
+          Kho chat ẩn
+        </button>
         {finding && (
           <div className="chat-find">
             <input
@@ -309,20 +438,33 @@ export function ChatPage() {
             <button
               key={c.conversation_id}
               className={`chat-conversation ${c.conversation_id === activeId ? "selected" : ""}`}
-              onClick={() =>
-                validId(c.conversation_id) &&
-                setParams({ id: String(c.conversation_id) })
-              }
+              onClick={() => {
+                if (validId(c.conversation_id)) {
+                  setHiddenThread(undefined);
+                  setParams({ id: String(c.conversation_id) });
+                }
+              }}
             >
               <Avatar name={c.display_name} url={c.display_avatar_url} />
               <span>
                 <strong>{c.display_name || "Hội thoại"}</strong>
                 <small>{c.last_message?.content || "Chưa có tin nhắn"}</small>
-                {c.type === "DIRECT" && validId(c.conversation_id) && !presence.isError && presence.data?.[c.conversation_id] != null && (
-                  <small className={presence.data[c.conversation_id] ? "presence-active" : undefined}>
-                    {presence.data[c.conversation_id] ? "Đang hoạt động" : "Không hoạt động"}
-                  </small>
-                )}
+                {c.type === "DIRECT" &&
+                  validId(c.conversation_id) &&
+                  !presence.isError &&
+                  presence.data?.[c.conversation_id] != null && (
+                    <small
+                      className={
+                        presence.data[c.conversation_id]
+                          ? "presence-active"
+                          : undefined
+                      }
+                    >
+                      {presence.data[c.conversation_id]
+                        ? "Đang hoạt động"
+                        : "Không hoạt động"}
+                    </small>
+                  )}
               </span>
               {!!c.unread_count && (
                 <b className="chat-count">{c.unread_count}</b>
@@ -346,6 +488,61 @@ export function ChatPage() {
           load={() => void conversations.fetchNextPage()}
         />
       </aside>
+      {hiddenOpen && (
+        <HiddenChats
+          expiresAt={hiddenExpiry}
+          onUnlock={setHiddenExpiry}
+          onLock={() => {
+            setHiddenExpiry(0);
+            setHiddenThread(undefined);
+            setGroupDialog(undefined);
+            setAttachment(undefined);
+            client.removeQueries({ queryKey: hiddenKey });
+            if (hiddenId)
+              client.removeQueries({ queryKey: ["chat-messages", hiddenId] });
+          }}
+          onOpen={(item) => {
+            setParams({});
+            setHiddenThread(item);
+            setHiddenOpen(false);
+          }}
+          onClose={() => setHiddenOpen(false)}
+        />
+      )}
+      {groupDialog === "create" && (
+        <CreateChatGroup
+          onClose={() => setGroupDialog(undefined)}
+          onOpen={(id) => {
+            setGroupDialog(undefined);
+            setHiddenThread(undefined);
+            setParams({ id: String(id) });
+          }}
+        />
+      )}
+      {groupDialog === "manage" &&
+        current &&
+        validId(current.conversation_id) && (
+          <ManageChatGroup
+            group={{ ...current, conversation_id: current.conversation_id }}
+            userId={profile.data?.user_id}
+            onClose={() => setGroupDialog(undefined)}
+            onLeave={() => {
+              setGroupDialog(undefined);
+              setHiddenThread(undefined);
+              setParams({});
+            }}
+          />
+        )}
+      {invitationsOpen && (
+        <GroupInvitations
+          onClose={() => setInvitationsOpen(false)}
+          onOpen={(id) => {
+            setInvitationsOpen(false);
+            setHiddenThread(undefined);
+            setParams({ id: String(id) });
+          }}
+        />
+      )}
       <section className="chat-main" aria-label="Nội dung hội thoại">
         {!validId(activeId) ? (
           <div className="chat-empty">
@@ -360,7 +557,10 @@ export function ChatPage() {
                 type="button"
                 className="icon-button chat-back"
                 aria-label="Trở về danh sách hội thoại"
-                onClick={() => setParams({})}
+                onClick={() => {
+                  setHiddenThread(undefined);
+                  setParams({});
+                }}
               >
                 <ArrowLeft size={20} />
               </button>
@@ -369,6 +569,23 @@ export function ChatPage() {
                 url={current?.display_avatar_url}
               />
               <strong>{current?.display_name || "Hội thoại"}</strong>
+              {current?.type === "GROUP" && (
+                <button
+                  className="text-button"
+                  onClick={() => setGroupDialog("manage")}
+                >
+                  Quản lý nhóm
+                </button>
+              )}
+              <button
+                className="text-button"
+                disabled={visibility.isPending}
+                onClick={() =>
+                  visibility.mutate({ id: activeId, hide: !hiddenThread })
+                }
+              >
+                {hiddenThread ? "Bỏ ẩn" : "Ẩn hội thoại"}
+              </button>
               <span className="muted">
                 {connected ? "Đã kết nối" : "Đang kết nối…"}
               </span>
@@ -390,35 +607,70 @@ export function ChatPage() {
                   {!unique.length && (
                     <p className="muted">Chưa có tin nhắn. Hãy gửi lời chào!</p>
                   )}
-                  {unique.map((m) => m.message_type === "SYSTEM" ? (
-                    <p key={m.message_id} className="chat-system-message muted">{m.content}</p>
-                  ) : (
-                    <div
-                      key={m.message_id}
-                      className={`chat-bubble ${m.sender_id === profile.data?.user_id ? "mine" : ""}`}
-                    >
-                      <small>
-                        {m.sender_name || "Thành viên"} ·{" "}
-                        {formatTime(m.created_at)}
-                      </small>
-                      <p>
-                        {m.revoked ? "Tin nhắn đã được thu hồi" : m.content}
+                  {unique.map((m) =>
+                    m.message_type === "SYSTEM" ? (
+                      <p
+                        key={m.message_id}
+                        className="chat-system-message muted"
+                      >
+                        {m.content}
                       </p>
-                      {m.sender_id === profile.data?.user_id && !m.revoked && (
-                        <button
-                          title="Thu hồi tin nhắn"
-                          aria-label="Thu hồi tin nhắn"
-                          disabled={remove.isPending}
-                          onClick={() =>
-                            validId(m.message_id) &&
-                            remove.mutate(m.message_id!)
-                          }
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    ) : (
+                      <div
+                        key={m.message_id}
+                        className={`chat-bubble ${m.sender_id === profile.data?.user_id ? "mine" : ""}`}
+                      >
+                        <small>
+                          {m.sender_name || "Thành viên"} ·{" "}
+                          {formatTime(m.created_at)}
+                        </small>
+                        <p>
+                          {m.revoked ? "Tin nhắn đã được thu hồi" : m.content}
+                        </p>
+                        {!m.revoked &&
+                          m.media_urls?.map((url, index) => {
+                            const src = imageUrl(url);
+                            if (!src) return null;
+                            return m.message_type === "VIDEO" ? (
+                              <video
+                                key={index}
+                                src={src}
+                                controls
+                                preload="metadata"
+                              />
+                            ) : (
+                              <a
+                                key={index}
+                                href={src}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <img
+                                  src={src}
+                                  alt="Ảnh đính kèm"
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </a>
+                            );
+                          })}
+                        {m.sender_id === profile.data?.user_id &&
+                          !m.revoked && (
+                            <button
+                              title="Thu hồi tin nhắn"
+                              aria-label="Thu hồi tin nhắn"
+                              disabled={remove.isPending}
+                              onClick={() =>
+                                validId(m.message_id) &&
+                                remove.mutate(m.message_id!)
+                              }
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                      </div>
+                    ),
+                  )}
                   {typing && <p className="muted">Đang soạn tin…</p>}
                   {remove.isError && (
                     <ErrorNotice message={errorMessage(remove.error)} />
@@ -436,7 +688,14 @@ export function ChatPage() {
                 </>
               )}
             </div>
-            <form className="chat-compose" onSubmit={send}>
+            {visibility.isError && (
+              <ErrorNotice message={errorMessage(visibility.error)} />
+            )}
+            {activeError && <ErrorNotice message={activeError} />}
+            <form
+              className="chat-compose"
+              onSubmit={(event) => void send(event)}
+            >
               <input
                 aria-label="Nội dung tin nhắn"
                 placeholder="Viết tin nhắn…"
@@ -447,22 +706,46 @@ export function ChatPage() {
                   setDraft(e.target.value);
                   connection?.send("/app/chat.typing", {
                     conversation_id: activeId,
-                    is_typing: !!e.target.value.trim(),
+                    typing: !!e.target.value.trim(),
                   });
                 }}
               />
               <button
                 className="button button-primary"
                 disabled={
-                  !draft.trim() ||
+                  uploadingChat ||
+                  (!draft.trim() && attachment?.id !== activeId) ||
                   !connected ||
                   !!sent[activeId] ||
                   !messages.data
                 }
               >
-                <Send size={18} /> Gửi
+                <Send size={18} /> {uploadingChat ? "Đang tải tệp…" : "Gửi"}
               </button>
             </form>
+            <label className="chat-invitations">
+              Đính kèm ảnh hoặc video
+              <input
+                type="file"
+                accept="image/*,video/*"
+                disabled={uploadingChat || !!sent[activeId]}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file && /^(image|video)\//.test(file.type))
+                    setAttachment({ id: activeId, file });
+                  event.target.value = "";
+                }}
+              />
+            </label>
+            {attachment?.id === activeId && (
+              <button
+                type="button"
+                className="text-button chat-invitations"
+                onClick={() => setAttachment(undefined)}
+              >
+                Bỏ tệp {attachment.file.name}
+              </button>
+            )}
             {sendError && (
               <p className="notice" role="status">
                 {sendError}

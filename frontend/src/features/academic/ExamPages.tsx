@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router";
 import { Download, FileCheck2, Plus, Trash2 } from "lucide-react";
 import { imageUrl } from "../../components/Avatar";
@@ -14,6 +14,7 @@ import { formatTime, routeId, validId } from "../../lib/cursor";
 import { AcademicPage, QuestionContent, SubjectSelect } from "./components";
 import {
   useSubjects,
+  getAcademic,
   useMyClasses,
   useExams,
   useExam,
@@ -320,6 +321,34 @@ export function ExamCreatePage() {
       );
     },
   });
+  const subjectId = routeId(subject);
+  const stock = useQuery({
+    queryKey: ["academic", "exam-stock", subjectId],
+    enabled: subjectId !== undefined,
+    queryFn: ({ signal }) =>
+      getAcademic<{
+        total_questions?: number;
+        topics?: {
+          topic_id?: number;
+          topic_name?: string;
+          total_questions?: number;
+        }[];
+      }>(
+        `/lecturer/exams/question-bank/${subjectId}/summary`,
+        undefined,
+        signal,
+      ),
+  });
+  const topicOptions = (stock.data?.topics || []).flatMap((topic) =>
+    validId(topic.topic_id)
+      ? [
+          {
+            value: String(topic.topic_id),
+            label: topic.topic_name || `#${topic.topic_id}`,
+          },
+        ]
+      : [],
+  );
   const available =
     classes.data?.filter((item) => item.subject_id === Number(subject)) || [];
   function submit(event: FormEvent) {
@@ -358,19 +387,32 @@ export function ExamCreatePage() {
     const weights: Record<string, number> = {};
     for (const item of topics) {
       if (
-        !item.topic.trim() ||
+        !(
+          item.topic === "untagged" ||
+          topicOptions.some((topic) => topic.value === item.topic)
+        ) ||
         item.weight.trim() === "" ||
         !Number.isFinite(Number(item.weight)) ||
-        Number(item.weight) < 0
+        Number(item.weight) < 0 ||
+        Number(item.weight) > 1
       ) {
-        setValidation("Mỗi chủ đề cần có tên và trọng số không âm.");
+        setValidation("Chọn chủ đề và nhập trọng số trong khoảng 0–1.");
         return;
       }
       if (Object.hasOwn(weights, item.topic.trim())) {
-        setValidation("Tên các chủ đề không được trùng nhau.");
+        setValidation("Mỗi chủ đề chỉ được chọn một lần.");
         return;
       }
       weights[item.topic.trim()] = Number(item.weight);
+    }
+    if (
+      topics.length &&
+      Math.abs(
+        Object.values(weights).reduce((sum, value) => sum + value, 0) - 1,
+      ) > 0.000001
+    ) {
+      setValidation("Tổng trọng số chủ đề phải bằng 1.");
+      return;
     }
     mutation.mutate({
       subject_id: Number(subject),
@@ -425,8 +467,34 @@ export function ExamCreatePage() {
             onChange={(value) => {
               setSubject(value);
               setClassIds([]);
+              setTopics([]);
             }}
           />
+          {subjectId && stock.isPending && (
+            <Loading label="Đang tải thống kê ngân hàng…" />
+          )}
+          {stock.isError && (
+            <QueryError
+              error={stock.error}
+              retry={() => void stock.refetch()}
+            />
+          )}
+          {stock.data && (
+            <section className="surface rewards-panel">
+              <h3>Ngân hàng câu hỏi</h3>
+              <p>{stock.data.total_questions ?? 0} câu có thể dùng để tạo đề</p>
+              {!!stock.data.topics?.length && (
+                <ul>
+                  {stock.data.topics.map((topic, index) => (
+                    <li key={topic.topic_id ?? index}>
+                      {topic.topic_name || "Chưa phân loại"} ·{" "}
+                      {topic.total_questions ?? 0} câu
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
           <div className="field">
             <label htmlFor="exam-title">Tiêu đề đề thi (tùy chọn)</label>
             <input
@@ -534,14 +602,13 @@ export function ExamCreatePage() {
           <div className="topic-weights">
             <h2>Trọng số chủ đề (tùy chọn)</h2>
             <p className="academic-help">
-              Nhập tên chủ đề có trong ngân hàng môn học. Bỏ trống để máy chủ sử
-              dụng phân bố mặc định.
+              Chọn chủ đề trong ngân hàng môn học. Tổng trọng số phải bằng 1.
             </p>
             {topics.map((item, index) => (
               <div key={index} className="topic-weight-row">
                 <label>
                   Chủ đề {index + 1}
-                  <input
+                  <select
                     value={item.topic}
                     onChange={(event) =>
                       setTopics((items) =>
@@ -552,7 +619,15 @@ export function ExamCreatePage() {
                         ),
                       )
                     }
-                  />
+                  >
+                    <option value="">Chọn chủ đề</option>
+                    {topicOptions.map((topic) => (
+                      <option key={topic.value} value={topic.value}>
+                        {topic.label}
+                      </option>
+                    ))}
+                    <option value="untagged">Chưa phân loại</option>
+                  </select>
                 </label>
                 <label>
                   Trọng số {index + 1}
@@ -589,6 +664,7 @@ export function ExamCreatePage() {
             <button
               type="button"
               className="text-button"
+              disabled={!stock.isSuccess}
               onClick={() =>
                 setTopics((items) => [...items, { topic: "", weight: "" }])
               }

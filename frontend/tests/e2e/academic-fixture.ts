@@ -239,11 +239,6 @@ export async function installAcademicMock(
       .filter((option) => option.is_correct)
       .map((option) => option.key!)
       .join(",");
-  function updateResolved() {
-    for (const session of state.sessions.values())
-      if (session.questions.every((question) => question.status !== "PENDING"))
-        session.status = "RESOLVED";
-  }
   function pageData<T>(
     items: T[],
     after: string | null,
@@ -624,7 +619,7 @@ export async function installAcademicMock(
         pagination: { has_next: offset + 1 < items.length, after: offset + 1 },
       });
     }
-    if (path === "/sessions/pending") {
+    if (path === "/lecturer/sessions/reviewable") {
       if (role !== "LECTURER") return deny(route);
       const items = [...state.sessions.values()]
         .filter((session) => session.status !== "RESOLVED")
@@ -644,14 +639,15 @@ export async function installAcademicMock(
         ),
       );
     }
-    const reviewMatch = path.match(/^\/sessions\/(\d+)$/);
+    const reviewMatch = path.match(/^\/lecturer\/sessions\/(\d+)$/);
     if (reviewMatch) {
       if (role !== "LECTURER") return deny(route);
       const session = state.sessions.get(Number(reviewMatch[1]));
       if (!session) return deny(route, 404);
-      session.status = "REVIEWING";
+      if (session.status === "PENDING") session.status = "REVIEWING";
       state.reviewOpens++;
       return reply({
+        session_status: session.status,
         items: session.questions.map((question) => ({
           question_id: question.question_id,
           content: question.content,
@@ -667,12 +663,12 @@ export async function installAcademicMock(
             similar_question_id: 501,
             similarity_score: 0.92,
             tier: "TRIGRAM",
-            matched_snipet: "Bộ lập lịch CPU",
+            matched_snippet: "Bộ lập lịch CPU",
           },
         ],
       });
     }
-    if (path === "/sessions/approve" || path === "/sessions/reject") {
+    if (path === "/lecturer/sessions/approve" || path === "/lecturer/sessions/reject") {
       if (role !== "LECTURER") return deny(route);
       const payload = body();
       for (const id of payload.question_ids) {
@@ -680,14 +676,13 @@ export async function installAcademicMock(
         if (question)
           question.status = path.endsWith("/approve") ? "APPROVED" : "REJECTED";
       }
-      updateResolved();
       return reply(
         path.endsWith("/approve")
           ? { points_earned: payload.question_ids.length * 10 }
           : null,
       );
     }
-    const complete = path.match(/^\/sessions\/(\d+)\/complete-review$/);
+    const complete = path.match(/^\/lecturer\/sessions\/(\d+)\/complete-review$/);
     if (complete) {
       if (role !== "LECTURER") return deny(route);
       const session = state.sessions.get(Number(complete[1]));
@@ -698,7 +693,7 @@ export async function installAcademicMock(
       session.status = "RESOLVED";
       return reply(null);
     }
-    const questionEdit = path.match(/^\/questions\/(\d+)$/);
+    const questionEdit = path.match(/^\/lecturer\/questions\/(\d+)$/);
     if (questionEdit && method === "PUT") {
       if (role !== "LECTURER") return deny(route);
       const question = questionById(Number(questionEdit[1]));
@@ -710,7 +705,6 @@ export async function installAcademicMock(
         explanation: payload.explanation,
       });
       if (payload.auto_approve) question.status = "APPROVED";
-      updateResolved();
       return reply({
         question_id: question.question_id,
         status: question.status,
@@ -730,7 +724,9 @@ export async function installAcademicMock(
             },
           ])
         : deny(route);
-    if (path === "/exams/my-exams")
+    if (path === "/lecturer/exams/question-bank/10/summary")
+      return role === "LECTURER" ? reply({ total_questions: 20, topics: [{ topic_id: 11, topic_name: "Tiến trình", total_questions: 20 }] }) : deny(route);
+    if (path === "/lecturer/exams/my-exams")
       return role === "LECTURER"
         ? reply({
             items: [...state.exams.values()].map((exam) => ({
@@ -743,7 +739,7 @@ export async function installAcademicMock(
             pagination: { has_next: false },
           })
         : deny(route);
-    if (path === "/exams/generate") {
+    if (path === "/lecturer/exams/generate") {
       if (role !== "LECTURER") return deny(route);
       const payload = body();
       const id = 900;
@@ -774,7 +770,7 @@ export async function installAcademicMock(
       state.exams.set(id, exam);
       return reply(exam);
     }
-    const examMatch = path.match(/^\/exams\/(\d+)(\/export)?$/);
+    const examMatch = path.match(/^\/lecturer\/exams\/(\d+)(\/export)?$/);
     if (path === "/lecturer/questions/export" || examMatch?.[2] === "/export")
       return role === "LECTURER"
         ? reply({

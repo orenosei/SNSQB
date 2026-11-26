@@ -39,6 +39,9 @@ export interface SavedSearches {
 export async function getSavedSearches() {
   return unwrap(await api.get<ApiEnvelope<SavedSearches>>("/search/saved"));
 }
+export async function saveSearch(query: string) {
+  return unwrap(await api.post<ApiEnvelope<unknown>>("/search/saved", { query }));
+}
 export async function deleteSavedSearch(id: number) {
   return unwrap(await api.delete<ApiEnvelope<unknown>>(`/search/saved/${id}`));
 }

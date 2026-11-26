@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import { ErrorNotice, Loading } from "../../components/Feedback";
 import { LoadMore, QueryError } from "../../components/SocialFeedback";
-import { errorMessage } from "../../lib/api";
-import { formatTime } from "../../lib/cursor";
+import { api, type ApiEnvelope, errorMessage, unwrap } from "../../lib/api";
+import { formatTime, validId } from "../../lib/cursor";
+import { useProfile } from "../profile/api";
+import { QuestionReport } from "./QuestionActions";
 import { rateQuestion, useQuestionStats, useRatings } from "./api";
 
 export function QuestionInsights({
@@ -20,6 +22,32 @@ export function QuestionInsights({
   const [comment, setComment] = useState("");
   const [isError, setIsError] = useState(false);
   const client = useQueryClient();
+  const reviewer = useProfile().data?.role === "LECTURER";
+  const [reviewed, setReviewed] = useState<number[]>([]);
+  const reviewError = useMutation({
+    mutationFn: async ({
+      userId,
+      confirmed,
+    }: {
+      userId: number;
+      confirmed: boolean;
+    }) =>
+      unwrap(
+        await api.post<ApiEnvelope<unknown>>(
+          `/questions/${questionId}/ratings/${userId}/review-error`,
+          { is_comfirmed: confirmed },
+        ),
+      ),
+    onSuccess: async (_data, { userId }) => {
+      setReviewed((ids) => [...ids, userId]);
+      await Promise.all([
+        client.invalidateQueries({
+          queryKey: ["academic", "ratings", questionId],
+        }),
+        client.invalidateQueries({ queryKey: ["profile", "me"] }),
+      ]);
+    },
+  });
   const mutation = useMutation({
     mutationFn: () =>
       rateQuestion(questionId, {
@@ -52,6 +80,7 @@ export function QuestionInsights({
   return (
     <section className="question-insights">
       <h3>Góc nhìn từ cộng đồng</h3>
+      {canRate && <QuestionReport questionId={questionId} />}
       {stats.isPending ? (
         <Loading label="Đang tải thống kê…" />
       ) : stats.error ? (
@@ -148,8 +177,45 @@ export function QuestionInsights({
               </strong>
               <p>{item.comment}</p>
               <time>{formatTime(item.created_at)}</time>
+              {reviewer &&
+                item.is_error &&
+                validId(item.user_id) &&
+                !reviewed.includes(item.user_id) && (
+                  <div className="invite-actions">
+                    <button
+                      className="button button-secondary"
+                      disabled={reviewError.isPending}
+                      onClick={() =>
+                        reviewError.mutate({
+                          userId: item.user_id!,
+                          confirmed: true,
+                        })
+                      }
+                    >
+                      Xác nhận có lỗi
+                    </button>
+                    <button
+                      className="button button-secondary"
+                      disabled={reviewError.isPending}
+                      onClick={() =>
+                        reviewError.mutate({
+                          userId: item.user_id!,
+                          confirmed: false,
+                        })
+                      }
+                    >
+                      Bác báo lỗi
+                    </button>
+                  </div>
+                )}
             </div>
           ))}
+        {reviewError.isError && (
+          <ErrorNotice message={errorMessage(reviewError.error)} />
+        )}
+        {reviewError.isSuccess && (
+          <p role="status">Đã ghi nhận kết quả xem xét báo lỗi.</p>
+        )}
         {ratings.isError && (
           <QueryError
             error={ratings.error}

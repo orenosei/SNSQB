@@ -34,3 +34,7 @@ npm run test:api     # Chạy kiểm thử kết nối API backend thật
 - `src/features/`: Các module tính năng (auth, profile, social posts, academic, chat, course-classes, devices, notifications,...).
 - `src/lib/`: Khởi tạo Axios client, xử lý token và API boundary.
 - `src/tokens.css` & `src/workspace.css`: Design tokens và layout workspace.
+
+## Web Push
+
+Điền cấu hình ứng dụng Firebase Web của SQB và khóa VAPID công khai theo `.env.example`, sau đó build lại. Trên origin HTTPS, mở **Cài đặt thông báo** và chọn **Đăng ký thiết bị nhận thông báo**. Frontend nhận Firebase Installation ID từ Firebase Messaging rồi gửi ID tới API thiết bị của phiên hiện tại. [Thiết lập Firebase Cloud Messaging cho web](https://firebase.google.com/docs/cloud-messaging/web/get-started)

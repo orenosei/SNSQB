@@ -17,7 +17,7 @@ for (const role of ["STUDENT", "LECTURER"] as const) {
       "/practice-catalog",
       "/videos",
       ...(role === "LECTURER"
-        ? ["/lecturer/reviews", "/lecturer/exams", "/lecturer/course-classes"]
+        ? ["/lecturer/reviews", "/lecturer/exams", "/lecturer/topics", "/lecturer/course-classes"]
         : []),
       "/me",
       "/notifications",

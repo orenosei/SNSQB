@@ -15,6 +15,7 @@ import {
   usePeople,
   acceptFriendRequest,
   declineFriendRequest,
+  withdrawFriendRequest,
   unfriend,
   unblock,
   refreshPeople,
@@ -43,11 +44,12 @@ function FriendRequestCard({
   const [confirm, setConfirm] = useState(false);
   const mutation = useMutation({
     mutationFn: async (
-      action: "accept" | "decline" | "unfriend" | "unblock",
+      action: "accept" | "decline" | "withdraw" | "unfriend" | "unblock",
     ) => {
       const actions = {
         accept: acceptFriendRequest,
         decline: declineFriendRequest,
+        withdraw: withdrawFriendRequest,
         unfriend,
         unblock,
       };
@@ -93,6 +95,11 @@ function FriendRequestCard({
                 ? "Lời mời đã bị từ chối"
                 : "Chưa rõ trạng thái"}
         </span>
+      )}
+      {kind === "sent" && entry.status === "PENDING" && (
+        <button className="button button-secondary" disabled={disabled} onClick={() => mutation.mutate("withdraw")}>
+          Rút lời mời
+        </button>
       )}
       {kind === "friends" && (
         <button

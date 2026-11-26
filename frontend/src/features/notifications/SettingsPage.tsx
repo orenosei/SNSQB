@@ -5,6 +5,8 @@ import { api, errorMessage, type ApiEnvelope, unwrap } from "../../lib/api";
 import { ErrorNotice, Loading } from "../../components/Feedback";
 import { QueryError } from "../../components/SocialFeedback";
 
+import { WebPushSettings } from "./WebPushSettings";
+
 interface PushSettings {
   push_enabled?: boolean;
   sound_enabled?: boolean;
@@ -167,6 +169,7 @@ function PushSettingsForm({ initial }: { initial: PushSettings }) {
           </button>
         </fieldset>
       </form>
+      <WebPushSettings />
     </div>
   );
 }
